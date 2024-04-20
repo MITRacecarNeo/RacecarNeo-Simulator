@@ -5,10 +5,10 @@ _The MIT Beaver Works RACECAR simulation environment_
 You can learn more about RacecarSim and download the current version [here](https://mitll-racecar-mn.readthedocs.io/en/latest/simulation.html).
 
 ## Changelog
-
-**v2.0.0**: Update from MN -> Neo Curriculum, Neo Labs updated, course organization implemented
-**v2.0.1**: Minor bug fixes (IMU, Physics)
-**v2.1.0**: Mini Grand Prix 2024 Spring: Speical Course Update
+ 
+**v2.0.0**: Update from MN -> Neo Curriculum, Neo Labs updated, course organization implemented \\
+**v2.0.1**: Minor bug fixes (IMU, Physics) \\
+**v2.1.0**: Mini Grand Prix 2024 Spring: Speical Course Update \\
 
 ## Getting Started
 
