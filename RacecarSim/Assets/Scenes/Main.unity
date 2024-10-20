@@ -16832,7 +16832,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: RACECAR Neo Simulation
+  m_Text: RACECAR Neo Simulator
 --- !u!222 &1674836688
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -20666,7 +20666,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Release v2.0.0
+  m_Text: Release v2.3.0
 --- !u!222 &2030344261
 CanvasRenderer:
   m_ObjectHideFlags: 0
