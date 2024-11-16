@@ -6,7 +6,7 @@ You can learn more about RacecarSim and download the current version [here](http
 
 ## Changelog
 
-- **v2.4.0**: Added Mini Grand Prix Fall 2024
+- **v2.4.0**: Added Mini Grand Prix Fall 2024, minor visual changes
 - **v2.3.0**: Updated Neo Labs (Lab C - Lab I) with autograder
 - **v2.2.0**: Grand Prix 2024 from BWSI RACECAR Summer 2024
 - **v2.1.0**: Mini Grand Prix Spring 2024: Speical Course Update
