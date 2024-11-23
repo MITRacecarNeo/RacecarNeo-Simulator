@@ -6629,7 +6629,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdc11c74339a8fd448d9a348fd981141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  points: 2
+  points: 5
   maxStopSpeed: 0.02
 --- !u!1 &1057121523
 GameObject:

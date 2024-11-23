@@ -318,7 +318,7 @@ EditorBuildSettings:
     path: Assets/Scenes/GrandPrixFiles/GP2022_Practice/Phase Rush.unity
     guid: 40dbd3f7f32ac844895ea8fb80c4ec07
   - enabled: 1
-    path: Assets/Scenes/GrandPrixFiles/MGP2023.unity
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2023Fa.unity
     guid: 3b96d88ccab62ab48b1d4a5f9aeb78d2
   - enabled: 1
     path: Assets/Scenes/Neo_Labs/Prereq_Specific/old_lab1.unity
@@ -345,7 +345,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Community/Final_TimeTrial2024.unity
     guid: 2b7a8cbeab3629e47a89a5368d87be76
   - enabled: 1
-    path: Assets/Scenes/GrandPrixFiles/MGP2024Sp.unity
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2024Sp.unity
     guid: ba44cf7fae736bf4d964d0bb3829b098
   - enabled: 1
     path: Assets/Scenes/GrandPrixFiles/GrandPrix2024.unity
@@ -383,4 +383,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Neo_Labs/Autograder/LabEAutograder/LabE_7_thecity.unity
     guid: 81a4c5fa7317b5d4ca1fa302f641cded
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2024Fa.unity
+    guid: 9f0a89cdd71942b44bd224ed7d56a27a
   m_configObjects: {}

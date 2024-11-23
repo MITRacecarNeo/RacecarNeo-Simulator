@@ -208,26 +208,29 @@ public class LevelCollection
                         {
                             Title = "Gentle Turn",
                             Description = "Follow the red line for a 30 degree turn.",
-                            MaxPoints = 1
+                            MaxPoints = 1,
+                            TimeLimit = 10
                         },
                         new AutograderLevelInfo()
                         {
                             Title = "Sharp Turn",
                             Description = "Follow the blue line for a 90 degree turn.",
-                            MaxPoints = 1
+                            MaxPoints = 1,
+                            TimeLimit = 10
                         },
                         new AutograderLevelInfo()
                         {
                             Title = "Curved path",
                             Description = "Follow the green line for a winding path.",
                             MaxPoints = 3,
-                            TimeLimit = 4
+                            TimeLimit = 10
                         },
                         new AutograderLevelInfo()
                         {
                             Title = "Color Priority 1",
                             Description = "Follow the color priority red > green > blue.",
-                            MaxPoints = 3
+                            MaxPoints = 3,
+                            TimeLimit = 10
                         },
                         new AutograderLevelInfo()
                         {
@@ -343,7 +346,7 @@ public class LevelCollection
                         {
                             Title = "Full Course",
                             Description = "Complete the slalom course.",
-                            MaxPoints = 5,
+                            MaxPoints = 10,
                             TimeLimit = 90,
                             TimeBonuses = new Vector2[]{ new Vector2(20, 1), new Vector2(30, 0.5f), new Vector2(45, 0), new Vector2(60, -1), new Vector2(float.PositiveInfinity, -2) }
                         }
@@ -995,6 +998,14 @@ public class LevelCollection
             ShortName = "Final",
             Levels = new LevelInfo[]
             {
+                new LevelInfo()
+                {
+                    DisplayName = "Mini Grand Prix: Fall 2024",
+                    BuildIndex = 126,
+                    IsRaceable = true,
+                    NumCheckpoints = 1,
+                    MaxCars = 2,
+                },
                 new LevelInfo()
                 {
                     DisplayName = "Grand Prix 2024",

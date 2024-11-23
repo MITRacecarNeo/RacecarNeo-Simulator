@@ -204,7 +204,12 @@ public class AutograderSummary : MonoBehaviour
     /// <returns>An hex ciphertext which encodes the user's score for the level.</returns>
     private string GenerateScoreCode(LevelInfo levelInfo, float score, string username)
     {
-        string scoreCode = $"{levelInfo.AutograderLevelCode}|{score}|{levelInfo.AutograderMaxScore}|{username}";
-        return Utilities.Encrypt(scoreCode);
+        if (username == "Default"){
+            return "0000000000000000"; // Null code to prevent users from using default username in Edly autograder
+        } else {
+            string scoreCode = $"{levelInfo.AutograderLevelCode}|{score}|{levelInfo.AutograderMaxScore}|{username}";
+            return Utilities.Encrypt(scoreCode);
+        }
+        
     }
 }
