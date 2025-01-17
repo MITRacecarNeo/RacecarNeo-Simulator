@@ -265,6 +265,20 @@ public class LevelManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Reduce the speed of the car to half.
+    /// </summary>
+    /// <param name="carIndex"> The index of the car to slow down.</param>
+    public static void SlowDown(int carIndex, float maxSpeed)
+    {
+        // Slow the speed of the car if its above the specified limit
+        Rigidbody carRigidBody = LevelManager.instance.players[carIndex].GetComponent<Rigidbody>();
+        if (carRigidBody.velocity.magnitude > maxSpeed) 
+        {
+            carRigidBody.velocity = carRigidBody.velocity * 0.5f;
+        }
+    }
+
+    /// <summary>
     /// Notifies the LevelManager that number of connected Python script(s) have changed.
     /// </summary>
     public static void UpdateConnectedPrograms()

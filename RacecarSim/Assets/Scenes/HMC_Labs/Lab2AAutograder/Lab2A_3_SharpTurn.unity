@@ -205,7 +205,7 @@ PrefabInstance:
     - target: {fileID: 7450428583852825321, guid: abf950ed962f79745adce9c39046331a,
         type: 3}
       propertyPath: points
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7450428583852825327, guid: abf950ed962f79745adce9c39046331a,
         type: 3}

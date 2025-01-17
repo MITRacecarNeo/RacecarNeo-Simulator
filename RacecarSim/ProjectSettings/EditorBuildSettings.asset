@@ -342,7 +342,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Neo_Labs/Lab_I.unity
     guid: 4b4a65a4a39852b40adf5becf42e478e
   - enabled: 1
-    path: Assets/Scenes/Community/Final_TimeTrial2024.unity
+    path: Assets/Scenes/Community/Greece_Final_TimeTrial2024.unity
     guid: 2b7a8cbeab3629e47a89a5368d87be76
   - enabled: 1
     path: Assets/Scenes/GrandPrixFiles/MGP/MGP2024Sp.unity
@@ -386,4 +386,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GrandPrixFiles/MGP/MGP2024Fa.unity
     guid: 9f0a89cdd71942b44bd224ed7d56a27a
+  - enabled: 1
+    path: Assets/Scenes/Community/Greece_Final_TimeTrial2025.unity
+    guid: b7520c8a65434dc4ba76acaead5d2956
+  - enabled: 1
+    path: Assets/Scenes/Community/Greece_FinalAutograder/FinalAutograder_TimeTrial2025.unity
+    guid: d11ca6cb9ef0ab84a949d2a082f6771c
+  - enabled: 1
+    path: Assets/Scenes/Community/Greece_Final_GrandPrix2025.unity
+    guid: fdc0b8e9852aaac4e885990d6acd583e
   m_configObjects: {}

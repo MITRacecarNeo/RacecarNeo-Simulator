@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 /// <summary>
 /// Fails the player if the pass on the incorrect side of a slalom cone.
@@ -23,6 +24,12 @@ public class SlalomCone : MonoBehaviour
     /// </summary>
     [SerializeField]
     private float timePenalty = 5;
+
+    /// <summary>
+    /// The max speed the car can have before getting penalized if they pass the cone on the incorrect side.
+    /// </summary>
+    [SerializeField]
+    private float maxSpeed = 8;
     #endregion
 
     /// <summary>
@@ -32,7 +39,8 @@ public class SlalomCone : MonoBehaviour
     {
         Disqualify,
         Reset,
-        TimePenalty
+        TimePenalty,
+        SlowDown
     }
 
     /// <summary>
@@ -62,6 +70,9 @@ public class SlalomCone : MonoBehaviour
                 case SlalomConePenalty.TimePenalty:
                     LevelManager.AddTimePenalty(this.timePenalty);
                     Destroy(this.gameObject);
+                    break;
+                case SlalomConePenalty.SlowDown:
+                    LevelManager.SlowDown(player.Index, maxSpeed);
                     break;
             }
         }
