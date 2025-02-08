@@ -5,6 +5,7 @@ _The MIT Beaver Works RACECAR simulation environment_
 You can learn more about RacecarSim and download the current version [here](https://sites.mit.edu/mit-racecar/resources/).
 
 ## Changelog
+- **v2.5.1**: Fixed incorrect offset in Lab D autograder (Driving in Mazes) [2/7/2025]
 - **v2.5.0**: Added Community Levels from Greece - Mathisi RACECAR. Time Trial 2025 & Grand Prix 2025 added. [1/17/2025]
 - **v2.4.2**: Fixed incorrect scoring in autograder for Labs E-I, updated app logo [11/23/2024]
 - **v2.4.1**: Fixed minor bug with Lab E lvl.5 autograder which had incorrect startpos [11/16/2024]
