@@ -9351,7 +9351,7 @@ PrefabInstance:
     - target: {fileID: 4799043134360992550, guid: 001a61d17ded0ce42957c20674cb5a39,
         type: 3}
       propertyPath: twoCarSpawnOffsets.Array.data[1].x
-      value: -20
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 4799043134360992550, guid: 001a61d17ded0ce42957c20674cb5a39,
         type: 3}
