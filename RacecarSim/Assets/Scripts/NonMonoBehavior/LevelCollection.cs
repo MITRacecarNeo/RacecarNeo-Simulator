@@ -1000,6 +1000,14 @@ public class LevelCollection
             {
                 new LevelInfo()
                 {
+                    DisplayName = "Mini Grand Prix: Spring 2025",
+                    BuildIndex = 131,
+                    IsRaceable = true,
+                    NumCheckpoints = 4,
+                    MaxCars = 2,
+                },
+                new LevelInfo()
+                {
                     DisplayName = "Micro Grand Prix 2025",
                     BuildIndex = 130,
                     IsRaceable = true,
