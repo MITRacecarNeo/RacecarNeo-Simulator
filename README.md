@@ -1,8 +1,8 @@
-# RacecarNeo-Simulator WITH FIXED AR MARKERS FOR GP2020 and TT2020
+# RacecarNeo-Simulator WITH FIXED AR TAGS FOR GP2020 and TT2020
 
 ###! This is a fork of the [MITRacecarNeo RacecarNeo-Simulator](https://github.com/MITRacecarNeo/RacecarNeo-Simulator) !###
 
-Thanks to the easy to change Unity Project uploaded in the [repo](https://github.com/MITRacecarNeo/RacecarNeo-Simulator) I have changed the markers to work correctly with ID and Orientation in the GrandPrix 2020 and in the TimeTrial 2020 if you have any issues please inform me.
+Thanks to the easy to change Unity Project uploaded in the [repo](https://github.com/MITRacecarNeo/RacecarNeo-Simulator) I have changed the ar tags to work correctly with ID and Orientation in the GrandPrix 2020 and in the TimeTrial 2020 if you have any issues please inform me.
 
 Releases:
   - [WINDOWS](https://github.com/JohnThyWizard/RacecarNeo-Simulator/releases/download/v2.6.0AR/WINDOWS.zip)
