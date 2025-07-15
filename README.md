@@ -14,9 +14,9 @@ Few things to take in mind if you want to build this instead of using the Releas
 - Use Unity version 2019.4.40f1 (You will get prompted to use this specific version if you try and open the project from Unity Hub)
 - If you want to build press File --> Build Settings then select your operating system and press Build or Build and run and select an empyu folder
 - Or alternatively you can just download the fixed files that are located in `Assets/Scenes/GrandPrixFiles/` which are `GrandPrix.unity` and `TimeTrial.unity` and paste them in the original repo and then build it<br/><br/>
-#################################################################################################
+#############################################################################
 This is the original README from the [repo](https://github.com/MITRacecarNeo/RacecarNeo-Simulator) is the following, and have a great Day
-#################################################################################################
+#############################################################################
 
 _The MIT Beaver Works RACECAR simulation environment_
 
