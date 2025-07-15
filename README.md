@@ -9,6 +9,8 @@ Releases:
   - [LINUX](https://github.com/JohnThyWizard/RacecarNeo-Simulator/releases/download/v2.6.0AR/LINUX.zip)
   - [MACOS](https://github.com/JohnThyWizard/RacecarNeo-Simulator/releases/download/v2.6.0AR/MACOS.app.zip)
 
+I suggest that you put them in a different folder than the racecar default to avoid conflicts<br/><br/>
+
 Few things to take in mind if you want to build this instead of using the Releases
 - Use Unity version 2019.4.40f1 (You will get prompted to use this specific version if you try and open the project from Unity Hub)
 - If you want to build press File --> Build Settings then select your operating system and press Build or Build and run and select an empyu folder
