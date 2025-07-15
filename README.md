@@ -3,10 +3,10 @@
 ###! This is a fork of the [MITRacecarNeo RacecarNeo-Simulator](https://github.com/MITRacecarNeo/RacecarNeo-Simulator) !###
 [repo](https://github.com/MITRacecarNeo/RacecarNeo-Simulator)
 
-Thanks to the easy to change Unity Project uploaded in the [repo](https://github.com/MITRacecarNeo/RacecarNeo-Simulator) I have changed the markers to work correctly with ID and Orientation in the GrandPrix 2020 and in the TimeTrial 2020 if you have any issues please inform me.
+Thanks to the easy to change Unity Project uploaded in the [repo](https://github.com/MITRacecarNeo/RacecarNeo-Simulator) I have changed the markers to work correctly with ID and Orientation in the GrandPrix 2020 and in the TimeTrial 2020 if you have any issues please inform me. <br/><br/>
+#################################################################################################
 This is the original README from the [repo](https://github.com/MITRacecarNeo/RacecarNeo-Simulator) is the following, and have a great Day
-
-######################################
+#################################################################################################
 
 _The MIT Beaver Works RACECAR simulation environment_
 
