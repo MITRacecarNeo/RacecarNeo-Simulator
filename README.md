@@ -1,4 +1,4 @@
-# RacecarNeo-Simulator
+# RacecarNeo-Simulator NON-WORKING FOR BOW AWAIT UPDATE
 
 _The MIT Beaver Works RACECAR simulation environment_
 
