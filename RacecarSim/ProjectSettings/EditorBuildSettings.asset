@@ -401,4 +401,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GrandPrixFiles/MGP/MGP2025Sp.unity
     guid: 12e1aa2fce7b3204a906be4151acc65e
+  - enabled: 1
+    path: Assets/Scenes/Neo_Labs/LongHallway.unity
+    guid: ac7075701413e63429645281d76ebf7e
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/GrandPrix2025.unity
+    guid: 93884f452720c7443a290d3061dec941
   m_configObjects: {}

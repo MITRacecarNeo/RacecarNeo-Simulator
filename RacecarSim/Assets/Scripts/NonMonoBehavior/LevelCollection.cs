@@ -81,6 +81,11 @@ public class LevelCollection
                     BuildIndex = 15,
                     HelpMessage = "Click a block to select it, then: left-click it to change it's tag, right-click it to change it's color, or scroll to rotate"
                 },
+                new LevelInfo()
+                {
+                    DisplayName = "Long Hallway Sandbox",
+                    BuildIndex = 132,
+                }
             }
         },
 
@@ -998,6 +1003,26 @@ public class LevelCollection
             ShortName = "Final",
             Levels = new LevelInfo[]
             {
+                new LevelInfo()
+                {
+                    DisplayName = "Grand Prix 2025",
+                    BuildIndex = 133,
+                    IsRaceable = true,
+                    NumCheckpoints = 4,
+                    MaxCars = 4,
+                    AutograderBuildIndex = 133,
+                    AutograderLevelCode = "gp2025",
+                    AutograderLevels = new AutograderLevelInfo[]
+                    {
+                        new AutograderLevelInfo()
+                        {
+                            Title = "Grand Prix 2025 Autograder",
+                            Description = "Navigate through the course.",
+                            MaxPoints = 25,
+                            TimeLimit = 200
+                        }
+                    }
+                },
                 new LevelInfo()
                 {
                     DisplayName = "Mini Grand Prix: Spring 2025",
