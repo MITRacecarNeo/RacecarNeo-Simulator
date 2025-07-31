@@ -5,6 +5,7 @@ _The MIT Beaver Works RACECAR simulation environment_
 You can learn more about RacecarSim and download the current version [here](https://sites.mit.edu/mit-racecar/resources/).
 
 ## Changelog
+- **v2.7.0**: Grand Prix 2025 from BWSI RACECAR Summer 2025 [7/31/2025]
 - **v2.6.1**: Added Long Hallway Sandbox Map [7/7/2025]
 - **v2.6.0**: Added Mini Grand Prix Spring 2025 Final Challenge [5/17/2025]
 - **v2.5.2**: Added Micro Grand Prix 2025 Final Challenge, fixed bugs in Lab E - Stoplight Challenge [3/24/2025]
