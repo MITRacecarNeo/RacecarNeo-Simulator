@@ -1005,6 +1005,28 @@ public class LevelCollection
             {
                 new LevelInfo()
                 {
+                    DisplayName = "Mini Grand Prix: Fall 2025",
+                    BuildIndex = 134,
+                    HasRandomMaps = true,
+                    RandomSceneBuildIndices = new int[] {135, 136, 137, 138, 139, 140},
+                    IsRaceable = true,
+                    NumCheckpoints = 0,
+                    MaxCars = 2,
+                    AutograderBuildIndex = 135,
+                    AutograderLevelCode = "mgp2025fa",
+                    AutograderLevels = new AutograderLevelInfo[]
+                    {
+                        new AutograderLevelInfo()
+                        {
+                            Title = "Mini Grand Prix Fall 2025 Autograder",
+                            Description = "Navigate through === THE METROPOLIS ===",
+                            MaxPoints = 20,
+                            TimeLimit = 120
+                        }
+                    }
+                },
+                new LevelInfo()
+                {
                     DisplayName = "Grand Prix 2025",
                     BuildIndex = 133,
                     IsRaceable = true,

@@ -60,7 +60,7 @@ EditorBuildSettings:
     path: Assets/Scenes/GrandPrixFiles/TimeTrial.unity
     guid: caa585d600c7e194a934b0cf0542e5fd
   - enabled: 1
-    path: Assets/Scenes/GrandPrixFiles/GrandPrix.unity
+    path: Assets/Scenes/GrandPrixFiles/GrandPrix2020.unity
     guid: d66aacdc67c45f94e91e170b7c9ae645
   - enabled: 1
     path: Assets/Scenes/HMC_Labs/Bonus1A.unity
@@ -407,4 +407,25 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GrandPrixFiles/GrandPrix2025.unity
     guid: 93884f452720c7443a290d3061dec941
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2025Fa.unity
+    guid: 890ab15c497481843b6ac998678e6569
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2025Fa_Variants/Metropolis1.unity
+    guid: 37e85383846a76d4b8bb63b4efa15b4b
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2025Fa_Variants/Metropolis2.unity
+    guid: c06b748a7da6df04fb3b485b8026e8bb
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2025Fa_Variants/Metropolis3.unity
+    guid: f209841045436904393be8edae037ae6
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2025Fa_Variants/Metropolis4.unity
+    guid: e1c02fb87fb8fa540b6db266fbea1bc2
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2025Fa_Variants/Metropolis5.unity
+    guid: a48c37e7008f2c34bbc5f20dcfe67504
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/MGP/MGP2025Fa_Variants/Metropolis6.unity
+    guid: 6a2decc081eea1b468a7b4901f584c25
   m_configObjects: {}

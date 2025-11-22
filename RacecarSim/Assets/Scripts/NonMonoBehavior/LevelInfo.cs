@@ -24,6 +24,17 @@ public class LevelInfo
     public int BuildIndex;
 
     /// <summary>
+    /// If true, this level will choose one of several scene variants at random
+    /// instead of always using BuildIndex (in race and autograder modes)
+    /// </summary>
+    public bool HasRandomMaps = false;
+
+    /// <summary>
+    /// The information about each scene that the level could choose.
+    /// </summary>
+    public int[] RandomSceneBuildIndices;
+
+    /// <summary>
     /// The index of the first corresponding autograder level in the build settings.
     /// </summary>
     public int AutograderBuildIndex;

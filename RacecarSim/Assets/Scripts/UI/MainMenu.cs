@@ -76,7 +76,20 @@ public class MainMenu : MonoBehaviour
         LevelManager.LevelManagerMode = (LevelManagerMode)this.dropdowns[(int)Dropdowns.Mode].value;
 
         LevelManager.LevelInfo = this.SelectedLevel;
-        int buildIndex = LevelManager.LevelManagerMode == LevelManagerMode.Autograder ? this.SelectedLevel.AutograderBuildIndex : this.SelectedLevel.BuildIndex;
+        int buildIndex = -1; // set the build index to a default null value
+
+        // If random maps is selected as a level option (HasRandomMaps), then set the build index to one of the maps specified in RandomSceneBuildIndices
+        // If random maps is not selected, OR if the current level manager mode is Exploration, use the default build index option
+        if (!this.SelectedLevel.HasRandomMaps || LevelManager.LevelManagerMode == LevelManagerMode.Exploration)
+        {
+            buildIndex = LevelManager.LevelManagerMode == LevelManagerMode.Autograder ? this.SelectedLevel.AutograderBuildIndex : this.SelectedLevel.BuildIndex;
+        }
+        else
+        {
+            int[] candidates = this.SelectedLevel.RandomSceneBuildIndices;
+            int rand = UnityEngine.Random.Range(0, candidates.Length);
+            buildIndex = candidates[rand]; // choose a random level to run for autograder or race mode
+        }
 
         // If this is the first time the user has selected an autograder without setting their username, show dialog reminding them to set their username
         if (LevelManager.LevelManagerMode == LevelManagerMode.Autograder &&
