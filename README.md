@@ -4,7 +4,31 @@ _The MIT Beaver Works RACECAR simulation environment_
 
 You can learn more about RacecarSim and download the current version [here](https://sites.mit.edu/mit-racecar/resources/).
 
+> **Note**: As of update v2.8.0, the Racecar Neo Simulator is built using Unity `v2022.3.62f2`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
+
+## Table of Contents
+- [Changelog](#changelog)
+    - [v2.8.0](#v280-update---mini-grand-prix-fall-2025-11222025)
+    - [pre-v2.8.0](#pre-2870-updates)
+- [Getting Started](#getting-started)
+- [Repository Contents](#repository-contents)
+    - [Racecar Modules](#racecar-modules)
+- [Python Interface](#python-interface)
+    - [Synchronous Communication Protocol](#synchronous-communication-protocol-used-for-python-scripts)
+    - [Asynchronous Communication Protocol](#asynchronous-communication-protocol-used-for-jupyter-notebook)
+    - [Send Fragmented](#send-fragmented)
+- [Modeling Error](#modeling-error)
+
 ## Changelog
+
+### v2.8.0 Update - Mini Grand Prix Fall 2025 [11/22/2025]
+- Migrated entire project to Unity v2022 and updated lighting objects (sun) for older maps (pre-2019)
+- Added Mini Grand Prix Fall 2025 Final Challenge - The Metropolis
+- Added "random scenes" feature to `LevelInfo()` to allow level to select a random scene from the provided build array index for race and autograder modes
+- Fixed Grand Prix 2020 and Grand Prix 2021 maps having all AR markers be ID 32. Now the AR marker ID for each obstacle will advance by 1 (starting from 0)
+
+
+### Pre-2.8.0 Updates
 - **v2.7.0**: Grand Prix 2025 from BWSI RACECAR Summer 2025 [7/31/2025]
 - **v2.6.1**: Added Long Hallway Sandbox Map [7/7/2025]
 - **v2.6.0**: Added Mini Grand Prix Spring 2025 Final Challenge [5/17/2025]
