@@ -21,6 +21,9 @@ You can learn more about RacecarSim and download the current version [here](http
 
 ## Changelog
 
+### v2.8.1 Update - Checkpoint Bugfix [12/7/2025]
+- Fixed an issue where the resetCar function did not work properly upon migration from Unity 2019 to 2022
+
 ### v2.8.0 Update - Mini Grand Prix Fall 2025 [11/22/2025]
 - Migrated entire project to Unity v2022 and updated lighting objects (sun) for older maps (pre-2019)
 - Added Mini Grand Prix Fall 2025 Final Challenge - The Metropolis
