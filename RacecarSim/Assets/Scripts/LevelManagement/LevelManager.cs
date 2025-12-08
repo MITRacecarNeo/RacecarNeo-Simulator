@@ -253,15 +253,20 @@ public class LevelManager : MonoBehaviour
     /// <param name="carIndex">The index of the car to reset.</param>
     public static void ResetCar(int carIndex)
     {
-        // Relocate the car to its current reset point
         Transform resetLocation = LevelManager.instance.GetResetLocation(carIndex);
-        LevelManager.instance.players[carIndex].transform.position = resetLocation.position;
-        LevelManager.instance.players[carIndex].transform.rotation = resetLocation.rotation;
 
-        // Bring the car to a complete stop
+        // Stop physics first
         Rigidbody carRigidBody = LevelManager.instance.players[carIndex].GetComponent<Rigidbody>();
         carRigidBody.velocity = Vector3.zero;
         carRigidBody.angularVelocity = Vector3.zero;
+
+        // Use physics-aware movement methods
+        carRigidBody.MovePosition(resetLocation.position);
+        carRigidBody.MoveRotation(resetLocation.rotation);
+
+        // Backup direct transform setting
+        LevelManager.instance.players[carIndex].transform.position = resetLocation.position;
+        LevelManager.instance.players[carIndex].transform.rotation = resetLocation.rotation;
     }
 
     /// <summary>
