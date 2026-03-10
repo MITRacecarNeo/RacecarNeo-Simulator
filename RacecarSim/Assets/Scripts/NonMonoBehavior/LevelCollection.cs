@@ -1161,6 +1161,26 @@ public class LevelCollection
             {
                 new LevelInfo()
                 {
+                    DisplayName = "[Greece] Time Trial 2026",
+                    BuildIndex = 141,
+                    IsRaceable = true,
+                    NumCheckpoints = 3,
+                    MaxCars = 1,
+                    AutograderBuildIndex = 142,
+                    AutograderLevelCode = "final",
+                    AutograderLevels = new AutograderLevelInfo[]
+                    {
+                        new AutograderLevelInfo()
+                        {
+                            Title = "Time Trial 2026",
+                            Description = "Navigate through the course.",
+                            MaxPoints = 25,
+                            TimeLimit = 300,
+                            TimeBonuses = new Vector2[]{ new Vector2(85, 3), new Vector2(100, 2), new Vector2(130, 1), new Vector2(160, 0), new Vector2(190, -1), new Vector2(250, -3), new Vector2(float.PositiveInfinity, -5) }                        }
+                    }
+                },
+                new LevelInfo()
+                {
                     DisplayName = "[Greece] Time Trial 2025",
                     BuildIndex = 127,
                     IsRaceable = true,
