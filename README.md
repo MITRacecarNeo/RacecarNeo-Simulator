@@ -21,6 +21,9 @@ You can learn more about RacecarSim and download the current version [here](http
 
 ## Changelog
 
+### v2.8.2 Update - Greece Time Trial 2026 [3/9/2026]
+- Added time trial track under the "Community Levels" tab
+
 ### v2.8.1 Update - Checkpoint Bugfix [12/7/2025]
 - Fixed an issue where the resetCar function did not work properly upon migration from Unity 2019 to 2022
 
