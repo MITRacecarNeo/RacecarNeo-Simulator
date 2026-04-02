@@ -21,6 +21,9 @@ You can learn more about RacecarSim and download the current version [here](http
 
 ## Changelog
 
+### v2.8.3 Update - Micro Grand Prix 2026 [4/2/2026]
+- Added Micro Grand Prix 2026 map under "Final Challenge" - For BWSI Autonomous RACECAR Prerequisite Course 2026
+
 ### v2.8.2 Update - Greece Time Trial 2026 [3/9/2026]
 - Added time trial track under the "Community Levels" tab
 
