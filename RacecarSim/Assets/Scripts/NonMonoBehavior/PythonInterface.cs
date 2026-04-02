@@ -33,9 +33,11 @@ public class PythonInterface
     private const int unityPortAsync = 5064;
 
     /// <summary>
-    /// The IP address used for communication.
+    /// IPAddress.Any (0.0.0.0) accepts connections from any interface,
+    /// which is required for WSL 2 (NAT mode) where Python traffic arrives
+    /// on the virtual ethernet adapter rather than the loopback interface.
     /// </summary>
-    private static readonly IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
+    private static readonly IPAddress bindAddress = IPAddress.Any;
 
     /// <summary>
     /// The time (in ms) to wait for Python to respond.
@@ -66,7 +68,7 @@ public class PythonInterface
         this.pythonEndPoints = new List<IPEndPoint>();
 
         // Create a UDP client for handling sync calls
-        this.udpClient = new UdpClient(new IPEndPoint(PythonInterface.ipAddress, PythonInterface.unityPort));
+        this.udpClient = new UdpClient(new IPEndPoint(PythonInterface.bindAddress, PythonInterface.unityPort));
         this.udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         this.udpClient.Client.ReceiveTimeout = PythonInterface.timeoutTime;
 
@@ -194,11 +196,11 @@ public class PythonInterface
     /// <summary>
     /// Connect the sync client to a Python script.
     /// </summary>
-    /// <param name="pythonPort">The port used by the Python script.</param>
+    /// <param name="remoteEndPoint">The endpoint of the Python script (IP and port).</param>
     /// <returns>The index of the car with which the script is paired, or null if the script could not be paired.</returns>
-    private int? ConnectSyncClient(int pythonPort)
+    private int? ConnectSyncClient(IPEndPoint remoteEndPoint)
     {
-        IPEndPoint endPoint = new IPEndPoint(PythonInterface.ipAddress, pythonPort);
+        IPEndPoint endPoint = new IPEndPoint(remoteEndPoint.Address, remoteEndPoint.Port);
         int index = -1;
 
         // Replace the first null end point, if any exist
@@ -529,11 +531,11 @@ public class PythonInterface
     /// </summary>
     private void ProcessAsyncCalls()
     {
-        this.udpClientAsync = new UdpClient(new IPEndPoint(PythonInterface.ipAddress, PythonInterface.unityPortAsync));
+        this.udpClientAsync = new UdpClient(new IPEndPoint(PythonInterface.bindAddress, PythonInterface.unityPortAsync));
         this.udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         while (true)
         {
-            IPEndPoint receiveEndPoint = new IPEndPoint(PythonInterface.ipAddress, 0);
+            IPEndPoint receiveEndPoint = new IPEndPoint(PythonInterface.bindAddress, 0);
             byte[] data = this.udpClientAsync.Receive(ref receiveEndPoint);
             Header header = (Header)data[0];
 
@@ -546,7 +548,7 @@ public class PythonInterface
                     int pythonVersion = data.Length > 1 ? data[1] : 0;
                     if (PythonInterface.version == pythonVersion)
                     {
-                        int? index = this.ConnectSyncClient(receiveEndPoint.Port);
+                        int? index = this.ConnectSyncClient(receiveEndPoint);
                         if (index.HasValue)
                         {
                             sendData = new byte[] { (byte)Header.connect, (byte)index };

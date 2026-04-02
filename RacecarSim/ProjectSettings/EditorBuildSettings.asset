@@ -434,4 +434,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Community/Greece_FinalAutograder/FinalAutograder_TimeTrial2026.unity
     guid: 9e59eb860527c0143af2629acb41ca88
+  - enabled: 1
+    path: Assets/Scenes/GrandPrixFiles/uGP/uGP2026.unity
+    guid: ba90b1013983bdf4f902b64c8f049520
   m_configObjects: {}
