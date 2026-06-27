@@ -21,6 +21,9 @@ You can learn more about RacecarSim and download the current version [here](http
 
 ## Changelog
 
+### v2.8.4 Bugfix - Autograder [6/27/2026]
+- Resolves incompatible autograder versioning number between RACECAR Sim and Edx platform.
+
 ### v2.8.3 Update - Micro Grand Prix 2026 [4/2/2026]
 - Added Micro Grand Prix 2026 map under "Final Challenge" - For BWSI Autonomous RACECAR Prerequisite Course 2026
 
