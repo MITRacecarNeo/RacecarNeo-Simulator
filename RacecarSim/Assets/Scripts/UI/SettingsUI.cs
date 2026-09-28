@@ -12,9 +12,12 @@ public class SettingsUI : MonoBehaviour
     /// </summary>
     public void RestoreDefaultSetting()
     {
-        Settings.RestoreDefaults();
-        SavedDataManager.Data.ClearCustomization();
-        this.UpdateInputs();
+        // Only the inputs change; Save applies them and Cancel discards them
+        this.realismToggle.isOn = Settings.DefaultIsRealism;
+        this.hideCarsToggle.isOn = Settings.DefaultHideCarsInColorCamera;
+        this.depthResDropdown.value = (int)Settings.DefaultDepthRes;
+        this.username.text = Settings.DefaultUsername;
+        this.LoadColors(SavedData.Default.CarCustomizations);
     }
 
     /// <summary>
@@ -22,9 +25,9 @@ public class SettingsUI : MonoBehaviour
     /// </summary>
     public void SaveSettings()
     {
-        Settings.IsRealism = this.toggles[(int)Toggles.IsRealism].isOn;
-        Settings.HideCarsInColorCamera = this.toggles[(int)Toggles.HideCarsInColorCamera].isOn;
-        Settings.DepthRes = (Settings.DepthResolution)this.dropdowns[(int)Dropdowns.DepthRes].value;
+        Settings.IsRealism = this.realismToggle.isOn;
+        Settings.HideCarsInColorCamera = this.hideCarsToggle.isOn;
+        Settings.DepthRes = (Settings.DepthResolution)this.depthResDropdown.value;
         Settings.Username = this.username.text;
         
         this.ApplyColorInputs();
@@ -44,55 +47,47 @@ public class SettingsUI : MonoBehaviour
 
     public void ColorChanged()
     {
-        // TODO: update on fly
+        // Slider change hook referenced by the scene; colors apply on Save
     }
     #endregion
 
+    #region Set in Unity Editor
     /// <summary>
-    /// The dropdown menus in the main menu.
+    /// Realism mode (sensor noise).
     /// </summary>
-    private enum Dropdowns
-    {
-        DepthRes
-    }
+    [SerializeField]
+    private Toggle realismToggle;
 
     /// <summary>
-    /// The toggles (check boxes) in the main menu.
+    /// Hide other cars in the color camera.
     /// </summary>
-    private enum Toggles
-    {
-        IsRealism = 0,
-        HideCarsInColorCamera = 1,
-        FirstShiny = 2,
-    }
+    [SerializeField]
+    private Toggle hideCarsToggle;
 
     /// <summary>
-    /// The dropdown menus in the settings pane.
+    /// The depth camera resolution.
     /// </summary>
-    private Dropdown[] dropdowns;
+    [SerializeField]
+    private Dropdown depthResDropdown;
 
     /// <summary>
-    /// The toggles (check boxes) in the settings pane.
+    /// The username.
     /// </summary>
-    private Toggle[] toggles;
-
-    /// <summary>
-    /// The sliders in the settings pane.
-    /// </summary>
-    private Slider[] sliders;
-
-    /// <summary>
-    /// The input field in which the user enters their OpenEdx username.
-    /// </summary>
+    [SerializeField]
     private InputField username;
 
-    private void Awake()
-    {
-        this.dropdowns = this.GetComponentsInChildren<Dropdown>();
-        this.toggles = this.GetComponentsInChildren<Toggle>();
-        this.sliders = this.GetComponentsInChildren<Slider>();
-        this.username = this.GetComponentInChildren<InputField>();
-    }
+    /// <summary>
+    /// Car color sliders, six per car: front red, green, blue, then back red, green, blue.
+    /// </summary>
+    [SerializeField]
+    private Slider[] colorSliders;
+
+    /// <summary>
+    /// Shiny paint toggles, two per car: front, then back.
+    /// </summary>
+    [SerializeField]
+    private Toggle[] shinyToggles;
+    #endregion
 
     private void Start()
     {
@@ -104,12 +99,24 @@ public class SettingsUI : MonoBehaviour
     /// </summary>
     private void UpdateInputs()
     {
-        this.toggles[(int)Toggles.IsRealism].isOn = Settings.IsRealism;
-        this.toggles[(int)Toggles.HideCarsInColorCamera].isOn = Settings.HideCarsInColorCamera;
-        this.dropdowns[(int)Dropdowns.DepthRes].value = (int)Settings.DepthRes;
+        this.realismToggle.isOn = Settings.IsRealism;
+        this.hideCarsToggle.isOn = Settings.HideCarsInColorCamera;
+        this.depthResDropdown.value = (int)Settings.DepthRes;
         this.username.text = Settings.Username;
 
-        this.LoadColors();
+        this.LoadColors(SavedDataManager.Data.CarCustomizations);
+    }
+
+    /// <summary>
+    /// The number of cars with color inputs: six sliders (front and back RGB) per car, limited by
+    /// the number of saved customizations.
+    /// </summary>
+    private int NumColorInputCars
+    {
+        get
+        {
+            return Mathf.Min(this.colorSliders.Length / 6, SavedDataManager.Data.CarCustomizations.Length);
+        }
     }
 
     /// <summary>
@@ -117,21 +124,20 @@ public class SettingsUI : MonoBehaviour
     /// </summary>
     private void ApplyColorInputs()
     {
-        // TODO: 3 is a magic number
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < this.NumColorInputCars; i++)
         {
             SavedDataManager.Data.CarCustomizations[i].FrontColor = new SerializableColor(
-                this.sliders[6 * i].value,
-                this.sliders[6 * i + 1].value,
-                this.sliders[6 * i + 2].value);
+                this.colorSliders[6 * i].value,
+                this.colorSliders[6 * i + 1].value,
+                this.colorSliders[6 * i + 2].value);
 
             SavedDataManager.Data.CarCustomizations[i].BackColor = new SerializableColor(
-                this.sliders[6 * i + 3].value,
-                this.sliders[6 * i + 4].value,
-                this.sliders[6 * i + 5].value);
+                this.colorSliders[6 * i + 3].value,
+                this.colorSliders[6 * i + 4].value,
+                this.colorSliders[6 * i + 5].value);
 
-            SavedDataManager.Data.CarCustomizations[i].IsFrontShiny = this.toggles[(int)Toggles.FirstShiny + 2 * i].isOn;
-            SavedDataManager.Data.CarCustomizations[i].IsBackShiny = this.toggles[(int)Toggles.FirstShiny + 2 * i + 1].isOn;
+            SavedDataManager.Data.CarCustomizations[i].IsFrontShiny = this.shinyToggles[2 * i].isOn;
+            SavedDataManager.Data.CarCustomizations[i].IsBackShiny = this.shinyToggles[2 * i + 1].isOn;
         }
 
         SavedDataManager.Save();
@@ -140,22 +146,21 @@ public class SettingsUI : MonoBehaviour
     /// <summary>
     /// Update the customization interface with the current saved data.
     /// </summary>
-    private void LoadColors()
+    private void LoadColors(CarCustomization[] customizations)
     {
-        // TODO: 3 is a magic number
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < this.NumColorInputCars; i++)
         {
-            CarCustomization customization = SavedDataManager.Data.CarCustomizations[i];
-            this.sliders[6 * i].value = customization.FrontColor.r;
-            this.sliders[6 * i + 1].value = customization.FrontColor.g;
-            this.sliders[6 * i + 2].value = customization.FrontColor.b;
+            CarCustomization customization = customizations[i];
+            this.colorSliders[6 * i].value = customization.FrontColor.r;
+            this.colorSliders[6 * i + 1].value = customization.FrontColor.g;
+            this.colorSliders[6 * i + 2].value = customization.FrontColor.b;
 
-            this.sliders[6 * i + 3].value = customization.BackColor.r;
-            this.sliders[6 * i + 4].value = customization.BackColor.g;
-            this.sliders[6 * i + 5].value = customization.BackColor.b;
+            this.colorSliders[6 * i + 3].value = customization.BackColor.r;
+            this.colorSliders[6 * i + 4].value = customization.BackColor.g;
+            this.colorSliders[6 * i + 5].value = customization.BackColor.b;
 
-            this.toggles[(int)Toggles.FirstShiny + 2 * i].isOn = customization.IsFrontShiny;
-            this.toggles[(int)Toggles.FirstShiny + 2 * i + 1].isOn = customization.IsBackShiny;
+            this.shinyToggles[2 * i].isOn = customization.IsFrontShiny;
+            this.shinyToggles[2 * i + 1].isOn = customization.IsBackShiny;
         }
     }
 }

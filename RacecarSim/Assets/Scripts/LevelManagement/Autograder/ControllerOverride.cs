@@ -47,6 +47,7 @@ public class ControllerOverride : MonoBehaviour
     /// <returns>True if the provided button is currently pressed.</returns>
     public bool IsDown(Controller.Button button)
     {
+        this.Advance();
         return button == this.HeldButton || (button == this.pressedButton && this.pressedButtonState != ButtonState.Released);
     }
 
@@ -57,6 +58,8 @@ public class ControllerOverride : MonoBehaviour
     /// <returns>True if the provided button was pressed this frame.</returns>
     public bool WasPressed(Controller.Button button)
     {
+        this.Advance();
+
         // This button press was already registered earlier this frame
         if (this.pressedButton == button && this.pressedButtonState == ButtonState.Pressed)
         {
@@ -83,6 +86,7 @@ public class ControllerOverride : MonoBehaviour
     /// <returns>True if the provided button was released this frame.</returns>
     public bool WasReleased(Controller.Button button)
     {
+        this.Advance();
         return button == this.pressedButton && this.pressedButtonState == ButtonState.Released;
     }
 
@@ -138,6 +142,11 @@ public class ControllerOverride : MonoBehaviour
     private ButtonState pressedButtonState;
 
     /// <summary>
+    /// The Time.frameCount at which Advance last ran.
+    /// </summary>
+    private int lastAdvanceFrame = -1;
+
+    /// <summary>
     /// The button held for the duration of the level, or null if no button is held for the duration of the level.
     /// </summary>
     private Controller.Button? HeldButton
@@ -153,16 +162,35 @@ public class ControllerOverride : MonoBehaviour
         Controller.Override = this;
     }
 
-    private void Update()
+    /// <summary>
+    /// Moves the current button press through Pressed, Held, and Released, once per frame on the
+    /// first query. Each of Pressed and Released lasts exactly one frame regardless of the order in
+    /// which Unity runs Update on this component and on the LevelManager.
+    /// </summary>
+    private void Advance()
     {
+        if (this.lastAdvanceFrame == Time.frameCount)
+        {
+            return;
+        }
+        this.lastAdvanceFrame = Time.frameCount;
+
+        if (!this.pressedButton.HasValue)
+        {
+            return;
+        }
+
         if (this.pressedButtonState == ButtonState.Released)
         {
             this.pressedButton = null;
         }
-
-        if (this.pressedButton.HasValue && Time.time - this.pressedButtonTime > ControllerOverride.buttonPressTime)
+        else if (Time.time - this.pressedButtonTime > ControllerOverride.buttonPressTime)
         {
             this.pressedButtonState = ButtonState.Released;
+        }
+        else
+        {
+            this.pressedButtonState = ButtonState.Held;
         }
     }
 }

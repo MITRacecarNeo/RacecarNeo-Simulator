@@ -28,6 +28,11 @@ public class ReloadBuffer : MonoBehaviour
     /// </summary>
     private float counter;
 
+    /// <summary>
+    /// True once the reload was requested; the scene switch completes on a later frame.
+    /// </summary>
+    private bool isLoading;
+
     private void Start()
     {
         this.counter = ReloadBuffer.waitTime;
@@ -38,8 +43,9 @@ public class ReloadBuffer : MonoBehaviour
     private void Update()
     {
         this.counter -= Time.deltaTime;
-        if (this.counter <= 0)
+        if (this.counter <= 0 && !this.isLoading)
         {
+            this.isLoading = true;
             SceneManager.LoadScene(ReloadBuffer.BuildIndexToReload, LoadSceneMode.Single);
         }
     }

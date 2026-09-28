@@ -141,7 +141,7 @@ public class Elevator : MonoBehaviour
         switch (this.state)
         {
             case State.StopBottom:
-                this.rbody.velocity = Vector3.zero;
+                this.rbody.linearVelocity = Vector3.zero;
                 float prevCounter = this.counter;
                 this.counter -= Time.fixedDeltaTime;
                 if (prevCounter > this.SlowTime && this.counter < this.SlowTime)
@@ -156,7 +156,7 @@ public class Elevator : MonoBehaviour
                 break;
 
             case State.Raise:
-                this.rbody.velocity = Vector3.up * this.CalculateSpeed();
+                this.rbody.linearVelocity = Vector3.up * this.CalculateSpeed();
                 if (this.CurHeight >= this.height)
                 {
                     this.counter = this.stopTime;
@@ -165,7 +165,7 @@ public class Elevator : MonoBehaviour
                 break;
 
             case State.StopTop:
-                this.rbody.velocity = Vector3.zero;
+                this.rbody.linearVelocity = Vector3.zero;
                 this.counter -= Time.fixedDeltaTime;
                 if (this.counter <= 0)
                 {
@@ -174,7 +174,7 @@ public class Elevator : MonoBehaviour
                 break;
 
             case State.Lower:
-                this.rbody.velocity = Vector3.down * this.CalculateSpeed();
+                this.rbody.linearVelocity = Vector3.down * this.CalculateSpeed();
                 if (this.CurHeight <= 0)
                 {
                     this.counter = this.stopTime;

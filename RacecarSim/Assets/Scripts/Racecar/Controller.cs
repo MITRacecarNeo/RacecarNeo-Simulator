@@ -1,5 +1,14 @@
-﻿// Define operating system here (WINDOWS, MAC, or LINUX)
+﻿// Controller mappings differ by operating system. In the editor, input comes from the host OS
+// even when the build target is another platform, so editor symbols take priority.
+#if UNITY_EDITOR_WIN || (!UNITY_EDITOR && UNITY_STANDALONE_WIN)
 #define WINDOWS
+#elif UNITY_EDITOR_OSX || (!UNITY_EDITOR && UNITY_STANDALONE_OSX)
+#define MAC
+#elif UNITY_EDITOR_LINUX || (!UNITY_EDITOR && UNITY_STANDALONE_LINUX)
+#define LINUX
+#else
+#define WINDOWS
+#endif
 
 using System;
 using UnityEngine;
@@ -9,7 +18,7 @@ using UnityEngine;
 /// </summary>
 /// <remarks>
 /// Xbox controller mapping varies based on operating system.
-/// See https://wiki.unity3d.com/index.php/Xbox360Controller for details.
+/// Axis names refer to the joystick axes defined in ProjectSettings/InputManager.asset.
 /// </remarks>
 public static class Controller
 {

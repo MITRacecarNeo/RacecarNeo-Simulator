@@ -164,9 +164,8 @@ public class ParkingCube : MonoBehaviour
         {
             LevelManager.ShowMessage($"Angle: {this.Angle:F1} degrees\nDistance: {this.Distance:F1} cm", this.IsSuccess ? Color.green : Color.white, -1);
         }
-        else if (this.IsSuccess && LevelManager.GetCar().Physics.LinearVelocity.magnitude < Constants.MaxStopSeed)
+        else if (this.IsSuccess && LevelManager.GetCar().Physics.LinearVelocity.magnitude < Constants.MaxStopSpeed)
         {
-            // TODO: Find a way to display Angle and Distance
             AutograderManager.CompleteTask(this.autograderTask);
         }
     }

@@ -54,7 +54,7 @@ public class TrainEntrance : MonoBehaviour
             if (isSpawning)
             {
                 Rigidbody rbody = GameObject.Instantiate(this.train, this.transform.position, this.transform.rotation).GetComponent<Rigidbody>();
-                rbody.velocity = this.transform.forward * this.speed;
+                rbody.linearVelocity = this.transform.forward * this.speed;
             }
 
             this.remainingChunks--;

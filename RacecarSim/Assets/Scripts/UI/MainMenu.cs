@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,6 +16,30 @@ public class MainMenu : MonoBehaviour
     /// </summary>
     [SerializeField]
     private GameObject numCars;
+
+    /// <summary>
+    /// The level collection dropdown.
+    /// </summary>
+    [SerializeField]
+    private Dropdown collectionDropdown;
+
+    /// <summary>
+    /// The level dropdown.
+    /// </summary>
+    [SerializeField]
+    private Dropdown levelDropdown;
+
+    /// <summary>
+    /// The mode dropdown, listing LevelInfo.SupportedModes of the selected level.
+    /// </summary>
+    [SerializeField]
+    private Dropdown modeDropdown;
+
+    /// <summary>
+    /// The number of cars dropdown.
+    /// </summary>
+    [SerializeField]
+    private Dropdown numCarsDropdown;
     #endregion
 
     #region Constants
@@ -33,33 +59,6 @@ public class MainMenu : MonoBehaviour
         KeyCode.B,
         KeyCode.A
     };
-
-    /// <summary>
-    /// The LevelManagerModes are shown for a raceable level.
-    /// </summary>
-    private static List<Dropdown.OptionData> ModeOptionsWithRace = new List<Dropdown.OptionData>()
-    {
-        new Dropdown.OptionData("Exploration"),
-        new Dropdown.OptionData("Autograder"),
-        new Dropdown.OptionData("Race")
-    };
-
-    /// <summary>
-    /// The LevelManagerModes shown for a non-raceable level.
-    /// </summary>
-    private static List<Dropdown.OptionData> ModeOptionsWithoutRace = new List<Dropdown.OptionData>()
-    {
-        new Dropdown.OptionData("Exploration"),
-        new Dropdown.OptionData("Autograder")
-    };
-
-    /// <summary>
-    /// The LevelManagerModes shown for a level which only supports exploration mode.
-    /// </summary>
-    private static List<Dropdown.OptionData> ModeOptionsWithoutAutograder = new List<Dropdown.OptionData>()
-    {
-        new Dropdown.OptionData("Exploration"),
-    };
     #endregion
 
     #region Public Interface
@@ -69,24 +68,24 @@ public class MainMenu : MonoBehaviour
     public void BeginSimulation()
     {
         // Cache the current level and collection indices so we remember them the next time we load the main menu
-        MainMenu.prevCollectionIndex = this.dropdowns[(int)Dropdowns.CollectionSelect].value;
-        MainMenu.prevLevelIndex = this.dropdowns[(int)Dropdowns.LevelSelect].value;
+        MainMenu.prevCollectionIndex = this.collectionDropdown.value;
+        MainMenu.prevLevelIndex = this.levelDropdown.value;
 
-        LevelManager.NumPlayers = this.dropdowns[(int)Dropdowns.NumCars].value + 1;
-        LevelManager.LevelManagerMode = (LevelManagerMode)this.dropdowns[(int)Dropdowns.Mode].value;
+        LevelManager.NumPlayers = this.numCarsDropdown.value + 1;
+        LevelManager.LevelManagerMode = this.SelectedLevel.SupportedModes[this.modeDropdown.value];
 
         LevelManager.LevelInfo = this.SelectedLevel;
         int buildIndex = -1; // set the build index to a default null value
 
         // If random maps is selected as a level option (HasRandomMaps), then set the build index to one of the maps specified in RandomSceneBuildIndices
         // If random maps is not selected, OR if the current level manager mode is Exploration, use the default build index option
-        if (!this.SelectedLevel.HasRandomMaps || LevelManager.LevelManagerMode == LevelManagerMode.Exploration)
+        int[] candidates = this.SelectedLevel.RandomSceneBuildIndices;
+        if (!this.SelectedLevel.HasRandomMaps || LevelManager.LevelManagerMode == LevelManagerMode.Exploration || candidates == null || candidates.Length == 0)
         {
             buildIndex = LevelManager.LevelManagerMode == LevelManagerMode.Autograder ? this.SelectedLevel.AutograderBuildIndex : this.SelectedLevel.BuildIndex;
         }
         else
         {
-            int[] candidates = this.SelectedLevel.RandomSceneBuildIndices;
             int rand = UnityEngine.Random.Range(0, candidates.Length);
             buildIndex = candidates[rand]; // choose a random level to run for autograder or race mode
         }
@@ -112,7 +111,7 @@ public class MainMenu : MonoBehaviour
     /// </summary>
     public void ShowControls()
     {
-        this.controllsPane.gameObject.SetActive(true);
+        this.controlsPane.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -149,10 +148,9 @@ public class MainMenu : MonoBehaviour
     /// <param name="numCars">The number of cars which should be selected.</param>
     public void HandleLevelCollectionDropdownChange(int selectedLevel, LevelManagerMode mode, int numCars)
     {
-        Dropdown levelSelect = this.dropdowns[(int)Dropdowns.LevelSelect];
-        levelSelect.ClearOptions();
-        levelSelect.AddOptions(this.SelectedLevelCollection.LevelNames);
-        levelSelect.value = selectedLevel;
+        this.levelDropdown.ClearOptions();
+        this.levelDropdown.AddOptions(this.SelectedLevelCollection.LevelNames);
+        this.levelDropdown.value = selectedLevel;
 
         this.HandleLevelDropdownChange(mode, numCars);
     }
@@ -173,32 +171,25 @@ public class MainMenu : MonoBehaviour
     /// <param name="numCars">The number of cars which should be selected.</param>
     public void HandleLevelDropdownChange(LevelManagerMode mode, int numCars)
     {
-        // Adjust mode dropdown to show/hide "Race" option based on level
-        Dropdown modeDropdown = this.dropdowns[(int)Dropdowns.Mode];
-        List<Dropdown.OptionData> modeOptions = 
-            SelectedLevel.IsRaceable ? MainMenu.ModeOptionsWithRace
-            :  SelectedLevel.AutograderLevels != null ? MainMenu.ModeOptionsWithoutRace : MainMenu.ModeOptionsWithoutAutograder;
-        if (modeDropdown.options.Count != modeOptions.Count)
-        {
-            modeDropdown.options = modeOptions;
-            modeDropdown.interactable = modeOptions.Count > 1;
-        }
-
-        modeDropdown.value = (int)mode;
+        // Offer only the modes the level supports; a mode it lacks falls back to exploration
+        LevelManagerMode[] modes = this.SelectedLevel.SupportedModes;
+        this.modeDropdown.options = modes.Select(supported => new Dropdown.OptionData(supported.ToString())).ToList();
+        this.modeDropdown.interactable = modes.Length > 1;
+        this.modeDropdown.value = Mathf.Max(Array.IndexOf(modes, mode), 0);
+        this.modeDropdown.RefreshShownValue();
 
         // Show and populate the numCars dropdown if the level supports multiple cars
-        Dropdown numCarDropdown = this.dropdowns[(int)Dropdowns.NumCars];
         if (this.SelectedLevel.MaxCars > 1)
         {
-            if (this.SelectedLevel.MaxCars != numCarDropdown.options.Count)
+            if (this.SelectedLevel.MaxCars != this.numCarsDropdown.options.Count)
             {
                 List<string> options = new List<string>(this.SelectedLevel.MaxCars);
                 for (int i = 1; i <= this.SelectedLevel.MaxCars; i++)
                 {
                     options.Add(i.ToString());
                 }
-                numCarDropdown.ClearOptions();
-                numCarDropdown.AddOptions(options);
+                this.numCarsDropdown.ClearOptions();
+                this.numCarsDropdown.AddOptions(options);
             }
             this.numCars.SetActive(true);
         }
@@ -208,7 +199,7 @@ public class MainMenu : MonoBehaviour
         }
 
         // Regardless of whether it is shown, we always set the dropdown value since it determines NumPlayers when the level is loaded
-        numCarDropdown.value = numCars - 1;
+        this.numCarsDropdown.value = numCars - 1;
     }
 
     /// <summary>
@@ -217,15 +208,14 @@ public class MainMenu : MonoBehaviour
     public void HandleNumCarsChange()
     {
         // Lock the mode dropdown to "Race" if the user chcose multiple cars
-        Dropdown modeDropdown = this.dropdowns[(int)Dropdowns.Mode];
-        if (this.dropdowns[(int)Dropdowns.NumCars].value > 0)
+        if (this.numCarsDropdown.value > 0)
         {
-            modeDropdown.value = (int)LevelManagerMode.Race;
-            modeDropdown.interactable = false;
+            this.modeDropdown.value = Array.IndexOf(this.SelectedLevel.SupportedModes, LevelManagerMode.Race);
+            this.modeDropdown.interactable = false;
         }
         else
         {
-            modeDropdown.interactable = true;
+            this.modeDropdown.interactable = true;
         }
     }
 
@@ -244,7 +234,7 @@ public class MainMenu : MonoBehaviour
     {
         get
         {
-            return LevelCollection.LevelCollections[this.dropdowns[(int)Dropdowns.CollectionSelect].value];
+            return LevelCollection.LevelCollections[this.collectionDropdown.value];
         }
     }
 
@@ -255,21 +245,10 @@ public class MainMenu : MonoBehaviour
     {
         get
         {
-            return SelectedLevelCollection.Levels[this.dropdowns[(int)Dropdowns.LevelSelect].value];
+            return SelectedLevelCollection.Levels[this.levelDropdown.value];
         }
     }
     #endregion
-
-    /// <summary>
-    /// The dropdown menus in the main menu, with values corresponding to the index in dropdowns.
-    /// </summary>
-    private enum Dropdowns
-    {
-        CollectionSelect = 0,
-        LevelSelect = 1,
-        Mode = 2,
-        NumCars = 3
-    }
 
     /// <summary>
     /// The index of the level collection selected the last time we loaded the main menu.
@@ -282,14 +261,9 @@ public class MainMenu : MonoBehaviour
     private static int prevLevelIndex = 0;
 
     /// <summary>
-    /// The dropdown menus in the main menu.
-    /// </summary>
-    private Dropdown[] dropdowns;
-
-    /// <summary>
     /// The screen which shows the controls.
     /// </summary>
-    private ControllsUI controllsPane;
+    private ControlsUI controlsPane;
 
     /// <summary>
     /// The screen which allows the user to adjust settings.
@@ -311,27 +285,55 @@ public class MainMenu : MonoBehaviour
     /// </summary>
     private int konamiCodeIndex = 0;
 
+    /// <summary>
+    /// Returns how many keys of the Konami Code are matched after pressing a key, reusing any
+    /// matched suffix so a wrong key that starts the code again is not lost.
+    /// </summary>
+    /// <param name="matched">The number of code keys matched before this key.</param>
+    /// <param name="key">The key pressed.</param>
+    /// <returns>The longest code prefix that ends the typed sequence.</returns>
+    public static int NextKonamiIndex(int matched, KeyCode key)
+    {
+        KeyCode[] code = MainMenu.KonamiCodes;
+        for (int length = Mathf.Min(matched + 1, code.Length); length > 0; length--)
+        {
+            if (code[length - 1] != key)
+            {
+                continue;
+            }
+
+            bool isMatch = true;
+            for (int i = 0; isMatch && i < length - 1; i++)
+            {
+                isMatch = code[i] == code[matched - length + 1 + i];
+            }
+            if (isMatch)
+            {
+                return length;
+            }
+        }
+        return 0;
+    }
+
     private void Awake()
     {
-        this.dropdowns = this.GetComponentsInChildren<Dropdown>();
 
-        this.controllsPane = this.GetComponentInChildren<ControllsUI>();
+        this.controlsPane = this.GetComponentInChildren<ControlsUI>();
         this.settingsPane = this.GetComponentInChildren<SettingsUI>();
         this.bestTimesPane = this.GetComponentInChildren<BestTimesUI>();
         this.usernamePane = this.GetComponentInChildren<NoUsernameUI>();
 
-        if (LevelInfo.WinableLevels.Count != SavedDataManager.Data.BestTimes.Length)
+        if (SavedDataManager.WasLegacyDataReset)
         {
-            Debug.LogError("Best times do not align with current levels. Clearing best time data.");
-            SavedDataManager.Data.ClearBestTimes();
-            SavedDataManager.Save();
+            SavedDataManager.WasLegacyDataReset = false;
+            this.gameObject.AddComponent<SaveResetNotice>();
         }
     }
 
     private void Start()
     {
         // Hide panes
-        this.controllsPane.gameObject.SetActive(false);
+        this.controlsPane.gameObject.SetActive(false);
         this.settingsPane.gameObject.SetActive(false);
         this.bestTimesPane.gameObject.SetActive(false);
         this.usernamePane.gameObject.SetActive(false);
@@ -339,34 +341,58 @@ public class MainMenu : MonoBehaviour
         this.numCars.SetActive(false);
 
         // Populate level collection dropdown
-        Dropdown collectionSelect = this.dropdowns[(int)Dropdowns.CollectionSelect];
-        collectionSelect.ClearOptions();
+        this.collectionDropdown.ClearOptions();
         List<string> collectionDisplayNames = new List<string>(LevelCollection.LevelCollections.Length);
         foreach (LevelCollection levelCollection in LevelCollection.LevelCollections)
         {
             collectionDisplayNames.Add(levelCollection.DisplayName);
         }
-        collectionSelect.AddOptions(collectionDisplayNames);
-        collectionSelect.value = MainMenu.prevCollectionIndex;
+        this.collectionDropdown.AddOptions(collectionDisplayNames);
+        this.collectionDropdown.value = MainMenu.prevCollectionIndex;
 
         // Begin with the previous level selection
         this.HandleLevelCollectionDropdownChange(MainMenu.prevLevelIndex, LevelManager.LevelManagerMode, LevelManager.NumPlayers);
+
+        // The version label follows PlayerSettings.bundleVersion, the single version source
+        Text versionText = this.GetComponentsInChildren<Text>(true).FirstOrDefault(text => text.name == "Version");
+        if (versionText != null)
+        {
+            versionText.text = $"Release v{Application.version}";
+        }
+
+        // A level requested on the command line (LaunchOptions) skips the menu once
+        if (LaunchOptions.TryTakeLevelRequest(out LevelInfo requested))
+        {
+            if (!string.IsNullOrEmpty(LaunchOptions.Current.Username))
+            {
+                Settings.Username = LaunchOptions.Current.Username;
+            }
+            if (!requested.SupportedModes.Contains(LaunchOptions.Current.Mode))
+            {
+                Debug.LogError($"Level [{requested.DisplayName}] does not support {LaunchOptions.Current.Mode} mode (-racecarsim-mode).");
+                return;
+            }
+            LevelManager.LevelInfo = requested;
+            LevelManager.LevelManagerMode = LaunchOptions.Current.Mode;
+            LevelManager.NumPlayers = Mathf.Clamp(LaunchOptions.Current.NumCars, 1, requested.MaxCars);
+            int buildIndex = LevelManager.LevelManagerMode == LevelManagerMode.Autograder ? requested.AutograderBuildIndex : requested.BuildIndex;
+            SceneManager.LoadScene(buildIndex, LoadSceneMode.Single);
+        }
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(MainMenu.KonamiCodes[this.konamiCodeIndex]))
+        if (!Input.anyKeyDown)
         {
-            this.konamiCodeIndex++;
-            if (this.konamiCodeIndex == MainMenu.KonamiCodes.Length)
-            {
-                print("Cheat mode activated");
-                Settings.CheatMode = true;
-                this.konamiCodeIndex = 0;
-            }
+            return;
         }
-        else if (Input.anyKeyDown)
+
+        KeyCode? pressed = MainMenu.KonamiCodes.Distinct().Where(Input.GetKeyDown).Select(key => (KeyCode?)key).FirstOrDefault();
+        this.konamiCodeIndex = pressed.HasValue ? MainMenu.NextKonamiIndex(this.konamiCodeIndex, pressed.Value) : 0;
+        if (this.konamiCodeIndex == MainMenu.KonamiCodes.Length)
         {
+            Debug.Log("Cheat mode activated");
+            Settings.CheatMode = true;
             this.konamiCodeIndex = 0;
         }
     }

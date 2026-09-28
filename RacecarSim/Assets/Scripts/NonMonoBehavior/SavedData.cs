@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -8,9 +9,19 @@ using UnityEngine;
 public class SavedData
 {
     /// <summary>
-    /// The best time information for each winnable level, with indexed by the level WinableIndex.
+    /// The save format version written by this build.
     /// </summary>
-    public BestTimeInfo[] BestTimes;
+    public const int CurrentVersion = 2;
+
+    /// <summary>
+    /// The save format version of this data.
+    /// </summary>
+    public int Version = SavedData.CurrentVersion;
+
+    /// <summary>
+    /// The best time information for levels that have been played, keyed by BestTimeInfo.LevelId.
+    /// </summary>
+    public List<BestTimeInfo> BestTimes = new List<BestTimeInfo>();
 
     /// <summary>
     /// The customization for each car, indexed by car.
@@ -41,15 +52,37 @@ public class SavedData
     }
 
     /// <summary>
+    /// Returns the best times for a level, creating an empty entry when the level has none or
+    /// when its checkpoint count changed.
+    /// </summary>
+    /// <param name="level">A raceable level with a non-empty Id.</param>
+    /// <returns>The level's best time information, stored in BestTimes.</returns>
+    public BestTimeInfo GetBestTimes(LevelInfo level)
+    {
+        int index = this.BestTimes.FindIndex(entry => entry.LevelId == level.Id);
+        BestTimeInfo fresh = new BestTimeInfo(level.Id, level.NumCheckpoints);
+
+        if (index < 0)
+        {
+            this.BestTimes.Add(fresh);
+            return fresh;
+        }
+
+        BestTimeInfo existing = this.BestTimes[index];
+        if (existing.CheckpointTimes == null || existing.CheckpointTimes.Length != fresh.CheckpointTimes.Length)
+        {
+            this.BestTimes[index] = fresh;
+            return fresh;
+        }
+        return existing;
+    }
+
+    /// <summary>
     /// Reset all best times to store no progress toward any levels.
     /// </summary>
     public void ClearBestTimes()
     {
-        this.BestTimes = new BestTimeInfo[LevelInfo.WinableLevels.Count];
-        foreach (LevelInfo level in LevelInfo.WinableLevels)
-        {
-            this.BestTimes[level.WinableIndex] = new BestTimeInfo(level.NumCheckpoints);
-        }
+        this.BestTimes = new List<BestTimeInfo>();
     }
 
     /// <summary>

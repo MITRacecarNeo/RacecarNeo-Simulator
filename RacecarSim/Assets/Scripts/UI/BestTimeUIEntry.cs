@@ -7,6 +7,26 @@ using UnityEngine.UI;
 /// </summary>
 public class BestTimeUIEntry : MonoBehaviour
 {
+    #region Set in Unity Editor
+    /// <summary>
+    /// The level name.
+    /// </summary>
+    [SerializeField]
+    private Text levelNameText;
+
+    /// <summary>
+    /// The best overall time.
+    /// </summary>
+    [SerializeField]
+    private Text overallTimeText;
+
+    /// <summary>
+    /// The best time for each checkpoint.
+    /// </summary>
+    [SerializeField]
+    private Text checkpointsText;
+    #endregion
+
     #region Public Interface
     /// <summary>
     /// Begins the level corresponding to the best time entry in evaluation mode.
@@ -27,8 +47,8 @@ public class BestTimeUIEntry : MonoBehaviour
     /// <param name="bestTimeInfo">The best times with which the player completed the level.</param>
     public void SetInfo(LevelInfo levelInfo, BestTimeInfo bestTimeInfo)
     {
-        this.texts[(int)Texts.LevelName].text = levelInfo.FullName;
-        this.texts[(int)Texts.OverallTime].text = BestTimeUIEntry.FormatTime(bestTimeInfo.OverallTime);
+        this.levelNameText.text = levelInfo.FullName;
+        this.overallTimeText.text = BestTimeUIEntry.FormatTime(bestTimeInfo.OverallTime);
 
         string checkpointTimes = string.Empty;
         if (bestTimeInfo.CheckpointTimes != null && bestTimeInfo.CheckpointTimes.Length > 1)
@@ -39,36 +59,16 @@ public class BestTimeUIEntry : MonoBehaviour
                 checkpointTimes += $"    {i + 1}) {BestTimeUIEntry.FormatTime(bestTimeInfo.CheckpointTimes[i])}";
             }
         }
-        this.texts[(int)Texts.Checkpoints].text = checkpointTimes;
+        this.checkpointsText.text = checkpointTimes;
 
         this.level = levelInfo;
     }
     #endregion
 
     /// <summary>
-    /// The mutable text fields of the best time entry, with values corresponding to the index in texts.
-    /// </summary>
-    private enum Texts
-    {
-        LevelName = 0,
-        OverallTime = 1,
-        Checkpoints = 3
-    }
-
-    /// <summary>
-    /// The mutable text fields in the best time entry.
-    /// </summary>
-    private Text[] texts;
-
-    /// <summary>
     /// The level to which the entry corresponds.
     /// </summary>
     private LevelInfo level;
-
-    private void Awake()
-    {
-        this.texts = this.GetComponentsInChildren<Text>();
-    }
 
     /// <summary>
     /// Formats a time to be displayed.

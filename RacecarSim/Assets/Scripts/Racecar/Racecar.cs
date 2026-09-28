@@ -101,11 +101,6 @@ public class Racecar : MonoBehaviour
         this.Drive.Speed = Controller.GetTrigger(Controller.Trigger.RIGHT) - Controller.GetTrigger(Controller.Trigger.LEFT);
         this.Drive.Angle = Controller.GetJoystick(Controller.Joystick.LEFT).x;
 
-        if (Controller.WasPressed(Controller.Button.A))
-        {
-            print("Kachow!");
-        }
-
         // Use the bumpers to adjust max speed
         if (Controller.WasPressed(Controller.Button.RB))
         {
@@ -142,13 +137,16 @@ public class Racecar : MonoBehaviour
         // Set car color and customization based on saved data
         CarCustomization customization = SavedDataManager.Data.CarCustomizations[index];
 
-        Material frontMaterial = this.chassisFront.GetComponent<Renderer>().material;
-        frontMaterial.color = customization.FrontColor.Color;
-        frontMaterial.SetFloat("_Metallic", customization.IsFrontShiny ? 1 : 0);
+        // Renderer.material creates a per-car copy, destroyed in OnDestroy
+        Destroy(this.frontMaterial);
+        this.frontMaterial = this.chassisFront.GetComponent<Renderer>().material;
+        this.frontMaterial.color = customization.FrontColor.Color;
+        this.frontMaterial.SetFloat("_Metallic", customization.IsFrontShiny ? 1 : 0);
 
-        Material backMaterial = this.chassisBack.GetComponent<Renderer>().material;
-        backMaterial.color = customization.BackColor.Color;
-        backMaterial.SetFloat("_Metallic", customization.IsBackShiny ? 1 : 0);
+        Destroy(this.backMaterial);
+        this.backMaterial = this.chassisBack.GetComponent<Renderer>().material;
+        this.backMaterial.color = customization.BackColor.Color;
+        this.backMaterial.SetFloat("_Metallic", customization.IsBackShiny ? 1 : 0);
     }
 
     /// <summary>
@@ -167,6 +165,18 @@ public class Racecar : MonoBehaviour
     /// The index in PlayerCameras of the current active camera.
     /// </summary>
     private int curCamera;
+
+    /// <summary>
+    /// Per-car copies of the chassis materials created by SetIndex.
+    /// </summary>
+    private Material frontMaterial;
+    private Material backMaterial;
+
+    private void OnDestroy()
+    {
+        Destroy(this.frontMaterial);
+        Destroy(this.backMaterial);
+    }
 
     private void Awake()
     {

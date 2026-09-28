@@ -55,12 +55,15 @@ public class VariableObject : MonoBehaviour
 
     void Start()
     {
-        if (this.setColor)
+        // An object outside any color set (index -1) keeps its material color
+        bool hasVariableColor = this.colorSetIndex >= 0 && this.colorIndex >= 0;
+
+        if (this.setColor && hasVariableColor)
         {
             this.GetComponent<Renderer>().material.color = VariableManager.GetVariableColor(this.colorSetIndex, this.colorIndex);
         }
 
-        if (this.setColorInChild)
+        if (this.setColorInChild && hasVariableColor)
         {
             this.GetComponentInChildren<Renderer>().material.color = VariableManager.GetVariableColor(this.colorSetIndex, this.colorIndex);
         }

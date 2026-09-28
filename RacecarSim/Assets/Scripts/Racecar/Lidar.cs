@@ -69,6 +69,11 @@ public class Lidar : RacecarModule
     public float[] Samples { get; private set; }
 
     /// <summary>
+    /// The number of full rotations completed since the level loaded.
+    /// </summary>
+    public int CompletedScans { get; private set; }
+
+    /// <summary>
     /// Creates a visualization of the current LIDAR samples.
     /// </summary>
     /// <param name="texture">The texture to which the LIDAR visualization is rendered.</param>
@@ -110,6 +115,11 @@ public class Lidar : RacecarModule
     /// </summary>
     private int curSample = 0;
 
+    /// <summary>
+    /// Fractional samples owed from previous physics steps, so the scan rate stays exact at any time step.
+    /// </summary>
+    private float sampleAccumulator = 0;
+
     protected override void FindParent()
     {
         this.racecar = this.GetComponentInParent<Racecar>();
@@ -131,14 +141,21 @@ public class Lidar : RacecarModule
 
     private void FixedUpdate()
     {
-        int lastSample = (curSample + Mathf.RoundToInt(Lidar.samplesPerSecond * Time.deltaTime)) % NumSamples;
+        this.sampleAccumulator += Lidar.samplesPerSecond * Time.fixedDeltaTime;
+        int wholeSamples = Mathf.FloorToInt(this.sampleAccumulator);
+        this.sampleAccumulator -= wholeSamples;
+        int sampleCount = Mathf.Min(wholeSamples, Lidar.NumSamples);
 
-        // Take samples for the current frame by physically rotating the LIDAR
-        while (curSample != lastSample)
+        // Take samples for the current physics step by physically rotating the LIDAR
+        for (int i = 0; i < sampleCount; i++)
         {
             this.transform.localRotation = Quaternion.Euler(0, curSample * 360.0f / Lidar.NumSamples, 0);
             this.Samples[curSample] = TakeSample();
             curSample = (curSample + 1) % NumSamples;
+            if (curSample == 0)
+            {
+                this.CompletedScans++;
+            }
         }
     }
 

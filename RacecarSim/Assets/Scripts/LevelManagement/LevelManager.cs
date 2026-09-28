@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -110,6 +111,21 @@ public class LevelManager : MonoBehaviour
     public static float TimePenalty { get { return LevelManager.instance.timePenalty; } }
 
     /// <summary>
+    /// The current simulation mode, or Wait if no level is loaded.
+    /// </summary>
+    public static SimulationMode Mode { get { return LevelManager.instance != null ? LevelManager.instance.simulationMode : SimulationMode.Wait; } }
+
+    /// <summary>
+    /// The key point a car most recently passed: 0 for the start, i + 1 for checkpoint i, and
+    /// the checkpoint count + 1 for the finish.
+    /// </summary>
+    /// <param name="carIndex">The index of the car.</param>
+    public static int GetKeyPointIndex(int carIndex)
+    {
+        return LevelManager.instance.curKeyPoints[carIndex];
+    }
+
+    /// <summary>
     /// Displays a simulation error to the screen manager and logs it to standard error.
     /// </summary>
     /// <param name="errorText">A message describing the error.</param>
@@ -117,7 +133,7 @@ public class LevelManager : MonoBehaviour
     {
         if (LevelManager.LevelManagerMode == LevelManagerMode.Autograder)
         {
-            LevelManager.instance.autograderManager.HandleError();
+            LevelManager.instance.autograderManager?.HandleError();
             LevelManager.FinishAutograder();
         }
         else
@@ -140,6 +156,10 @@ public class LevelManager : MonoBehaviour
     /// <param name="persistTime">The time in seconds the text is shown.</param>
     public static void ShowMessage(string text, Color color, float persistTime)
     {
+        if (LevelManager.instance == null)
+        {
+            return;
+        }
         LevelManager.instance.screenManager.ShowMessage(text, color, persistTime);
     }
 
@@ -150,8 +170,9 @@ public class LevelManager : MonoBehaviour
     /// <param name="checkpointIndex">The index of the checkpoint which was passed.</param>
     public static void HandleCheckpoint(int carIndex, int checkpointIndex)
     {
-        // Only count the checkpoint if the car has not passed this checkpoint (or a later one) yet
-        if (!LevelManager.instance.failed && LevelManager.instance.curKeyPoints[carIndex] <= checkpointIndex)
+        // Only count the checkpoint if it is the next one for this car; checkpoints must be passed in order.
+        // Key point index = checkpoint index + 1 (the start is key point 0), so the car must be at key point checkpointIndex.
+        if (!LevelManager.instance.failed && LevelManager.instance.curKeyPoints[carIndex] == checkpointIndex)
         {
             // Add 1 to account for the start, making this a key point index
             checkpointIndex++;
@@ -173,8 +194,8 @@ public class LevelManager : MonoBehaviour
     {
         int finishIndex = LevelManager.instance.keyPoints.Length - 1;
 
-        // Only count if the car has not passed the finish yet
-        if (!LevelManager.instance.failed && LevelManager.instance.curKeyPoints[carIndex] < finishIndex)
+        // Only count if the car passed every checkpoint and has not finished yet
+        if (!LevelManager.instance.failed && LevelManager.instance.curKeyPoints[carIndex] == finishIndex - 1)
         {
             LevelManager.instance.curKeyPoints[carIndex] = finishIndex;
 
@@ -191,7 +212,7 @@ public class LevelManager : MonoBehaviour
                 {
                     bool isNewBestTime =
                         LevelManager.NumPlayers == 1 &&
-                        SavedDataManager.Data.BestTimes[LevelManager.LevelInfo.WinableIndex].OverallTime > LevelManager.instance.CurTime;
+                        SavedDataManager.Data.GetBestTimes(LevelManager.LevelInfo).OverallTime > LevelManager.instance.CurTime;
 
                     LevelManager.instance.simulationMode = SimulationMode.Finished;
                     LevelManager.instance.screenManager.HandleWin(LevelManager.instance.CurTime, isNewBestTime);
@@ -237,14 +258,12 @@ public class LevelManager : MonoBehaviour
     /// <remarks>If there are multiple cars in the race, this will penalize all cars.</remarks>
     public static void AddTimePenalty(float penalty)
     {
+        // Exploration has no clock, so the penalty is only shown there
         if (LevelManager.LevelManagerMode != LevelManagerMode.Exploration)
         {
             LevelManager.instance.timePenalty += penalty;
         }
-        else
-        {
-            LevelManager.instance.screenManager.ShowWarning($"Time penalty: -{penalty:F1} seconds");
-        }
+        LevelManager.instance.screenManager.ShowWarning($"Time penalty: +{penalty:F1} seconds");
     }
 
     /// <summary>
@@ -253,20 +272,20 @@ public class LevelManager : MonoBehaviour
     /// <param name="carIndex">The index of the car to reset.</param>
     public static void ResetCar(int carIndex)
     {
-        Transform resetLocation = LevelManager.instance.GetResetLocation(carIndex);
+        (Vector3 position, Quaternion rotation) = LevelManager.instance.GetResetPose(carIndex);
 
         // Stop physics first
         Rigidbody carRigidBody = LevelManager.instance.players[carIndex].GetComponent<Rigidbody>();
-        carRigidBody.velocity = Vector3.zero;
+        carRigidBody.linearVelocity = Vector3.zero;
         carRigidBody.angularVelocity = Vector3.zero;
 
         // Use physics-aware movement methods
-        carRigidBody.MovePosition(resetLocation.position);
-        carRigidBody.MoveRotation(resetLocation.rotation);
+        carRigidBody.MovePosition(position);
+        carRigidBody.MoveRotation(rotation);
 
         // Backup direct transform setting
-        LevelManager.instance.players[carIndex].transform.position = resetLocation.position;
-        LevelManager.instance.players[carIndex].transform.rotation = resetLocation.rotation;
+        LevelManager.instance.players[carIndex].transform.position = position;
+        LevelManager.instance.players[carIndex].transform.rotation = rotation;
     }
 
     /// <summary>
@@ -277,9 +296,9 @@ public class LevelManager : MonoBehaviour
     {
         // Slow the speed of the car if its above the specified limit
         Rigidbody carRigidBody = LevelManager.instance.players[carIndex].GetComponent<Rigidbody>();
-        if (carRigidBody.velocity.magnitude > maxSpeed) 
+        if (carRigidBody.linearVelocity.magnitude > maxSpeed) 
         {
-            carRigidBody.velocity = carRigidBody.velocity * 0.5f;
+            carRigidBody.linearVelocity = carRigidBody.linearVelocity * 0.5f;
         }
     }
 
@@ -288,19 +307,34 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public static void UpdateConnectedPrograms()
     {
-        // We cannot update the screen manager immediately since this may not be the main thread,
-        // so we instead wait until the next call to Update
-        LevelManager.instance.wasConnectedProgramsChanged = true;
+        // Applied in the next call to Update, after the Python interface finishes the current frame
+        if (LevelManager.instance != null)
+        {
+            LevelManager.instance.wasConnectedProgramsChanged = true;
+        }
     }
 
     /// <summary>
     /// Returns a racecar in the current level.
     /// </summary>
     /// <param name="index">The index of the racecar to return.</param>
-    /// <returns>The racecar with the specified index.</returns>
+    /// <returns>The racecar with the specified index, or null if no level is loaded or the index is out of range.</returns>
     public static Racecar GetCar(int index = 0)
     {
-        return LevelManager.instance.players[index];
+        LevelManager current = LevelManager.instance;
+        if (current == null || current.players == null || index < 0 || index >= current.players.Length)
+        {
+            return null;
+        }
+        return current.players[index];
+    }
+
+    /// <summary>
+    /// Restarts the current level, as START + BACK does.
+    /// </summary>
+    public static void RestartLevel()
+    {
+        LevelManager.instance?.HandleRestart();
     }
 
     /// <summary>
@@ -315,6 +349,7 @@ public class LevelManager : MonoBehaviour
         }
 
         LevelManager.cachedPythonInterface = LevelManager.instance.pythonInterface;
+        LevelManager.instance.isPythonInterfaceHandedOff = true;
         LevelManager.autograderBuildIndex++;
         SceneManager.LoadScene(LevelManager.autograderBuildIndex, LoadSceneMode.Single);
 
@@ -328,7 +363,7 @@ public class LevelManager : MonoBehaviour
         LevelManager.instance.SetTimeScale(1.0f);
         LevelManager.instance.pythonInterface.HandleExit();
         LevelManager.cachedPythonInterface = null;
-        SceneManager.LoadScene(AutograderManager.AutograderSummaryBuildIndex, LoadSceneMode.Single);
+        SceneManager.LoadScene(AutograderManager.AutograderSummaryScene, LoadSceneMode.Single);
     }
     #endregion
 
@@ -343,6 +378,11 @@ public class LevelManager : MonoBehaviour
     private static PythonInterface cachedPythonInterface = null;
 
     /// <summary>
+    /// Render textures created for race views, released when the level unloads.
+    /// </summary>
+    private readonly List<RenderTexture> ownedRenderTextures = new List<RenderTexture>();
+
+    /// <summary>
     /// The build index of the current autograder level.
     /// </summary>
     private static int autograderBuildIndex;
@@ -351,6 +391,11 @@ public class LevelManager : MonoBehaviour
     /// Encapsulates the interaction with Python scripts.
     /// </summary>
     private PythonInterface pythonInterface;
+
+    /// <summary>
+    /// True once the Python interface was passed to the next autograder level, which then owns it.
+    /// </summary>
+    private bool isPythonInterfaceHandedOff;
 
     /// <summary>
     /// The autograder manager for the current level, if relevant.
@@ -464,6 +509,7 @@ public class LevelManager : MonoBehaviour
         if (LevelManager.LevelInfo.BuildIndex < 0)
         {
             SceneManager.LoadScene(LevelCollection.MainMenuBuildIndex, LoadSceneMode.Single);
+            return;
         }
 
         LevelManager.instance = this;
@@ -476,7 +522,11 @@ public class LevelManager : MonoBehaviour
     {
         this.FindKeyPoints();
         this.SpawnPlayers();  // Depends on FindKeyPoints to find the start keypoint
-        this.SetTimeScale(1.0f);  // Depends on SpawnPlayers to create the screen manager
+        this.SetTimeScale(LaunchOptions.Current.TimeScale);  // Depends on SpawnPlayers to create the screen manager
+        if (!string.IsNullOrEmpty(LaunchOptions.Current.DiagnosticsPath))
+        {
+            this.gameObject.AddComponent<SimDiagnostics>();
+        }
 
         switch (LevelManager.LevelManagerMode)
         {
@@ -502,6 +552,7 @@ public class LevelManager : MonoBehaviour
                 else
                 {
                     this.pythonInterface = LevelManager.cachedPythonInterface;
+                    LevelManager.cachedPythonInterface = null;
                     this.screenManager.UpdateConnectedPrograms(this.pythonInterface.ConnectedPrograms);
                     this.HandleStart();
                 }
@@ -517,11 +568,17 @@ public class LevelManager : MonoBehaviour
         {
             this.pythonInterface = new PythonInterface();
             this.screenManager.UpdateConnectedPrograms(this.pythonInterface.ConnectedPrograms);
+            if (this.pythonInterface.StartupError != null)
+            {
+                this.screenManager.ShowError(this.pythonInterface.StartupError);
+            }
         }
     }
 
     private void Update()
     {
+        this.pythonInterface?.ProcessPendingRequests();
+
         switch (this.simulationMode)
         {
             case SimulationMode.DefaultDrive:
@@ -579,7 +636,16 @@ public class LevelManager : MonoBehaviour
                 // If the user forcibly exits all programs, this is equivalent to pressing back
                 this.HandleBack();
             }
-            this.wasConnectedProgramsChanged = false; // TODO: there is probably a data race here
+            this.wasConnectedProgramsChanged = false;
+            Debug.Log($"Connected programs: [{string.Join(", ", this.pythonInterface.ConnectedPrograms)}]");
+
+            // Scripted runs (LaunchOptions) start whenever every car has a program, including after a reconnect
+            if (LaunchOptions.Current.AutoStart &&
+                this.simulationMode != SimulationMode.UserProgram && this.simulationMode != SimulationMode.Finished &&
+                this.pythonInterface.ConnectedPrograms.Count(connected => connected) == LevelManager.NumPlayers)
+            {
+                this.HandleStart();
+            }
         }
 
         // In exploration mode, skip between checkpoints on tab key
@@ -613,6 +679,26 @@ public class LevelManager : MonoBehaviour
         if (LevelManager.NumPlayers > 1)
         {
             this.ManageRaceInputs();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        foreach (RenderTexture texture in this.ownedRenderTextures)
+        {
+            texture.Release();
+            Destroy(texture);
+        }
+        this.ownedRenderTextures.Clear();
+
+        // Release the UDP ports on any unload path that skipped HandleExit, so the next level can bind them
+        if (!this.isPythonInterfaceHandedOff)
+        {
+            this.pythonInterface?.HandleExit();
+        }
+        if (LevelManager.instance == this)
+        {
+            LevelManager.instance = null;
         }
     }
 
@@ -654,9 +740,21 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     /// <param name="carIndex">The index of the car to reset.</param>
     /// <returns>The transform of the key point at which the car should be reset.</returns>
-    private Transform GetResetLocation(int carIndex)
+    private (Vector3, Quaternion) GetResetPose(int carIndex)
     {
-        return this.keyPoints[this.curKeyPoints[carIndex]].transform;
+        int keyPointIndex = this.curKeyPoints[carIndex];
+        (Vector3 spawnPosition, Quaternion spawnRotation) = this.GetSpawnLocation(carIndex);
+        if (keyPointIndex == 0)
+        {
+            return (spawnPosition, spawnRotation);
+        }
+
+        // At a later key point, keep the car's place in the starting formation, turned to the
+        // key point's heading, so cars reset at the same checkpoint do not land on each other
+        Transform start = this.keyPoints[0].transform;
+        Transform target = this.keyPoints[keyPointIndex].transform;
+        Vector3 formationOffset = Quaternion.Inverse(start.rotation) * (spawnPosition - start.position);
+        return (target.position + target.rotation * formationOffset, target.rotation);
     }
 
     /// <summary>
@@ -664,6 +762,24 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     private void ManageRaceInputs()
     {
+        // R + number resets that car
+        if (Input.GetKey(KeyCode.R))
+        {
+            for (int i = 0; i < LevelManager.NumPlayers && i < 9; i++)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+                {
+                    LevelManager.ResetCar(i);
+                }
+            }
+            return;
+        }
+
+        if (this.raceCameras.Length == 0)
+        {
+            return;
+        }
+
         int prevRaceCamera = this.curRaceCamera;
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -684,19 +800,12 @@ public class LevelManager : MonoBehaviour
         }
         this.curRaceCamera %= this.raceCameras.Length;
 
-        for (int i = 0; i < this.raceCameras.Length; i++)
+        for (int i = 0; i < this.raceCameras.Length && i < 9; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
-                if (Input.GetKey(KeyCode.R))
-                {
-                    LevelManager.ResetCar(i);
-                }
-                else
-                {
-                    this.curRaceCamera = i;
-                    break;
-                }
+                this.curRaceCamera = i;
+                break;
             }
         }
 
@@ -742,11 +851,13 @@ public class LevelManager : MonoBehaviour
                 this.players[i] = GameObject.Instantiate(this.playerPrefab, spawnPosition, spawnRotation).GetComponentInChildren<Racecar>();
                 this.players[i].SetIndex(i);
                 playerCameraTextures[i] = new RenderTexture(textureDescriptor);
+                this.ownedRenderTextures.Add(playerCameraTextures[i]);
                 this.players[i].SetPlayerCameraFeatures(playerCameraTextures[i], false);
             }
 
             // Create a render texture for the race cameras
             RenderTexture raceCameraTexture = new RenderTexture(textureDescriptor);
+            this.ownedRenderTextures.Add(raceCameraTexture);
             foreach(Camera raceCamera in this.raceCameras)
             {
                 raceCamera.targetTexture = raceCameraTexture;
@@ -811,6 +922,13 @@ public class LevelManager : MonoBehaviour
         {
             this.TogglePause();
         }
+        else if (LevelManager.LevelManagerMode == LevelManagerMode.Autograder)
+        {
+            if (this.simulationMode == SimulationMode.UserProgram)
+            {
+                this.screenManager.ShowWarning("Manual driving is disabled during an autograder run.");
+            }
+        }
         else if (this.simulationMode == SimulationMode.UserProgram)
         {
             this.simulationMode = SimulationMode.DefaultDrive;
@@ -830,6 +948,14 @@ public class LevelManager : MonoBehaviour
         // Reload current level with the ReloadBuffer
         this.pythonInterface.HandleExit();
         ReloadBuffer.BuildIndexToReload = SceneManager.GetActiveScene().buildIndex;
+
+        // An autograder restart begins the run again from its first level with a new Python interface
+        if (LevelManager.LevelManagerMode == LevelManagerMode.Autograder)
+        {
+            LevelManager.cachedPythonInterface = null;
+            AutograderManager.ResetAutograder();
+            ReloadBuffer.BuildIndexToReload = LevelManager.LevelInfo.AutograderBuildIndex;
+        }
         SceneManager.LoadScene(ReloadBuffer.BuildIndex, LoadSceneMode.Single);
     }
 
@@ -881,7 +1007,18 @@ public class LevelManager : MonoBehaviour
     /// <param name="scaleFactor">The number with which to multiply the current time scale.</param>
     private void ScaleTimeScale(float scaleFactor)
     {
-        this.SetTimeScale(Mathf.Max(Mathf.Min(Time.timeScale * scaleFactor, 1.0f), LevelManager.minTimeScale));
+        float scaled = Mathf.Max(Mathf.Min(this.timeScale * scaleFactor, 1.0f), LevelManager.minTimeScale);
+        if (Time.timeScale == 0)
+        {
+            // Paused: keep the game paused and apply the new scale when it resumes
+            this.timeScale = scaled;
+            Time.fixedDeltaTime = Settings.DefaultFixedDeltaTime * scaled;
+            this.screenManager.UpdateTimeScale(scaled);
+        }
+        else
+        {
+            this.SetTimeScale(scaled);
+        }
     }
 
     /// <summary>
@@ -905,7 +1042,7 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     private void FindKeyPoints()
     {
-        this.keyPoints = FindObjectsOfType<KeyPoint>();
+        this.keyPoints = FindObjectsByType<KeyPoint>();
         Array.Sort(this.keyPoints);
 
         // If the level does not have a start key point, create and add a default one
@@ -945,18 +1082,22 @@ public class LevelManager : MonoBehaviour
             this.curKeyPoints[0] > 0 &&
             !Settings.CheatMode)
         {
-            BestTimeInfo bestTimeInfo = SavedDataManager.Data.BestTimes[LevelManager.LevelInfo.WinableIndex];
+            BestTimeInfo bestTimeInfo = SavedDataManager.Data.GetBestTimes(LevelManager.LevelInfo);
 
             // Update overall time if we finished the level
-            if (this.curKeyPoints[0] == this.keyPoints.Length - 1)
+            if (this.curKeyPoints[0] == this.keyPoints.Length - 1 && this.totalDuration > 0)
             {
                 bestTimeInfo.OverallTime = Mathf.Min(bestTimeInfo.OverallTime, this.totalDuration);
             }
 
-            // Update the times for the checkpoints we completed
-            for (int i = 0; i < this.curKeyPoints[0]; i++)
+            // Update the times for the checkpoints we completed; an unset (zero) duration is never a best time
+            for (int i = 0; i < this.curKeyPoints[0] && i < bestTimeInfo.CheckpointTimes.Length; i++)
             {
-                bestTimeInfo.CheckpointTimes[i] = Mathf.Min(bestTimeInfo.CheckpointTimes[i], this.keyPointDurations[i + 1]);
+                float duration = this.keyPointDurations[i + 1];
+                if (duration > 0)
+                {
+                    bestTimeInfo.CheckpointTimes[i] = Mathf.Min(bestTimeInfo.CheckpointTimes[i], duration);
+                }
             }
 
             SavedDataManager.Save();

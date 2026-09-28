@@ -53,9 +53,15 @@ public class CameraModule : RacecarModule
     private const float averageErrorFactor = 0.02f;
 
     /// <summary>
-    /// Time (in ms) to wait for the color or depth image to update during an async call.
+    /// Maximum time (in ms) an async call waits for the main thread to capture an image. A call
+    /// normally returns after one frame; the limit applies while no frames run (scene loading).
     /// </summary>
-    private const int asyncWaitTime = 200;
+    private const int asyncWaitTime = 1000;
+
+    /// <summary>
+    /// Seconds between refreshes of the HUD depth view.
+    /// </summary>
+    private const float depthVisualizationInterval = 0.1f;
     #endregion
 
     #region Public Interface
@@ -153,7 +159,7 @@ public class CameraModule : RacecarModule
             {
                 if (this.DepthImage[r][c] != CameraModule.minCode && this.DepthImage[r][c] != CameraModule.maxCode)
                 {
-                    rawData[(CameraModule.DepthHeight - r) * texture.width + c] = CameraModule.InterpolateDepthColor(DepthImage[r][c]);
+                    rawData[(CameraModule.DepthHeight - 1 - r) * texture.width + c] = CameraModule.InterpolateDepthColor(DepthImage[r][c]);
                 }
             }
         }
@@ -162,27 +168,23 @@ public class CameraModule : RacecarModule
     }
 
     /// <summary>
-    /// Asynchronously updates and returns the color image captured by the camera.
-    /// Warning: This method blocks for asyncWaitTime ms to wait for the new image to load.
+    /// Requests a color image from a background thread and waits for the main thread to capture it.
     /// </summary>
-    /// <returns>The color image captured by the camera.</returns>
+    /// <returns>A copy of the color image captured on the next frame, or the last copy if no frame
+    /// ran within asyncWaitTime ms (for example while a scene loads).</returns>
     public byte[] GetColorImageRawAsync()
     {
-        this.mustUpdateColorImageRaw = true;
-        Thread.Sleep(CameraModule.asyncWaitTime);
-        return this.colorImageRaw;
+        return this.colorRequest.Wait(CameraModule.asyncWaitTime);
     }
 
     /// <summary>
-    /// Asynchronously updates and returns the depth image captured by the camera.
-    /// Warning: This method blocks for asyncWaitTime ms to wait for the new image to load.
+    /// Requests a depth image from a background thread and waits for the main thread to capture it.
     /// </summary>
-    /// <returns>The depth image captured by the camera.</returns>
+    /// <returns>A copy of the depth image captured on the next frame, or the last copy if no frame
+    /// ran within asyncWaitTime ms.</returns>
     public byte[] GetDepthImageRawAsync()
     {
-        this.mustUpdateDepthImageRaw = true;
-        Thread.Sleep(CameraModule.asyncWaitTime);
-        return this.depthImageRaw;
+        return this.depthRequest.Wait(CameraModule.asyncWaitTime);
     }
     #endregion
 
@@ -222,20 +224,74 @@ public class CameraModule : RacecarModule
     private Camera colorCamera;
 
     /// <summary>
-    /// The depth camera on the car.
-    /// This is currently unused, but a future goal is to use this instead of raycasts.
+    /// The depth camera on the car. Its viewport defines the raycast directions in UpdateDepthImage.
     /// </summary>
     private Camera depthCamera;
 
     /// <summary>
-    /// If true, colorImageRaw is updated next frame.
+    /// A frame capture requested by the async (Jupyter) thread and fulfilled on the main thread.
+    /// Each fulfilled request stores a new array, so the requesting thread never reads a buffer
+    /// that the main thread is writing.
     /// </summary>
-    private bool mustUpdateColorImageRaw;
+    private class AsyncCaptureRequest
+    {
+        private readonly ManualResetEventSlim fulfilled = new ManualResetEventSlim(false);
+
+        private volatile bool isRequested;
+
+        private volatile byte[] snapshot;
+
+        public AsyncCaptureRequest(int length)
+        {
+            this.snapshot = new byte[length];
+        }
+
+        /// <summary>
+        /// True while a background thread waits for a capture.
+        /// </summary>
+        public bool IsRequested { get { return this.isRequested; } }
+
+        /// <summary>
+        /// Called on the background thread: requests a capture and blocks until it arrives or the timeout passes.
+        /// </summary>
+        public byte[] Wait(int timeoutMs)
+        {
+            this.fulfilled.Reset();
+            this.isRequested = true;
+            this.fulfilled.Wait(timeoutMs);
+            return this.snapshot;
+        }
+
+        /// <summary>
+        /// Called on the main thread: stores a copy of the current data and releases the waiting thread.
+        /// </summary>
+        public void Fulfill(byte[] current)
+        {
+            this.snapshot = (byte[])current.Clone();
+            this.isRequested = false;
+            this.fulfilled.Set();
+        }
+    }
 
     /// <summary>
-    /// If true, depthImageRaw is updated next frame.
+    /// CPU-side copy target for color captures, reused across frames.
     /// </summary>
-    private bool mustUpdateDepthImageRaw;
+    private Texture2D captureTexture;
+
+    /// <summary>
+    /// The Time.unscaledTime at which the HUD depth view next refreshes.
+    /// </summary>
+    private float nextDepthVisualizationTime;
+
+    /// <summary>
+    /// Pending async color image request.
+    /// </summary>
+    private AsyncCaptureRequest colorRequest;
+
+    /// <summary>
+    /// Pending async depth image request.
+    /// </summary>
+    private AsyncCaptureRequest depthRequest;
 
     protected override void Awake()
     {
@@ -251,6 +307,8 @@ public class CameraModule : RacecarModule
 
         this.depthImageRaw = new byte[sizeof(float) * CameraModule.DepthHeight * CameraModule.DepthWidth];
         this.colorImageRaw = new byte[sizeof(float) * CameraModule.ColorWidth * CameraModule.ColorHeight];
+        this.colorRequest = new AsyncCaptureRequest(this.colorImageRaw.Length);
+        this.depthRequest = new AsyncCaptureRequest(this.depthImageRaw.Length);
 
         if (Settings.HideCarsInColorCamera)
         {
@@ -268,22 +326,27 @@ public class CameraModule : RacecarModule
 
     private void Update()
     {
-        if (this.mustUpdateColorImageRaw)
+        if (this.colorRequest.IsRequested)
         {
-            this.UpdateColorImageRaw();
-            this.mustUpdateColorImageRaw = false;
+            this.colorRequest.Fulfill(this.ColorImageRaw);
         }
 
-        if (this.mustUpdateDepthImageRaw)
+        if (this.depthRequest.IsRequested)
         {
-            this.UpdateDepthImageRaw();
-            this.mustUpdateDepthImageRaw = false;
+            this.depthRequest.Fulfill(this.DepthImageRaw);
         }
 
-        if (this.racecar.Hud != null)
+        // The HUD depth view raycasts the full depth image, so refresh it at a fixed rate rather than every frame
+        if (this.racecar.Hud != null && Time.unscaledTime >= this.nextDepthVisualizationTime)
         {
             this.VisualizeDepth(this.racecar.Hud.DepthVisualization);
+            this.nextDepthVisualizationTime = Time.unscaledTime + CameraModule.depthVisualizationInterval;
         }
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(this.captureTexture);
     }
 
     private void LateUpdate()
@@ -329,29 +392,36 @@ public class CameraModule : RacecarModule
     private void UpdateColorImageRaw()
     {
         RenderTexture activeRenderTexture = RenderTexture.active;
-
-        // Tell GPU to render the image captured by the color camera
         RenderTexture.active = this.ColorImage;
-        this.colorCamera.Render();
 
-        // Copy this image from the GPU to a Texture2D on the CPU
-        Texture2D image = new Texture2D(this.ColorImage.width, this.ColorImage.height);
-        image.ReadPixels(new Rect(0, 0, this.ColorImage.width, this.ColorImage.height), 0, 0);
-        image.Apply();
+        // An enabled color camera already renders to ColorImage every frame; reading that image
+        // costs one frame of latency instead of a second render. Render explicitly only when the
+        // camera is disabled or has not rendered yet.
+        if (!this.colorCamera.enabled || Time.frameCount <= 1)
+        {
+            this.colorCamera.Render();
+        }
+
+        // Copy this image from the GPU to a reused Texture2D on the CPU
+        if (this.captureTexture == null || this.captureTexture.width != this.ColorImage.width || this.captureTexture.height != this.ColorImage.height)
+        {
+            Destroy(this.captureTexture);
+            this.captureTexture = new Texture2D(this.ColorImage.width, this.ColorImage.height, TextureFormat.RGBA32, false);
+        }
+        this.captureTexture.ReadPixels(new Rect(0, 0, this.ColorImage.width, this.ColorImage.height), 0, 0);
 
         // Restore the previous GPU render target
         RenderTexture.active = activeRenderTexture;
 
         // Copy the bytes from the Texture2D to this.colorImageRaw, reversing row order
         // (Unity orders bottom-to-top, we want top-to-bottom)
-        byte[] bytes = image.GetRawTextureData();
+        Unity.Collections.NativeArray<byte> bytes = this.captureTexture.GetRawTextureData<byte>();
         int bytesPerRow = CameraModule.ColorWidth * 4;
         for (int r = 0; r < CameraModule.ColorHeight; r++)
         {
-            Buffer.BlockCopy(bytes, (CameraModule.ColorHeight - r - 1) * bytesPerRow, this.colorImageRaw, r * bytesPerRow, bytesPerRow);
+            Unity.Collections.NativeArray<byte>.Copy(bytes, (CameraModule.ColorHeight - r - 1) * bytesPerRow, this.colorImageRaw, r * bytesPerRow, bytesPerRow);
         }
 
-        Destroy(image);
         this.isColorImageRawValid = true;
     }
 

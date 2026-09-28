@@ -130,6 +130,12 @@ public class ArMarkerToggle : MonoBehaviour
 
     private void Start()
     {
+        // A marker without patterns keeps the pattern and colors set on its materials
+        if (this.patterns.Length == 0)
+        {
+            return;
+        }
+
         this.PatternIndex = this.initialPattern;
         this.ColorIndex = this.initialColor;
         this.Selected = false;
@@ -147,7 +153,7 @@ public class ArMarkerToggle : MonoBehaviour
         {
             if (tagClicked)
             {
-                if (leftMouse)
+                if (leftMouse && this.patterns.Length > 0)
                 {
                     // Toggle the displayed pattern when left-clicked
                     this.PatternIndex = (this.PatternIndex + 1) % this.patterns.Length;

@@ -30,11 +30,16 @@ public class SpeedLimit : MonoBehaviour
     /// </summary>
     private readonly HashSet<Racecar> cars = new HashSet<Racecar>();
 
+    /// <summary>
+    /// Cars that already failed in this zone; each car fails once.
+    /// </summary>
+    private readonly HashSet<Racecar> failedCars = new HashSet<Racecar>();
+
     private void Update()
     {
         foreach (Racecar car in this.cars)
         {
-            if (car.Physics.LinearVelocity.magnitude > this.maxSpeed)
+            if (car.Physics.LinearVelocity.magnitude > this.maxSpeed && this.failedCars.Add(car))
             {
                 LevelManager.HandleFailure(car.Index, this.FailureMessage);
             }

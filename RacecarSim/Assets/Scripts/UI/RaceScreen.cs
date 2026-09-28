@@ -60,7 +60,7 @@ public class RaceScreen : ScreenManager
 
     public override void UpdateMode(SimulationMode mode)
     {
-        this.images[(int)Images.WaitMessage].gameObject.SetActive(mode == SimulationMode.Wait);
+        this.waitMessage.gameObject.SetActive(mode == SimulationMode.Wait);
     }
 
     public override void UpdateTimeScale(float timeScale)
@@ -104,17 +104,16 @@ public class RaceScreen : ScreenManager
     #endregion
 
     /// <summary>
-    /// The mutable images of the race screen manager, with values corresponding to the index in images.
-    /// </summary>
-    private enum Images
-    {
-        WaitMessage = 9
-    }
-
-    /// <summary>
     /// The potential camera views in the race screen.
     /// </summary>
+    [SerializeField]
     private RaceCameraView[] cameraViews;
+
+    /// <summary>
+    /// The message shown while waiting for the race to start.
+    /// </summary>
+    [SerializeField]
+    private RawImage waitMessage;
 
     /// <summary>
     /// The number of cars in the current race.
@@ -123,12 +122,7 @@ public class RaceScreen : ScreenManager
 
     protected override void Awake()
     {
-        this.messageTextIndex = 5;
-        this.mainTimeTextIndex = 6;
-
         base.Awake();
-
-        this.cameraViews = this.GetComponentsInChildren<RaceCameraView>();
 
         // Unity requires one camera rendering to the display, so create a dummy camera
         // (which is fully blocked by the race screen background)

@@ -6,6 +6,26 @@ using UnityEngine.UI;
 /// </summary>
 public class AutograderUIEntry : MonoBehaviour
 {
+    #region Set in Unity Editor
+    /// <summary>
+    /// The trial title.
+    /// </summary>
+    [SerializeField]
+    private Text nameText;
+
+    /// <summary>
+    /// The score and max score.
+    /// </summary>
+    [SerializeField]
+    private Text scoreText;
+
+    /// <summary>
+    /// The trial time.
+    /// </summary>
+    [SerializeField]
+    private Text timeText;
+    #endregion
+
     #region Constants
     /// <summary>
     /// The color shown for a score which is between 0 and full credit, not inclusive.
@@ -26,55 +46,35 @@ public class AutograderUIEntry : MonoBehaviour
     /// <param name="bestTimeInfo">Information about the user's performance in the level.</param>
     public void SetInfo(AutograderLevelInfo levelInfo, AutograderLevelScore levelScore)
     {
-        this.texts[(int)Texts.Name].text = levelInfo.IsRequired ? $"*{levelInfo.Title}" : levelInfo.Title;
+        this.nameText.text = levelInfo.IsRequired ? $"*{levelInfo.Title}" : levelInfo.Title;
 
         if (levelScore != null)
         {
-            this.texts[(int)Texts.Score].text = $"{levelScore.Score:F2}/{levelInfo.MaxPoints:F2}";
-            this.texts[(int)Texts.Time].text = levelScore.Time.ToString("F2");
+            this.scoreText.text = $"{levelScore.Score:F2}/{levelInfo.MaxPoints:F2}";
+            this.timeText.text = levelScore.Time.ToString("F2");
 
             if (levelInfo.MaxPoints > 0 && levelScore.Score == 0)
             {
                 // No credit
-                this.texts[(int)Texts.Score].color = Color.red;
+                this.scoreText.color = Color.red;
             }
             else if (levelScore.Score > levelInfo.MaxPoints)
             {
                 // Extra credit
-                this.texts[(int)Texts.Score].color = AutograderUIEntry.extraCreditColor;
+                this.scoreText.color = AutograderUIEntry.extraCreditColor;
             }
             else if (levelScore.Score != levelInfo.MaxPoints)
             {
                 // Partial credit
-                this.texts[(int)Texts.Score].color = AutograderUIEntry.partialCreditColor;
+                this.scoreText.color = AutograderUIEntry.partialCreditColor;
             }
         }
         else
         {
-            this.texts[(int)Texts.Score].text = $"--/{levelInfo.MaxPoints:F2}";
-            this.texts[(int)Texts.Score].color = Color.red;
-            this.texts[(int)Texts.Time].text = "--";
+            this.scoreText.text = $"--/{levelInfo.MaxPoints:F2}";
+            this.scoreText.color = Color.red;
+            this.timeText.text = "--";
         }
     }
     #endregion
-
-    /// <summary>
-    /// The mutable text fields of the UI entry, with values corresponding to the index in texts.
-    /// </summary>
-    private enum Texts
-    {
-        Name = 0,
-        Score = 1,
-        Time = 2
-    }
-
-    /// <summary>
-    /// The mutable text fields in the UI entry.
-    /// </summary>
-    private Text[] texts;
-
-    private void Awake()
-    {
-        this.texts = this.GetComponentsInChildren<Text>();
-    }
 }

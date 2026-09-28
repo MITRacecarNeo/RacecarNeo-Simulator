@@ -43,8 +43,8 @@ public abstract class ScreenManager : MonoBehaviour
     /// <param name="fadeTime">In the time in seconds it takes for the text to fade out after persistTime has passed.</param>
     public void ShowMessage(string message, Color color, float persistTime = -1, float fadeTime = 1.0f)
     {
-        this.texts[this.messageTextIndex].text = message;
-        this.texts[this.messageTextIndex].color = color;
+        this.messageText.text = message;
+        this.messageText.color = color;
 
         this.messageColor = color;
         this.messageCounter = 0;
@@ -71,7 +71,7 @@ public abstract class ScreenManager : MonoBehaviour
     /// <param name="keyPointDurations">The time which the 0th car spent on each key point, indexed by key point.</param>
     public virtual void UpdateTime(float mainTime, float[] keyPointDurations)
     {
-        this.texts[this.mainTimeTextIndex].text = mainTime.ToString("F3");
+        this.mainTimeText.text = mainTime.ToString("F3");
 
         // The children of this class can override this method if they wish to display key point times
     }
@@ -82,7 +82,7 @@ public abstract class ScreenManager : MonoBehaviour
     /// <param name="isPaused">True if the simulation is currently paused.</param>
     public void SetPause(bool isPaused)
     {
-        this.images[this.pauseScreenIndex].gameObject.SetActive(isPaused);
+        this.pauseScreen.gameObject.SetActive(isPaused);
     }
 
     #region Abstract
@@ -120,41 +120,31 @@ public abstract class ScreenManager : MonoBehaviour
     #endregion
     #endregion
 
+    #region Set in Unity Editor
     /// <summary>
-    /// All text fields contained in the screen manager.
+    /// The text showing messages, warnings, and errors.
     /// </summary>
-    protected Text[] texts;
+    [SerializeField]
+    protected Text messageText;
 
     /// <summary>
-    /// All images contained in the screen manager.
+    /// The text showing the main timer.
     /// </summary>
-    protected RawImage[] images;
+    [SerializeField]
+    protected Text mainTimeText;
 
     /// <summary>
-    /// The index of the message text in texts.
+    /// The overlay shown while the simulation is paused.
     /// </summary>
-    protected int messageTextIndex = 0;
-
-    /// <summary>
-    /// The index of the main time text in texts.
-    /// </summary>
-    protected int mainTimeTextIndex = 1;
-
-    /// <summary>
-    /// The index of the pause screen in images.
-    /// </summary>
-    /// <remarks>By default, it is the last image in images.</remarks>
-    protected int pauseScreenIndex;
+    [SerializeField]
+    protected RawImage pauseScreen;
+    #endregion
 
     protected virtual void Awake()
     {
-        this.texts = GetComponentsInChildren<Text>();
-        this.images = this.GetComponentsInChildren<RawImage>();
-        this.pauseScreenIndex = this.images.Length - 1;
-
         this.messagePersistTime = -1;
-        this.texts[this.messageTextIndex].text = string.Empty;
-        this.texts[this.mainTimeTextIndex].text = string.Empty;
+        this.messageText.text = string.Empty;
+        this.mainTimeText.text = string.Empty;
 
         this.SetPause(false);
     }
@@ -174,7 +164,7 @@ public abstract class ScreenManager : MonoBehaviour
         else if (this.messagePersistTime == 0 && this.messageCounter < this.messageFadeTime)
         {
             this.messageCounter += Time.deltaTime;
-            this.texts[this.messageTextIndex].color = Color.Lerp(this.messageColor, Color.clear, this.messageCounter / this.messageFadeTime);
+            this.messageText.color = Color.Lerp(this.messageColor, Color.clear, this.messageCounter / this.messageFadeTime);
         }
     }
 

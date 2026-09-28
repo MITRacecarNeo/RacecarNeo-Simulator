@@ -84,7 +84,7 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Long Hallway Sandbox",
-                    BuildIndex = 132,
+                    BuildIndex = 117,
                 }
             }
         },
@@ -98,10 +98,10 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab D: Driving in Mazes",
-                    BuildIndex = 106,
+                    BuildIndex = 92,
                     NumCheckpoints = 4,
                     HelpMessage = "Press the TAB key to skip to the next checkpoint, collisions will reset you back to the checkpoint",
-                    AutograderBuildIndex = 115,
+                    AutograderBuildIndex = 100,
                     AutograderLevelCode = "labd",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -139,9 +139,9 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab E: Stoplight Challenge",
-                    BuildIndex = 107,
+                    BuildIndex = 93,
                     HelpMessage = "Click on the block to select it, then right-click it to change it's color",
-                    AutograderBuildIndex = 119,
+                    AutograderBuildIndex = 104,
                     AutograderLevelCode = "labe",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -200,12 +200,13 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab F: Line Follower",
-                    BuildIndex = 108,
+                    Id = "lab-f-line-follower",
+                    BuildIndex = 94,
                     NumCheckpoints = 4,
                     IsRaceable = true,
                     MaxCars = 1,
                     HelpMessage = "Press the TAB key to skip to the next checkpoint, going down the wrong path resets you back to the checkpoint",
-                    AutograderBuildIndex = 35,
+                    AutograderBuildIndex = 31,
                     AutograderLevelCode = "labf",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -256,9 +257,9 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab G: Autonomous Parking",
-                    BuildIndex = 109,
+                    BuildIndex = 95,
                     HelpMessage = "Left-Click on the screen to move the cone",
-                    AutograderBuildIndex = 41,
+                    AutograderBuildIndex = 37,
                     AutograderLevelCode = "labg",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -308,9 +309,9 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab H: Cone Slalom",
-                    BuildIndex = 110,
+                    BuildIndex = 96,
                     HelpMessage = "Drive on the left side of the blue cone and on the right side of the red cone",
-                    AutograderBuildIndex = 64,
+                    AutograderBuildIndex = 60,
                     AutograderLevelCode = "labh",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -361,12 +362,13 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab I: Wall Follower",
-                    BuildIndex = 111,
+                    Id = "lab-i-wall-follower",
+                    BuildIndex = 97,
                     NumCheckpoints = 4,
                     IsRaceable = true,
                     MaxCars = 1,
                     HelpMessage = "Press the TAB key to skip to the next checkpoint",
-                    AutograderBuildIndex = 78,
+                    AutograderBuildIndex = 74,
                     AutograderLevelCode = "labi",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -429,7 +431,7 @@ public class LevelCollection
                 {
                     DisplayName = "Lab 1: Driving in Shapes",
                     BuildIndex = 3,
-                    AutograderBuildIndex = 26,
+                    AutograderBuildIndex = 22,
                     AutograderLevelCode = "lab1",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -493,7 +495,7 @@ public class LevelCollection
                 {
                     DisplayName = "Lab 2a: Line Following",
                     BuildIndex = 5,
-                    AutograderBuildIndex = 34,
+                    AutograderBuildIndex = 30,
                     AutograderLevelCode = "lab2a",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -520,7 +522,7 @@ public class LevelCollection
                         {
                             Title = "Curved path",
                             Description = "Follow the green line for a winding path.",
-                            MaxPoints = 1,
+                            MaxPoints = 3,
                             TimeLimit = 12
                         },
                         new AutograderLevelInfo()
@@ -533,7 +535,7 @@ public class LevelCollection
                         {
                             Title = "Color Priority 2",
                             Description = "Follow the color priority red > green > blue for a more complex path.",
-                            MaxPoints = 3,
+                            MaxPoints = 10,
                             TimeLimit = 20
                         },
                         new AutograderLevelInfo()
@@ -549,7 +551,7 @@ public class LevelCollection
                     DisplayName = "Lab 2b: Cone Parking",
                     BuildIndex = 6,
                     HelpMessage = "Left-click on the screen to move the cone",
-                    AutograderBuildIndex = 41,
+                    AutograderBuildIndex = 37,
                     AutograderLevelCode = "lab2b",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -557,40 +559,40 @@ public class LevelCollection
                         {
                             Title = "Far",
                             Description = "Park 30 cm away from the cone.",
-                            MaxPoints = 2
+                            MaxPoints = 4
                         },
                         new AutograderLevelInfo()
                         {
                             Title = "Close",
                             Description = "Park 30 cm away from the cone.",
-                            MaxPoints = 1
+                            MaxPoints = 4
                         },
                         new AutograderLevelInfo()
                         {
                             Title = "Very Far",
                             Description = "Park 30 cm away from the cone.",
-                            MaxPoints = 1,
+                            MaxPoints = 3,
                             TimeLimit = 15
                         },
                         new AutograderLevelInfo()
                         {
                             Title = "Slight left",
                             Description = "Park 30 cm away from the cone.",
-                            MaxPoints = 2,
+                            MaxPoints = 3,
                             TimeLimit = 15
                         },
                         new AutograderLevelInfo()
                         {
                             Title = "Far right",
                             Description = "Park 30 cm away from the cone.",
-                            MaxPoints = 2,
+                            MaxPoints = 3,
                             TimeLimit = 15
                         },
                         new AutograderLevelInfo()
                         {
                             Title = "Near and left",
                             Description = "Park 30 cm away from the cone.",
-                            MaxPoints = 2,
+                            MaxPoints = 3,
                             TimeLimit = 15
                         }
                     }
@@ -599,7 +601,7 @@ public class LevelCollection
                 {
                     DisplayName = "Lab 3a: Safety Stop",
                     BuildIndex = 8,
-                    AutograderBuildIndex = 47,
+                    AutograderBuildIndex = 43,
                     AutograderLevelCode = "lab3a",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -659,7 +661,7 @@ public class LevelCollection
                     DisplayName = "Lab 3b: Cone Parking (Revisited)",
                     BuildIndex = 9,
                     HelpMessage = "Left-click on the screen to move the cone and scroll to resize the cone",
-                    AutograderBuildIndex = 55,
+                    AutograderBuildIndex = 51,
                     AutograderLevelCode = "lab3b",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -701,7 +703,7 @@ public class LevelCollection
                 {
                     DisplayName = "Lab 3c: Wall Parking",
                     BuildIndex = 10,
-                    AutograderBuildIndex = 60,
+                    AutograderBuildIndex = 56,
                     AutograderLevelCode = "lab3c",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -736,7 +738,7 @@ public class LevelCollection
                 {
                     DisplayName = "Lab 4a: Safety Stop (Revisited)",
                     BuildIndex = 8,
-                    AutograderBuildIndex = 73,
+                    AutograderBuildIndex = 69,
                     AutograderLevelCode = "lab4a",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -781,10 +783,11 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab 4b: Wall Following",
+                    Id = "lab-4b-wall-following",
                     BuildIndex = 14,
                     IsRaceable = true,
                     NumCheckpoints = 2,
-                    AutograderBuildIndex = 78,
+                    AutograderBuildIndex = 74,
                     AutograderLevelCode = "lab4b",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -837,10 +840,11 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab 5: AR Tag Decisions",
+                    Id = "lab-5-ar-tag-decisions",
                     BuildIndex = 16,
                     IsRaceable = true,
                     NumCheckpoints = 2,
-                    AutograderBuildIndex = 84,
+                    AutograderBuildIndex = 80,
                     AutograderLevelCode = "lab5",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -904,15 +908,17 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Lab 6c: Speed Limit",
+                    Id = "lab-6c-speed-limit",
                     BuildIndex = 20,
                     IsRaceable = true
                 },
                 new LevelInfo()
                 {
                     DisplayName = "Cone Slalom: Regular",
+                    Id = "cone-slalom-regular",
                     BuildIndex = 11,
                     IsRaceable = true,
-                    AutograderBuildIndex = 64,
+                    AutograderBuildIndex = 60,
                     AutograderLevelCode = "p1",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -953,7 +959,7 @@ public class LevelCollection
                         {
                             Title = "Full Course",
                             Description = "Complete the slalom course.",
-                            MaxPoints = 5,
+                            MaxPoints = 10,
                             TimeLimit = 90,
                             TimeBonuses = new Vector2[]{ new Vector2(20, 1), new Vector2(30, 0.5f), new Vector2(45, 0), new Vector2(60, -1), new Vector2(float.PositiveInfinity, -2) }
                         }
@@ -962,10 +968,11 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Cone Slalom: Hard",
+                    Id = "cone-slalom-hard",
                     BuildIndex = 12,
                     IsRaceable = true,
                     NumCheckpoints = 2,
-                    AutograderBuildIndex = 70,
+                    AutograderBuildIndex = 66,
                     AutograderLevelCode = "p1hard",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
@@ -1005,8 +1012,18 @@ public class LevelCollection
             {
                 new LevelInfo()
                 {
+                    DisplayName = "Grand Prix 2026",
+                    Id = "grand-prix-2026",
+                    BuildIndex = 129,
+                    IsRaceable = true,
+                    NumCheckpoints = 4,
+                    MaxCars = 4,
+                },
+                new LevelInfo()
+                {
                     DisplayName = "Micro Grand Prix 2026",
-                    BuildIndex = 143,
+                    Id = "micro-grand-prix-2026",
+                    BuildIndex = 128,
                     IsRaceable = true,
                     NumCheckpoints = 0,
                     MaxCars = 2,
@@ -1014,49 +1031,28 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Mini Grand Prix: Fall 2025",
-                    BuildIndex = 134,
+                    Id = "mini-grand-prix-fall-2025",
+                    BuildIndex = 119,
                     HasRandomMaps = true,
-                    RandomSceneBuildIndices = new int[] {135, 136, 137, 138, 139, 140},
+                    RandomSceneBuildIndices = new int[] {120, 121, 122, 123, 124, 125},
                     IsRaceable = true,
                     NumCheckpoints = 0,
                     MaxCars = 2,
-                    AutograderBuildIndex = 135,
-                    AutograderLevelCode = "mgp2025fa",
-                    AutograderLevels = new AutograderLevelInfo[]
-                    {
-                        new AutograderLevelInfo()
-                        {
-                            Title = "Mini Grand Prix Fall 2025 Autograder",
-                            Description = "Navigate through === THE METROPOLIS ===",
-                            MaxPoints = 20,
-                            TimeLimit = 120
-                        }
-                    }
                 },
                 new LevelInfo()
                 {
                     DisplayName = "Grand Prix 2025",
-                    BuildIndex = 133,
+                    Id = "grand-prix-2025",
+                    BuildIndex = 118,
                     IsRaceable = true,
                     NumCheckpoints = 4,
                     MaxCars = 4,
-                    AutograderBuildIndex = 133,
-                    AutograderLevelCode = "gp2025",
-                    AutograderLevels = new AutograderLevelInfo[]
-                    {
-                        new AutograderLevelInfo()
-                        {
-                            Title = "Grand Prix 2025 Autograder",
-                            Description = "Navigate through the course.",
-                            MaxPoints = 25,
-                            TimeLimit = 200
-                        }
-                    }
                 },
                 new LevelInfo()
                 {
                     DisplayName = "Mini Grand Prix: Spring 2025",
-                    BuildIndex = 131,
+                    Id = "mini-grand-prix-spring-2025",
+                    BuildIndex = 116,
                     IsRaceable = true,
                     NumCheckpoints = 4,
                     MaxCars = 2,
@@ -1064,7 +1060,8 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Micro Grand Prix 2025",
-                    BuildIndex = 130,
+                    Id = "micro-grand-prix-2025",
+                    BuildIndex = 115,
                     IsRaceable = true,
                     NumCheckpoints = 0,
                     MaxCars = 2,
@@ -1072,7 +1069,8 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Mini Grand Prix: Fall 2024",
-                    BuildIndex = 126,
+                    Id = "mini-grand-prix-fall-2024",
+                    BuildIndex = 111,
                     IsRaceable = true,
                     NumCheckpoints = 1,
                     MaxCars = 2,
@@ -1080,7 +1078,8 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Grand Prix 2024",
-                    BuildIndex = 114,
+                    Id = "grand-prix-2024",
+                    BuildIndex = 99,
                     IsRaceable = true,
                     NumCheckpoints = 5,
                     MaxCars = 4,
@@ -1088,7 +1087,8 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Mini Grand Prix: Spring 2024",
-                    BuildIndex = 113,
+                    Id = "mini-grand-prix-spring-2024",
+                    BuildIndex = 98,
                     IsRaceable = true,
                     NumCheckpoints = 0,
                     MaxCars = 2,
@@ -1096,7 +1096,8 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Mini Grand Prix: Fall 2023",
-                    BuildIndex = 104,
+                    Id = "mini-grand-prix-fall-2023",
+                    BuildIndex = 91,
                     IsRaceable = true,
                     NumCheckpoints = 0,
                     MaxCars = 4,
@@ -1104,7 +1105,8 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Grand Prix 2022",
-                    BuildIndex = 96,
+                    Id = "grand-prix-2022",
+                    BuildIndex = 90,
                     IsRaceable = true,
                     NumCheckpoints = 7,
                     MaxCars = 4,
@@ -1112,7 +1114,8 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Grand Prix 2021",
-                    BuildIndex = 95,
+                    Id = "grand-prix-2021",
+                    BuildIndex = 89,
                     IsRaceable = true,
                     NumCheckpoints = 8,
                     MaxCars = 4,
@@ -1120,17 +1123,18 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Grand Prix 2020",
+                    Id = "grand-prix-2020",
                     BuildIndex = 18,
                     IsRaceable = true,
                     NumCheckpoints = 5,
                     MaxCars = 4,
-                    AutograderBuildIndex = 92,
-                    AutograderLevelCode = "final",
+                    AutograderBuildIndex = 88,
+                    AutograderLevelCode = "gp2020",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
                         new AutograderLevelInfo()
                         {
-                            Title = "Grad Prix 2020",
+                            Title = "Grand Prix 2020",
                             Description = "Navigate through the course.",
                             MaxPoints = 25,
                             TimeLimit = 360,
@@ -1141,11 +1145,12 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "Time Trial 2020",
+                    Id = "time-trial-2020",
                     BuildIndex = 17,
                     IsRaceable = true,
                     NumCheckpoints = 3,
-                    AutograderBuildIndex = 91,
-                    AutograderLevelCode = "final",
+                    AutograderBuildIndex = 87,
+                    AutograderLevelCode = "tt2020",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
                         new AutograderLevelInfo()
@@ -1170,12 +1175,13 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "[Greece] Time Trial 2026",
-                    BuildIndex = 141,
+                    Id = "greece-time-trial-2026",
+                    BuildIndex = 126,
                     IsRaceable = true,
                     NumCheckpoints = 3,
                     MaxCars = 1,
-                    AutograderBuildIndex = 142,
-                    AutograderLevelCode = "final",
+                    AutograderBuildIndex = 127,
+                    AutograderLevelCode = "gtt2026",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
                         new AutograderLevelInfo()
@@ -1190,11 +1196,13 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "[Greece] Time Trial 2025",
-                    BuildIndex = 127,
+                    Id = "greece-time-trial-2025",
+                    BuildIndex = 112,
                     IsRaceable = true,
+                    NumCheckpoints = 3,
                     MaxCars = 1,
-                    AutograderBuildIndex = 128,
-                    AutograderLevelCode = "final",
+                    AutograderBuildIndex = 113,
+                    AutograderLevelCode = "gtt2025",
                     AutograderLevels = new AutograderLevelInfo[]
                     {
                         new AutograderLevelInfo()
@@ -1209,7 +1217,8 @@ public class LevelCollection
                 new LevelInfo()
                 {
                     DisplayName = "[Greece] Grand Prix 2025",
-                    BuildIndex = 129,
+                    Id = "greece-grand-prix-2025",
+                    BuildIndex = 114,
                     IsRaceable = true,
                     NumCheckpoints = 4,
                     MaxCars = 4,
@@ -1233,7 +1242,6 @@ public class LevelCollection
                 level.CollectionName = collection.ShortName;
                 if (level.IsRaceable)
                 {
-                    level.WinableIndex = LevelInfo.WinableLevels.Count;
                     LevelInfo.WinableLevels.Add(level);
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -26,6 +27,42 @@ public class AutograderSummary : MonoBehaviour
     /// </summary>
     [SerializeField]
     private GameObject cutShortMessage;
+
+    /// <summary>
+    /// The text inside cutShortMessage.
+    /// </summary>
+    [SerializeField]
+    private Text cutShortText;
+
+    /// <summary>
+    /// The lab title.
+    /// </summary>
+    [SerializeField]
+    private Text titleText;
+
+    /// <summary>
+    /// The total score and time.
+    /// </summary>
+    [SerializeField]
+    private Text totalText;
+
+    /// <summary>
+    /// The note explaining required trials, shown when the lab has one.
+    /// </summary>
+    [SerializeField]
+    private Text requiredTrialText;
+
+    /// <summary>
+    /// The username.
+    /// </summary>
+    [SerializeField]
+    private InputField usernameInput;
+
+    /// <summary>
+    /// The score code.
+    /// </summary>
+    [SerializeField]
+    private InputField scoreCodeInput;
     #endregion
 
     #region Constants
@@ -43,6 +80,11 @@ public class AutograderSummary : MonoBehaviour
     /// The fraction of the container that a level entry should leave unoccupied on the left and right.
     /// </summary>
     private const float entryXBuffer = 0.02f;
+
+    /// <summary>
+    /// Shown in place of a score code when the build has no autograder key.
+    /// </summary>
+    private const string noKeyMessage = "Score codes unavailable in this build";
     #endregion
 
     #region Public Interface
@@ -66,63 +108,31 @@ public class AutograderSummary : MonoBehaviour
     }
     #endregion
 
-    /// <summary>
-    /// The mutable text fields in the autograder summary, with values corresponding to the index in texts.
-    /// </summary>
-    private enum Texts
-    {
-        Title = 0,
-        Total = 1,
-        RequiredTrialExplanation = 2
-    }
-
-    /// <summary>
-    /// The input fields in the autograder summary, with values corresponding to the index in inputFields.
-    /// </summary>
-    private enum InputFields
-    {
-        Username = 0,
-        ScoreCode = 1
-    }
-
-    /// <summary>
-    /// The mutable text fields in the autograder summary.
-    /// </summary>
-    private Text[] texts;
-
-    /// <summary>
-    /// The input fields in the autograder summary.
-    /// </summary>
-    private InputField[] inputFields;
-
-    private void Awake()
-    {
-        this.texts = this.GetComponentsInChildren<Text>();
-        this.inputFields = this.GetComponentsInChildren<InputField>();
-    }
-
     private void Start()
     {
         this.PopulateLevelEntries(LevelManager.LevelInfo.AutograderLevels, AutograderManager.levelScores.ToArray(), out float totalScore, out float totalTime, out bool requiredTrial);
-        this.texts[(int)Texts.Title].text = $"{LevelManager.LevelInfo.FullName} Autograder";
-        this.texts[(int)Texts.Total].text = $"{totalScore:F2}/{LevelManager.LevelInfo.AutograderMaxScore:F2}; {totalTime} seconds";
-        this.texts[(int)Texts.RequiredTrialExplanation].gameObject.SetActive(requiredTrial);
+        this.titleText.text = $"{LevelManager.LevelInfo.FullName} Autograder";
+        this.totalText.text = $"{totalScore:F2}/{LevelManager.LevelInfo.AutograderMaxScore:F2}; {totalTime} seconds";
+        this.requiredTrialText.gameObject.SetActive(requiredTrial);
 
-        this.inputFields[(int)InputFields.Username].text = Settings.Username;
-        this.inputFields[(int)InputFields.ScoreCode].text = this.GenerateScoreCode(LevelManager.LevelInfo, totalScore, Settings.Username);
+        this.usernameInput.text = Settings.Username;
+        this.scoreCodeInput.text = this.GenerateScoreCode(LevelManager.LevelInfo, totalScore, Settings.Username);
+        string trials = string.Join("; ", AutograderManager.levelScores.Select((level, i) => $"{i + 1}: {level.Score} pts, {level.Time:F2} s"));
+        Debug.Log($"Autograder summary: {LevelManager.LevelInfo.FullName}, score {totalScore}, error {AutograderSummary.WasError}, trials [{trials}], score code {this.scoreCodeInput.text}");
 
         if (AutograderSummary.WasError || AutograderSummary.WasRequiredLevelFailed)
         { 
             this.cutShortMessage.SetActive(true);
-            Text message = this.cutShortMessage.GetComponentsInChildren<Text>()[0];
+            Text message = this.cutShortText;
             if (AutograderSummary.WasError)
             {
                 message.text = "The autograder was cut short because an error occurred. This may be because your Python program encountered an error.";
             }
             else // wasRequiredLevelFailed
             {
-                AutograderLevelInfo lastLevelInfo = LevelManager.LevelInfo.AutograderLevels[AutograderManager.levelScores.Count - 1];
-                message.text = $"The autograder was cut short because you did not pass the required trial <b>{AutograderManager.levelScores.Count}. {lastLevelInfo.Title}</b>. To complete the full autograder for this lab, you must pass that trial with full points.";
+                int failedLevel = Mathf.Clamp(AutograderManager.levelScores.Count, 1, LevelManager.LevelInfo.AutograderLevels.Length);
+                AutograderLevelInfo lastLevelInfo = LevelManager.LevelInfo.AutograderLevels[failedLevel - 1];
+                message.text = $"The autograder was cut short because you did not pass the required trial <b>{failedLevel}. {lastLevelInfo.Title}</b>. To complete the full autograder for this lab, you must pass that trial with full points.";
             }
         }
         AutograderSummary.WasError = false;
@@ -206,10 +216,26 @@ public class AutograderSummary : MonoBehaviour
     {
         if (username == "Default"){
             return "0000000000000000"; // Null code to prevent users from using default username in Edly autograder
+        } else if (!Utilities.HasKey) {
+            return AutograderSummary.noKeyMessage;
         } else {
-            string scoreCode = $"{levelInfo.AutograderLevelCode}|{score}|{levelInfo.AutograderMaxScore}|{username}";
+            string scoreCode = AutograderSummary.FormatScorePayload(levelInfo.AutograderLevelCode, score, levelInfo.AutograderMaxScore, username);
             return Utilities.Encrypt(scoreCode);
         }
-        
+
+    }
+
+    /// <summary>
+    /// Formats the plaintext score-code payload. Numbers use the invariant culture so the
+    /// decoder reads the same text on every OS locale.
+    /// </summary>
+    /// <param name="levelCode">The lab's autograder level code.</param>
+    /// <param name="score">The user's total score on the lab autograder.</param>
+    /// <param name="maxScore">The maximum score for the lab.</param>
+    /// <param name="username">The user's OpenEdx username.</param>
+    /// <returns>The payload in the form code|score|max|username.</returns>
+    public static string FormatScorePayload(string levelCode, float score, float maxScore, string username)
+    {
+        return FormattableString.Invariant($"{levelCode}|{score}|{maxScore}|{username}");
     }
 }

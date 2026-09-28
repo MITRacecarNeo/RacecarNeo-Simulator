@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Controls the heads-up display shown to the user during races with a single car.
@@ -18,6 +19,120 @@ public class Hud : ScreenManager, IAutograderHud
     /// </summary>
     [SerializeField]
     private GameObject SuccessMessage;
+
+    /// <summary>
+    /// The time spent on each checkpoint.
+    /// </summary>
+    [SerializeField]
+    private Text checkpointTimesText;
+
+    /// <summary>
+    /// The slow-motion label.
+    /// </summary>
+    [SerializeField]
+    private Text timeScaleText;
+
+    /// <summary>
+    /// The car's true speed.
+    /// </summary>
+    [SerializeField]
+    private Text trueSpeedText;
+
+    /// <summary>
+    /// The car's linear acceleration.
+    /// </summary>
+    [SerializeField]
+    private Text linearAccelerationText;
+
+    /// <summary>
+    /// The car's angular velocity.
+    /// </summary>
+    [SerializeField]
+    private Text angularVelocityText;
+
+    /// <summary>
+    /// The simulation mode label.
+    /// </summary>
+    [SerializeField]
+    private Text modeText;
+
+    /// <summary>
+    /// The reason shown in the failure message.
+    /// </summary>
+    [SerializeField]
+    private Text failureText;
+
+    /// <summary>
+    /// The title of the success message.
+    /// </summary>
+    [SerializeField]
+    private Text successMessageText;
+
+    /// <summary>
+    /// The time shown in the success message.
+    /// </summary>
+    [SerializeField]
+    private Text successTimeText;
+
+    /// <summary>
+    /// The autograder trial title.
+    /// </summary>
+    [SerializeField]
+    private Text autograderTitleText;
+
+    /// <summary>
+    /// The autograder trial description.
+    /// </summary>
+    [SerializeField]
+    private Text autograderDescriptionText;
+
+    /// <summary>
+    /// The autograder trial score.
+    /// </summary>
+    [SerializeField]
+    private Text autograderScoreText;
+
+    /// <summary>
+    /// The autograder time limit or time bonus.
+    /// </summary>
+    [SerializeField]
+    private Text maxTimeText;
+
+    /// <summary>
+    /// The filter darkening the screen in slow motion.
+    /// </summary>
+    [SerializeField]
+    private RawImage timeWarp;
+
+    /// <summary>
+    /// The depth camera visualization.
+    /// </summary>
+    [SerializeField]
+    private RawImage depthFeed;
+
+    /// <summary>
+    /// The LIDAR visualization.
+    /// </summary>
+    [SerializeField]
+    private RawImage lidarMap;
+
+    /// <summary>
+    /// The background of the simulation mode label.
+    /// </summary>
+    [SerializeField]
+    private RawImage modeBackground;
+
+    /// <summary>
+    /// The Python icon, dimmed when no program is connected.
+    /// </summary>
+    [SerializeField]
+    private RawImage connectedProgram;
+
+    /// <summary>
+    /// The controller input icons: each Controller.Button, then each Controller.Trigger, then each Controller.Joystick, in enum order.
+    /// </summary>
+    [SerializeField]
+    private RawImage[] controllerInputs;
     #endregion
 
     #region Constants
@@ -69,31 +184,31 @@ public class Hud : ScreenManager, IAutograderHud
     public override void HandleWin(float time, bool isNewBestTime = false)
     {
         this.SuccessMessage.SetActive(true);
-        this.texts[(int)Texts.SuccessMessage].text = isNewBestTime ? "New Best Time!" : "Mission Accomplished!";
-        this.texts[(int)Texts.SuccessTime].text = $"Time: {time:F3} seconds";
+        this.successMessageText.text = isNewBestTime ? "New Best Time!" : "Mission Accomplished!";
+        this.successTimeText.text = $"Time: {time:F3} seconds";
     }
 
     public override void HandleFailure(int carIndex, string reason)
     {
         this.FailureMessage.SetActive(true);
-        this.texts[(int)Texts.Failure].text = reason;
+        this.failureText.text = reason;
     }
 
     public override void UpdateConnectedPrograms(bool[] connectedPrograms)
     {
-        this.images[(int)Images.ConnectedProgram].color = connectedPrograms.Length > 0 ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, Hud.unconnectedScriptAlpha);
+        this.connectedProgram.color = connectedPrograms.Length > 0 ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, Hud.unconnectedScriptAlpha);
     }
 
     public override void UpdateMode(SimulationMode mode)
     {
-        this.texts[(int)Texts.Mode].text = Hud.modeNames[(int)mode];
-        this.images[(int)Images.ModeBackground].color = Hud.modeColors[(int)mode];
+        this.modeText.text = Hud.modeNames[(int)mode];
+        this.modeBackground.color = Hud.modeColors[(int)mode];
     }
 
     public override void UpdateTimeScale(float timeScale)
     {
-        this.images[(int)Images.TimeWarp].color = new Color(1, 1, 1, Mathf.Max(0, 1 - Mathf.Sqrt(timeScale)));
-        this.texts[(int)Texts.TimeScale].text = timeScale >= 1 ? string.Empty : $"{Mathf.Round(1 / timeScale)}x Slow Motion";
+        this.timeWarp.color = new Color(1, 1, 1, Mathf.Max(0, 1 - Mathf.Sqrt(timeScale)));
+        this.timeScaleText.text = timeScale >= 1 ? string.Empty : $"{Mathf.Round(1 / timeScale)}x Slow Motion";
     }
 
     public override void UpdateTime(float mainTime, float[] keyPointDurations)
@@ -116,7 +231,7 @@ public class Hud : ScreenManager, IAutograderHud
                 }
             }
 
-            this.texts[(int)Texts.CheckpointTimes].text = text;
+            this.checkpointTimesText.text = text;
         }
     }
     #endregion
@@ -124,17 +239,22 @@ public class Hud : ScreenManager, IAutograderHud
     #region IAutograderHud
     void IAutograderHud.SetLevelInfo(int levelIndex, string title, string description)
     {
-        this.texts[(int)Texts.AutograderTitle].text = $"<b>Trial {levelIndex + 1}</b> - {title}";
-        this.texts[(int)Texts.AutograderDescription].text = description;
+        // The trial title and description occupy the bottom strip, so messages move above them
+        RectTransform messageBox = (RectTransform)this.messageText.transform.parent;
+        messageBox.anchorMin = Hud.autograderMessageAnchorMin;
+        messageBox.anchorMax = Hud.autograderMessageAnchorMax;
+
+        this.autograderTitleText.text = $"<b>Trial {levelIndex + 1}</b> - {title}";
+        this.autograderDescriptionText.text = description;
     }
 
     void IAutograderHud.UpdateScore(float score, float maxScore)
     {
-        this.texts[(int)Texts.AutograderScore].text = $"{score:F2}/{maxScore:F2}";
+        this.autograderScoreText.text = $"{score:F2}/{maxScore:F2}";
 
         if (score == maxScore)
         {
-            this.texts[(int)Texts.AutograderScore].color = Color.green;
+            this.autograderScoreText.color = Color.green;
         }
     }
 
@@ -144,30 +264,30 @@ public class Hud : ScreenManager, IAutograderHud
 
         if (time >= timeLimit)
         {
-            this.texts[(int)Texts.MainTime].color = Color.red;
+            this.mainTimeText.color = Color.red;
         }
         else if (timeLimit - time < timeLimit * Hud.autograderWarningTimeRatio)
         {
-            this.texts[(int)Texts.MainTime].color = Color.yellow;
+            this.mainTimeText.color = Color.yellow;
         }
     }
 
     void IAutograderHud.SetMaxTime(float maxTime)
     {
-        this.texts[(int)Texts.MaxTime].text = $"Max: {maxTime:F1}";
+        this.maxTimeText.text = $"Max: {maxTime:F1}";
     }
 
     void IAutograderHud.SetTimeBonus(float maxTime, float bonus, bool isLastBracket)
     {
         if (bonus >= 0)
         {
-            this.texts[(int)Texts.MaxTime].text = $"Bonus: +{bonus} (under {maxTime:F1} sec)";
-            this.texts[(int)Texts.MaxTime].color = bonus > 0 ? Color.green : Color.white;
+            this.maxTimeText.text = $"Bonus: +{bonus} (under {maxTime:F1} sec)";
+            this.maxTimeText.color = bonus > 0 ? Color.green : Color.white;
         }
         else
         {
-            this.texts[(int)Texts.MaxTime].text = $"Penalty: {bonus} (under {maxTime:F1} sec)";
-            this.texts[(int)Texts.MaxTime].color = isLastBracket ? Color.red : Color.yellow;
+            this.maxTimeText.text = $"Penalty: {bonus} (under {maxTime:F1} sec)";
+            this.maxTimeText.color = isLastBracket ? Color.red : Color.yellow;
         }
     }
     #endregion
@@ -179,7 +299,7 @@ public class Hud : ScreenManager, IAutograderHud
     {
         get
         {
-            return (Texture2D)this.images[(int)Images.LidarMap].texture;
+            return (Texture2D)this.lidarMap.texture;
         }
     }
 
@@ -190,7 +310,7 @@ public class Hud : ScreenManager, IAutograderHud
     {
         get
         {
-            return (Texture2D)this.images[(int)Images.DepthFeed].texture;
+            return (Texture2D)this.depthFeed.texture;
         }
     }
 
@@ -202,54 +322,38 @@ public class Hud : ScreenManager, IAutograderHud
     /// <param name="angularVelocity">The car's angular velocity in rad/s.</param>
     public void UpdatePhysics(float speed, Vector3 linearAcceleration, Vector3 angularVelocity)
     {
-        this.texts[(int)Texts.TrueSpeed].text = speed.ToString("F2");
-        this.texts[(int)Texts.LinearAcceleration].text = FormatVector3(linearAcceleration);
-        this.texts[(int)Texts.AngularVelocity].text = FormatVector3(angularVelocity);
+        this.trueSpeedText.text = speed.ToString("F2");
+        this.linearAccelerationText.text = FormatVector3(linearAcceleration);
+        this.angularVelocityText.text = FormatVector3(angularVelocity);
     }
     #endregion
 
     /// <summary>
-    /// The mutable text fields of the HUD, with values corresponding to the index in texts.
+    /// Message box anchors during autograder runs: above the trial title (0.08-0.14) and
+    /// description (0.02-0.07), below the car.
     /// </summary>
-    private enum Texts
-    {
-        Message = 0,
-        MainTime = 1,
-        CheckpointTimes = 2,
-        TimeScale = 3,
-        TrueSpeed = 8,
-        LinearAcceleration = 12,
-        AngularVelocity = 15,
-        Mode = 17,
-        Failure = 19,
-        SuccessMessage = 21,
-        SuccessTime = 22,
-        AutograderTitle = 25,
-        AutograderDescription = 26,
-        AutograderScore = 27,
-        MaxTime = 28
-    }
+    private static readonly Vector2 autograderMessageAnchorMin = new Vector2(0.28f, 0.16f);
+    private static readonly Vector2 autograderMessageAnchorMax = new Vector2(0.72f, 0.28f);
 
     /// <summary>
-    /// The mutable images of the HUD, with values corresponding to the index in images.
+    /// Controller enum values, cached because Enum.GetValues allocates on every call.
     /// </summary>
-    private enum Images
-    {
-        TimeWarp = 0,
-        ColorFeed = 3,
-        DepthFeed = 5,
-        LidarMap = 7,
-        ModeBackground = 9,
-        ConnectedProgram = 10,
-        ControllerFirstButton = 12
-    }
+    private static readonly Controller.Button[] buttons = (Controller.Button[])Enum.GetValues(typeof(Controller.Button));
+    private static readonly Controller.Trigger[] triggers = (Controller.Trigger[])Enum.GetValues(typeof(Controller.Trigger));
+    private static readonly Controller.Joystick[] joysticks = (Controller.Joystick[])Enum.GetValues(typeof(Controller.Joystick));
 
     protected override void Awake()
     {
         base.Awake();
 
-        this.images[(int)Images.LidarMap].texture = new Texture2D(CameraModule.ColorWidth / Hud.lidarMapScale, CameraModule.ColorHeight / Hud.lidarMapScale);
-        this.images[(int)Images.DepthFeed].texture = new Texture2D(CameraModule.DepthWidth, CameraModule.DepthHeight);
+        this.lidarMap.texture = new Texture2D(CameraModule.ColorWidth / Hud.lidarMapScale, CameraModule.ColorHeight / Hud.lidarMapScale, TextureFormat.RGBA32, false);
+        this.depthFeed.texture = new Texture2D(CameraModule.DepthWidth, CameraModule.DepthHeight, TextureFormat.RGBA32, false);
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(this.lidarMap.texture);
+        Destroy(this.depthFeed.texture);
     }
 
     private void Start()
@@ -257,7 +361,7 @@ public class Hud : ScreenManager, IAutograderHud
         this.FailureMessage.SetActive(false);
         this.SuccessMessage.SetActive(false);
 
-        this.texts[(int)Texts.CheckpointTimes].text = string.Empty;
+        this.checkpointTimesText.text = string.Empty;
     }
 
     protected override void Update()
@@ -271,28 +375,24 @@ public class Hud : ScreenManager, IAutograderHud
     /// </summary>
     private void UpdateController()
     {
-        Array buttons = Enum.GetValues(typeof(Controller.Button));
-        Array triggers = Enum.GetValues(typeof(Controller.Trigger));
-        Array joysticks = Enum.GetValues(typeof(Controller.Joystick));
+        int index = 0;
 
-        int index = (int)Images.ControllerFirstButton;
-
-        foreach (Controller.Button button in buttons)
+        foreach (Controller.Button button in Hud.buttons)
         {
-            this.images[index].enabled = Controller.IsDown(button);
+            this.controllerInputs[index].enabled = Controller.IsDown(button);
             index++;
         }
 
-        foreach (Controller.Trigger trigger in triggers)
+        foreach (Controller.Trigger trigger in Hud.triggers)
         {
-            this.images[index].enabled = Controller.GetTrigger(trigger) > 0;
+            this.controllerInputs[index].enabled = Controller.GetTrigger(trigger) > 0;
             index++;
         }
 
-        foreach (Controller.Joystick joystick in joysticks)
+        foreach (Controller.Joystick joystick in Hud.joysticks)
         {
             Vector2 joystickAxes = Controller.GetJoystick(joystick);
-            this.images[index].enabled = joystickAxes.x != 0 || joystickAxes.y != 0;
+            this.controllerInputs[index].enabled = joystickAxes.x != 0 || joystickAxes.y != 0;
             index++;
         }
     }

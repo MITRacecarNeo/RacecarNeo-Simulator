@@ -1,8 +1,16 @@
-﻿using System;
-using UnityEngine;
+using System;
 
+/// <summary>
+/// Samples from a normal distribution for sensor noise.
+/// </summary>
 public static class NormalDist
 {
+    /// <summary>
+    /// Source of uniform samples. Separate from UnityEngine.Random so sensor noise neither reseeds
+    /// nor consumes the global generator used elsewhere (for example random scene selection).
+    /// </summary>
+    private static readonly System.Random generator = new System.Random();
+
     /// <summary>
     /// Takes a random sample from a normal distribution.
     /// </summary>
@@ -11,20 +19,17 @@ public static class NormalDist
     /// <returns>A random number sampled from the specified distribution.</returns>
     public static float Random(float mean = 0, float sdev = 1)
     {
-        float x = UnityEngine.Random.value;
-
-        if (x >= 0.5)
+        double u1;
+        double u2;
+        lock (NormalDist.generator)
         {
-            return mean + sdev * Mathf.Sqrt(-1.57079632679f * Mathf.Log(1 - Mathf.Pow(2 * x - 1, 2), Mathf.Exp(1)));
+            // 1 - NextDouble() lies in (0, 1], so the logarithm below is finite
+            u1 = 1.0 - NormalDist.generator.NextDouble();
+            u2 = NormalDist.generator.NextDouble();
         }
-        else
-        {
-            return mean - sdev * Mathf.Sqrt(-1.57079632679f * Mathf.Log(1 - Mathf.Pow(2 * x - 1, 2), Mathf.Exp(1)));
-        }
-    }
 
-    static NormalDist()
-    {
-        UnityEngine.Random.InitState(DateTime.Now.Millisecond);
+        // Box-Muller transform
+        double standard = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Cos(2.0 * Math.PI * u2);
+        return mean + sdev * (float)standard;
     }
 }

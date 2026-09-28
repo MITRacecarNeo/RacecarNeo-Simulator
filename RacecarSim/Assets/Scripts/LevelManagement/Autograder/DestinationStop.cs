@@ -10,7 +10,7 @@ public class DestinationStop : AutograderTask
     /// The maximum speed which the car can travel in m/s and still be considered "stopped".
     /// </summary>
     [SerializeField]
-    private float maxStopSpeed = Constants.MaxStopSeed;
+    private float maxStopSpeed = Constants.MaxStopSpeed;
     #endregion
 
     #region Constants
@@ -38,7 +38,7 @@ public class DestinationStop : AutograderTask
     /// <summary>
     /// The current alpha (opaqueness) of the mesh, which increases the longer the user has been parked.
     /// </summary>
-    private float Alapha
+    private float Alpha
     {
         get
         {
@@ -55,7 +55,7 @@ public class DestinationStop : AutograderTask
 
     private void Start()
     {
-        this.material.color = new Color(this.material.color.r, this.material.color.g, this.material.color.b, this.Alapha);
+        this.material.color = new Color(this.material.color.r, this.material.color.g, this.material.color.b, this.Alpha);
     }
 
     private void OnTriggerStay(Collider other)
@@ -76,7 +76,17 @@ public class DestinationStop : AutograderTask
                 this.startTime = float.MaxValue;
             }
 
-            this.material.color = new Color(this.material.color.r, this.material.color.g, this.material.color.b, this.Alapha);
+            this.material.color = new Color(this.material.color.r, this.material.color.g, this.material.color.b, this.Alpha);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        // Leaving the destination restarts the stop timer
+        if (other.GetComponentInParent<Racecar>() != null)
+        {
+            this.startTime = float.MaxValue;
+            this.material.color = new Color(this.material.color.r, this.material.color.g, this.material.color.b, this.Alpha);
         }
     }
 }

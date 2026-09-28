@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Fails the player if the pass on the incorrect side of a slalom cone.
@@ -53,12 +54,34 @@ public class SlalomCone : MonoBehaviour
     /// </summary>
     private const string blueMessage = "You must pass on the left side of blue slalom cones.";
 
+    /// <summary>
+    /// The number of each car's colliders inside the trigger. A car is penalized when its count
+    /// goes from 0 to 1, so a car with several colliders is penalized once per pass.
+    /// </summary>
+    private readonly Dictionary<Racecar, int> collidersInside = new Dictionary<Racecar, int>();
+
+    private void OnTriggerExit(Collider other)
+    {
+        Racecar player = other.GetComponentInParent<Racecar>();
+        if (player != null && this.collidersInside.TryGetValue(player, out int count))
+        {
+            this.collidersInside[player] = Math.Max(count - 1, 0);
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         // If the collider is a player, cause the player to fail
         Racecar player = other.GetComponentInParent<Racecar>();
         if (player != null)
         {
+            this.collidersInside.TryGetValue(player, out int count);
+            this.collidersInside[player] = count + 1;
+            if (count > 0)
+            {
+                return;
+            }
+
             switch (this.penalty)
             {
                 case SlalomConePenalty.Disqualify:

@@ -59,3 +59,7 @@ sysinfo.txt
 crashlytics-build.properties
 
 Assets/Imported/
+
+# Autograder key source, present only during a player build
+/[Aa]ssets/Scripts/Static/AutograderKey.Generated.cs
+/[Aa]ssets/Scripts/Static/AutograderKey.Generated.cs.meta

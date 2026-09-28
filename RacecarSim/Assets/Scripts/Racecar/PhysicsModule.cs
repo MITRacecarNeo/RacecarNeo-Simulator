@@ -40,7 +40,7 @@ public class PhysicsModule : RacecarModule
     /// <summary>
     /// The linear acceleration of the car relative to the car's transform (in meters/second^2).
     /// </summary>
-    public Vector3 LinearAccceleration { get; private set; } = Vector3.zero;
+    public Vector3 LinearAcceleration { get; private set; } = Vector3.zero;
 
     /// <summary>
     /// The linear velocity of the car relative to the car's transform (in meters/second)
@@ -51,14 +51,16 @@ public class PhysicsModule : RacecarModule
         {
             if (!this.linearVelocity.HasValue)
             {
-                this.linearVelocity = this.transform.InverseTransformDirection(this.rBody.velocity) / 10;
+                this.linearVelocity = this.transform.InverseTransformDirection(this.rBody.linearVelocity) / 10;
             }
             return this.linearVelocity.Value;
         }
     }
 
     /// <summary>
-    /// The angular velocity of the car (in radians/second).
+    /// The angular velocity of the car (in radians/second) about the car's own axes: x right,
+    /// y up, z forward. Positive values follow the right-hand rule (counterclockwise when viewed
+    /// from the positive end of the axis), so a left turn has positive y.
     /// </summary>
     public Vector3 AngularVelocity
     {
@@ -66,8 +68,9 @@ public class PhysicsModule : RacecarModule
         {
             if (!this.angularVelocity.HasValue)
             {
-                // Unity uses a left-handed coordinate system, but our API is right-handed
-                Vector3 angVel = -this.rBody.angularVelocity;
+                // Unity reports world-space rates with left-hand-rule signs; the API uses car-frame
+                // axes with right-hand-rule signs
+                Vector3 angVel = -this.transform.InverseTransformDirection(this.rBody.angularVelocity);
 
                 if (Settings.IsRealism)
                 {
@@ -90,9 +93,9 @@ public class PhysicsModule : RacecarModule
     private Rigidbody rBody;
 
     /// <summary>
-    /// The previous linear velocity of the car using the car's transform as basis vectors.
+    /// The world-space velocity of the car (in real-world meters/second) at the previous physics step.
     /// </summary>
-    private Vector3 prevVelocity;
+    private Vector3 prevWorldVelocity;
 
     /// <summary>
     /// Private member for the LinearVelocity accessor
@@ -113,22 +116,28 @@ public class PhysicsModule : RacecarModule
 
     private void Start()
     {
-        this.prevVelocity = this.LinearVelocity;
+        this.prevWorldVelocity = this.rBody.linearVelocity / 10;
     }
 
     private void Update()
     {
         if (this.racecar.Hud != null)
         {
-            this.racecar.Hud.UpdatePhysics(this.LinearVelocity.magnitude, this.LinearAccceleration, this.AngularVelocity);
+            this.racecar.Hud.UpdatePhysics(this.LinearVelocity.magnitude, this.LinearAcceleration, this.AngularVelocity);
         }
     }
 
     private void FixedUpdate()
     {
+        // Differentiate the world-space velocity read fresh each physics step, then rotate into the
+        // car frame. Differentiating in the world frame keeps the centripetal term that a car-frame
+        // derivative drops. The sim world is 10x scale, so divide by 10 for real-world units.
+        Vector3 worldVelocity = this.rBody.linearVelocity / 10;
+        Vector3 worldAcceleration = (worldVelocity - this.prevWorldVelocity) / Time.fixedDeltaTime;
+        this.prevWorldVelocity = worldVelocity;
+
         // Calculate current linear acceleration, incorporating gravity and error rate
-        Vector3 curAcceleration = (this.LinearVelocity - this.prevVelocity) / Time.deltaTime;
-        curAcceleration += this.transform.InverseTransformDirection(Vector3.down * 9.81f);
+        Vector3 curAcceleration = this.transform.InverseTransformDirection(worldAcceleration + Vector3.down * 9.81f);
         if (Settings.IsRealism)
         {
             curAcceleration *= NormalDist.Random(1, PhysicsModule.linearErrorFactor);
@@ -138,8 +147,7 @@ public class PhysicsModule : RacecarModule
         }
 
         // Update linear acceleration running average
-        this.LinearAccceleration += (curAcceleration - this.LinearAccceleration) / PhysicsModule.accelerationSamples;
-        this.prevVelocity = this.LinearVelocity;
+        this.LinearAcceleration += (curAcceleration - this.LinearAcceleration) / PhysicsModule.accelerationSamples;
     }
 
     private void LateUpdate()

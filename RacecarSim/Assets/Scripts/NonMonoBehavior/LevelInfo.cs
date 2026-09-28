@@ -19,6 +19,12 @@ public class LevelInfo
     public string DisplayName;
 
     /// <summary>
+    /// Stable identifier used to key saved best times. Required for raceable levels and must
+    /// not change after release, since changing it discards the level's saved times.
+    /// </summary>
+    public string Id;
+
+    /// <summary>
     /// The index of the level in the build settings.
     /// </summary>
     public int BuildIndex;
@@ -53,11 +59,6 @@ public class LevelInfo
     /// True if the level supports LevelManagerMode.Race.
     /// </summary>
     public bool IsRaceable = false;
-
-    /// <summary>
-    /// The index of a winable level in LevelInfo.WinableLevels.
-    /// </summary>
-    public int WinableIndex = -1;
 
     /// <summary>
     /// The maximum number of cars the level supports.
@@ -98,6 +99,27 @@ public class LevelInfo
         get
         {
             return this.AutograderLevels.Aggregate(0.0f, (total, next) => total + next.MaxPoints);
+        }
+    }
+
+    /// <summary>
+    /// The modes this level can run in, in main menu order: exploration always, autograder
+    /// when it has autograder levels, race when it is raceable.
+    /// </summary>
+    public LevelManagerMode[] SupportedModes
+    {
+        get
+        {
+            List<LevelManagerMode> modes = new List<LevelManagerMode>() { LevelManagerMode.Exploration };
+            if (this.AutograderLevels != null && this.AutograderLevels.Length > 0)
+            {
+                modes.Add(LevelManagerMode.Autograder);
+            }
+            if (this.IsRaceable)
+            {
+                modes.Add(LevelManagerMode.Race);
+            }
+            return modes.ToArray();
         }
     }
 

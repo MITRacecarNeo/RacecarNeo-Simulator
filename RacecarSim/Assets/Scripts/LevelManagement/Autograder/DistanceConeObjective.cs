@@ -26,7 +26,7 @@ public class DistanceConeObjective : DistanceCone
         if (Mathf.Abs(this.Distance - this.goalDistance) < this.allowableDistanceError)
         {
             this.text.color = Color.green;
-            if (LevelManager.GetCar().Physics.LinearVelocity.magnitude < Constants.MaxStopSeed)
+            if (LevelManager.GetCar().Physics.LinearVelocity.magnitude < Constants.MaxStopSpeed)
             {
                 // The autograder task must be stored as a separate script due to the inheritance structure
                 AutograderManager.CompleteTask(this.GetComponent<AutograderTask>());

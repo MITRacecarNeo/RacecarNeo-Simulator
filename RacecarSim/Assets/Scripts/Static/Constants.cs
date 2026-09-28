@@ -3,7 +3,7 @@
     /// <summary>
     /// The maximum speed which the car can travel in m/s and still be considered "stopped".
     /// </summary>
-    public const float MaxStopSeed = 0.02f;
+    public const float MaxStopSpeed = 0.02f;
 
     /// <summary>
     /// A bitmask which ignores the UI and IgnoreRaycast layers.

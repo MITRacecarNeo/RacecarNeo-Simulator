@@ -4,10 +4,11 @@ _The MIT Beaver Works RACECAR simulation environment_
 
 You can learn more about RacecarSim and download the current version [here](https://sites.mit.edu/mit-racecar/resources/).
 
-> **Note**: As of update v2.8.0, the Racecar Neo Simulator is built using Unity `v2022.3.62f2`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
+> **Note**: As of update v2.9.1, the Racecar Neo Simulator is built using Unity `v6000.4.5f1`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
 
 ## Table of Contents
 - [Changelog](#changelog)
+    - [v2.9.1](#v291-update---unity-6-and-stability-9272026)
     - [v2.8.0](#v280-update---mini-grand-prix-fall-2025-11222025)
     - [pre-v2.8.0](#pre-2870-updates)
 - [Getting Started](#getting-started)
@@ -20,6 +21,60 @@ You can learn more about RacecarSim and download the current version [here](http
 - [Modeling Error](#modeling-error)
 
 ## Changelog
+
+### v2.9.1 Update - Unity 6 and Stability [9/27/2026]
+**Requirements**
+- The project now opens in Unity 6000.4.5f1 (was 2022.3.62f2).
+- macOS builds need macOS 12 or later (was 10.13).
+- Python programs must run on the same computer or in WSL 2. To accept a
+  program from another computer, set the environment variable
+  `RACECARSIM_ALLOW_REMOTE=1` before starting the simulator.
+
+**Autograder**
+- Score codes use a new format (starting with `R2`) that cannot be edited
+  by hand. Codes from v2.9.0 and earlier keep the old format.
+- Each lab has its own level code: Grand Prix 2020, Time Trial 2020, and the
+  Greece Time Trials no longer share one.
+- Grand Prix 2025, Grand Prix 2026, and Mini Grand Prix: Fall 2025 no longer
+  offer an autograder; it could not record a score. They keep Exploration
+  and Race.
+- Lab 2a, Lab 2b, and Cone Slalom: Regular show maximum scores that match
+  their trials (19, 20, and 20).
+- Manual driving is disabled during autograder runs; pressing START again
+  no longer restarts the trial clock; restarting begins the run from the
+  first trial.
+- Fixed: scoring after an error, time bonuses, destination stops, and speed
+  limit and slalom penalties counted more than once. Score codes no longer
+  depend on the computer's number format.
+
+**Races and levels**
+- Checkpoints count only in order.
+- Best times are saved in a new format. Best times and car colors from
+  earlier versions reset once, with a notice on first launch.
+- The main menu lists only the modes each level supports.
+- Fixed: time-penalty warning in races; in multi-car races each car resets
+  to its own start position; errors on loading Lab E and Mini Grand Prix:
+  Fall 2025; Greece Time Trial 2025 checkpoint times.
+
+**Sensors**
+- IMU linear acceleration includes turning forces and no longer depends on
+  frame rate; angular velocity is reported in the car's axes. Programs that
+  compared IMU readings against fixed thresholds may need new values.
+- Lidar keeps its scan rate in slow motion.
+- Camera reads from Jupyter return complete, current frames.
+
+**Python connection**
+- A failing or malformed request gets an error reply instead of stopping the
+  simulator's connection; one failing program no longer disconnects the
+  others. A port already in use is shown on screen.
+
+**Controls and settings**
+- macOS and Linux builds choose their own gamepad mapping.
+- Settings: Restore defaults can be cancelled.
+
+**Performance**
+- Fixed memory growth across level restarts; the color camera no longer
+  renders twice per frame.
 
 ### v2.9.0 Update - Grand Prix 2026 [7/31/2026]
 - Added Final Challenge - Grand Prix 2026 map

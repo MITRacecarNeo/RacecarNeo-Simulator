@@ -7,6 +7,11 @@
 public class BestTimeInfo
 {
     /// <summary>
+    /// The LevelInfo.Id of the level these times belong to.
+    /// </summary>
+    public string LevelId;
+
+    /// <summary>
     /// The best time for completing the entire level.
     /// </summary>
     public float OverallTime;
@@ -18,14 +23,16 @@ public class BestTimeInfo
     /// Checkpoint time is calculated as the time spent working towards that checkpoint only. For example, if the user completes
     /// checkpoint 1 at 2.35 seconds and checkpoint 2 at 5.60 seconds, then the time for checkpoint 2 is 5.60 - 2.35 = 3.25 seconds.
     /// </remarks>
-    public float[] CheckpointTimes { get; private set; }
+    public float[] CheckpointTimes;
 
     /// <summary>
     /// Creates new best time information for a level indicating no completions yet.
     /// </summary>
+    /// <param name="levelId">The LevelInfo.Id of the level.</param>
     /// <param name="numCheckpoints">The number of checkpoints in the level.</param>
-    public BestTimeInfo(int numCheckpoints)
+    public BestTimeInfo(string levelId, int numCheckpoints)
     {
+        this.LevelId = levelId;
         this.OverallTime = float.MaxValue;
         this.CheckpointTimes = new float[numCheckpoints + 1];
         for (int i = 0; i < this.CheckpointTimes.Length; i++)

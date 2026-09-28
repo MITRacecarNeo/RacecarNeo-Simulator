@@ -42,19 +42,16 @@ public class BestTimesUI : MonoBehaviour
     /// </summary>
     public void UpdateEntries()
     {
-        if (this.bestTimeEntries.Length != SavedDataManager.Data.BestTimes.Length)
+        // The pane starts inactive, so its Start may not have run when the main menu opens it
+        if (this.bestTimeEntries == null)
         {
-            Debug.LogError("The existing best time UI entries do not align with the best times in the saved data. Deleting the existing UI entries.");
-            foreach(BestTimeUIEntry uiEntry in this.bestTimeEntries)
-            {
-                GameObject.Destroy(uiEntry.gameObject);
-            }
             this.CreateBlankEntries();
         }
 
         for(int i = 0; i < this.bestTimeEntries.Length; i++)
         {
-            this.bestTimeEntries[i].SetInfo(LevelInfo.WinableLevels[i], SavedDataManager.Data.BestTimes[i]);
+            LevelInfo level = LevelInfo.WinableLevels[i];
+            this.bestTimeEntries[i].SetInfo(level, SavedDataManager.Data.GetBestTimes(level));
         }
     }
 
@@ -84,8 +81,6 @@ public class BestTimesUI : MonoBehaviour
 
     private void Start()
     {
-        // Create best time entries on the canvas
-        this.CreateBlankEntries();
         this.UpdateEntries();
     }
 
@@ -105,20 +100,18 @@ public class BestTimesUI : MonoBehaviour
 
         float entryYBuffer = 1.0f / (this.bestTimeEntries.Length * (BestTimesUI.entryWidthToBufferRatio + 1) + 2);
         float entryHeight = entryYBuffer * BestTimesUI.entryWidthToBufferRatio;
-        float anchorY = 1 - entryYBuffer;
-
-        // TODO: Handle float rounding errors
         for (int i = 0; i < this.bestTimeEntries.Length; i++)
         {
+            // Computed from the index rather than accumulated, so rounding error does not build up down the list
+            float anchorY = 1 - entryYBuffer - i * (entryHeight + entryYBuffer);
+
             GameObject uiEntry = GameObject.Instantiate(this.bestTimeEntry, Vector3.zero, Quaternion.identity);
 
             // Set uiEntry's anchor points inside of the container
             uiEntry.transform.SetParent(this.bestTimesContainer.transform);
             RectTransform rect = uiEntry.GetComponent<RectTransform>();
             rect.anchorMax = new Vector2(1 - BestTimesUI.entryXBuffer, anchorY);
-            anchorY -= entryHeight;
-            rect.anchorMin = new Vector2(BestTimesUI.entryXBuffer, anchorY);
-            anchorY -= entryYBuffer;
+            rect.anchorMin = new Vector2(BestTimesUI.entryXBuffer, anchorY - entryHeight);
 
             // Size exactly to the anchor points
             rect.anchoredPosition = new Vector2(0, 0);

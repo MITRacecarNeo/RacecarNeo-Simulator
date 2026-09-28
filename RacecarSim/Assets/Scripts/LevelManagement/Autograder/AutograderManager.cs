@@ -8,9 +8,10 @@ public class AutograderManager : MonoBehaviour
 {
     #region Constants
     /// <summary>
-    /// The build index of the level which displays a summary of an autograder run.
+    /// The scene which displays a summary of an autograder run, loaded by name so build list
+    /// changes cannot point it at another scene.
     /// </summary>
-    public const int AutograderSummaryBuildIndex = 25;
+    public const string AutograderSummaryScene = "AutograderSummary";
     #endregion
 
     #region Public Interface
@@ -31,6 +32,8 @@ public class AutograderManager : MonoBehaviour
     {
         AutograderManager.levelIndex = 0;
         AutograderManager.levelScores.Clear();
+        AutograderSummary.WasError = false;
+        AutograderSummary.WasRequiredLevelFailed = false;
     }
 
     /// <summary>
@@ -39,7 +42,7 @@ public class AutograderManager : MonoBehaviour
     /// <param name="task">The task which was completed.</param>
     public static void CompleteTask(AutograderTask task)
     {
-        if (AutograderManager.CurTask == task)
+        if (task != null && AutograderManager.CurTask == task)
         {
             task.Disable();
             AutograderManager.instance.levelScore += task.Points;
@@ -69,7 +72,11 @@ public class AutograderManager : MonoBehaviour
     /// <param name="hud">The autograder HUD used for this level.</param>
     public void HandleStart(IAutograderHud hud)
     {
-        this.startTime = Time.time;
+        // The level clock starts once; pressing START again does not restart it
+        if (!this.startTime.HasValue)
+        {
+            this.startTime = Time.time;
+        }
         this.hud = hud;
         this.hud.SetLevelInfo(AutograderManager.levelIndex, AutograderManager.LevelInfo.Title, AutograderManager.LevelInfo.Description);
         this.hud.UpdateScore(this.levelScore, AutograderManager.LevelInfo.MaxPoints);
@@ -91,12 +98,18 @@ public class AutograderManager : MonoBehaviour
     /// </summary>
     public void HandleError()
     {
+        AutograderSummary.WasError = true;
+        if (this.wasFinishedCalled)
+        {
+            return;
+        }
+
+        this.wasFinishedCalled = true;
         AutograderManager.levelScores.Add(new AutograderLevelScore()
         {
             Score = this.levelScore,
-            Time = Time.time - this.startTime ?? Time.time
+            Time = this.ElapsedTime
         });
-        AutograderSummary.WasError = true;
     }
 
     /// <summary>
@@ -109,7 +122,7 @@ public class AutograderManager : MonoBehaviour
     #endregion
 
     /// <summary>
-    /// A static reference to the current LevelManager (there is only ever one at a time).
+    /// A static reference to the current AutograderManager (there is only ever one at a time).
     /// </summary>
     private static AutograderManager instance;
 
@@ -156,7 +169,25 @@ public class AutograderManager : MonoBehaviour
     /// <summary>
     /// The current task which must be completed.
     /// </summary>
-    private static AutograderTask CurTask { get { return AutograderManager.instance.tasks[AutograderManager.instance.taskIndex]; } }
+    private static AutograderTask CurTask
+    {
+        get
+        {
+            AutograderManager manager = AutograderManager.instance;
+            return manager.taskIndex < manager.tasks.Length ? manager.tasks[manager.taskIndex] : null;
+        }
+    }
+
+    /// <summary>
+    /// Seconds since the level started, including time penalties, or 0 if the level never started.
+    /// </summary>
+    private float ElapsedTime
+    {
+        get
+        {
+            return this.startTime.HasValue ? Time.time - this.startTime.Value + LevelManager.TimePenalty : 0;
+        }
+    }
 
     private void Awake()
     {
@@ -166,18 +197,18 @@ public class AutograderManager : MonoBehaviour
 
     private void Start()
     {
-        AutograderManager.CurTask.Enable();
+        AutograderManager.CurTask?.Enable();
     }
 
     private void Update()
     {
         if (this.startTime.HasValue && !this.wasFinishedCalled)
         {
-            float elapsedTime = Time.time - this.startTime.Value + LevelManager.TimePenalty;
+            float elapsedTime = this.ElapsedTime;
             this.hud.UpdateTime(elapsedTime, AutograderManager.LevelInfo.TimeLimit);
 
             Vector2[] timeBonuses = AutograderManager.LevelInfo.TimeBonuses;
-            if (timeBonuses != null && elapsedTime > timeBonuses[this.timeBonusIndex].x)
+            if (timeBonuses != null && this.timeBonusIndex < timeBonuses.Length - 1 && elapsedTime > timeBonuses[this.timeBonusIndex].x)
             {
                 this.timeBonusIndex++;
                 Vector2 timeBonus = timeBonuses[this.timeBonusIndex];
@@ -194,7 +225,7 @@ public class AutograderManager : MonoBehaviour
             }
 
             if (elapsedTime > AutograderManager.LevelInfo.TimeLimit ||
-                (AutograderManager.LevelInfo.DoNotProceedUntilStopped && this.taskIndex >= this.tasks.Length && LevelManager.GetCar().Physics.LinearVelocity.magnitude < Constants.MaxStopSeed) ||
+                (AutograderManager.LevelInfo.DoNotProceedUntilStopped && this.taskIndex >= this.tasks.Length && LevelManager.GetCar().Physics.LinearVelocity.magnitude < Constants.MaxStopSpeed) ||
                 Input.GetKeyDown(KeyCode.Tab))
             {
                 this.FinishLevel();
@@ -221,7 +252,7 @@ public class AutograderManager : MonoBehaviour
             AutograderManager.levelScores.Add(new AutograderLevelScore()
             {
                 Score = this.levelScore,
-                Time = Time.time - this.startTime + LevelManager.TimePenalty ?? Time.time
+                Time = this.ElapsedTime
             });
 
             if (AutograderManager.levelIndex == LevelManager.LevelInfo.AutograderLevels.Length - 1)

@@ -49,7 +49,7 @@ public class KeyPoint : MonoBehaviour, IComparable<KeyPoint>
 
     private void OnTriggerEnter(Collider other)
     {
-        Racecar car = other.attachedRigidbody.GetComponent<Racecar>();
+        Racecar car = other.attachedRigidbody != null ? other.attachedRigidbody.GetComponent<Racecar>() : null;
         if (car != null)
         {
             switch (this.Type)

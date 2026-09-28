@@ -93,6 +93,11 @@ public class Drive : RacecarModule
         BackRight
     }
 
+    /// <summary>
+    /// All wheel positions, cached because Enum.GetValues allocates on every call.
+    /// </summary>
+    private static readonly WheelPosition[] wheelPositions = (WheelPosition[])Enum.GetValues(typeof(WheelPosition));
+
     protected override void Awake()
     {
         this.rBody = this.GetComponent<Rigidbody>();
@@ -111,7 +116,7 @@ public class Drive : RacecarModule
     private void FixedUpdate()
     {
         // Apply resting brake torque if Speed input is 0
-        float brakeTorque = this.Speed == 0 ? Mathf.Pow(this.rBody.velocity.magnitude, 2) * Drive.brakeTorqueScale : 0;
+        float brakeTorque = this.Speed == 0 ? Mathf.Pow(this.rBody.linearVelocity.magnitude, 2) * Drive.brakeTorqueScale : 0;
         foreach (WheelCollider wheel in this.WheelColliders)
         {
             wheel.brakeTorque = brakeTorque;
@@ -127,7 +132,7 @@ public class Drive : RacecarModule
         this.WheelColliders[(int)WheelPosition.FrontRight].steerAngle = driveAngle;
 
         // Update position and rotation of wheel models to match wheel colliders
-        foreach(WheelPosition wheelPosition in Enum.GetValues(typeof(WheelPosition)))
+        foreach (WheelPosition wheelPosition in Drive.wheelPositions)
         {
             this.WheelColliders[(int)wheelPosition].GetWorldPose(out Vector3 position, out Quaternion rotation);
             this.Wheels[(int)wheelPosition].transform.rotation = rotation;

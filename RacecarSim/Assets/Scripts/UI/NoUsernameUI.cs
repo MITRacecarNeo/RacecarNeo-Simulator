@@ -55,11 +55,11 @@ public class NoUsernameUI : MonoBehaviour
     /// <summary>
     /// The button which allows the user to save their new username.
     /// </summary>
+    [SerializeField]
     private Button saveButton;
 
     private void Awake()
     {
         this.input = this.GetComponentInChildren<InputField>();
-        this.saveButton = this.GetComponentsInChildren<Button>()[1];
     }
 }
