@@ -67,6 +67,37 @@ public static class PlayModeLevels
     }
 
     /// <summary>
+    /// Center of the flat test pad, far from any level's geometry.
+    /// </summary>
+    public static readonly Vector3 PadCenter = new Vector3(5000, 0, 5000);
+
+    /// <summary>
+    /// Places the car at rest on a flat pad (created on first use in the scene), at the given
+    /// offset from the pad center and facing +z.
+    /// </summary>
+    public static void PlaceOnPad(Racecar car, Vector3 offset)
+    {
+        if (GameObject.Find("TestPad") == null)
+        {
+            GameObject pad = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            pad.name = "TestPad";
+            pad.transform.position = PlayModeLevels.PadCenter;
+            pad.transform.localScale = new Vector3(400, 1, 400);
+        }
+
+        Vector3 position = PlayModeLevels.PadCenter + offset;
+        Rigidbody body = car.GetComponent<Rigidbody>();
+        car.Drive.Speed = 0;
+        car.Drive.Angle = 0;
+        car.transform.SetPositionAndRotation(position, Quaternion.identity);
+        body.position = position;
+        body.rotation = Quaternion.identity;
+        body.linearVelocity = Vector3.zero;
+        body.angularVelocity = Vector3.zero;
+        Physics.SyncTransforms();
+    }
+
+    /// <summary>
     /// Replaces every loaded scene with an empty one, destroying the level and closing its UDP
     /// ports, and restores global state the tests change.
     /// </summary>

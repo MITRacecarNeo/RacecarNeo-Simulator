@@ -34,6 +34,13 @@ public class PhysicsModule : RacecarModule
     /// This value is made up (it is NOT specified in the Intel RealSense D435i datasheet).
     /// </summary>
     private const float angularErrorFixed = 0.005f;
+
+    /// <summary>
+    /// Position of the IMU in car root coordinates (in dm): the breakout on the RACECAR Neo V2,
+    /// 190 mm ahead of the rear axle and 105 mm above the ground. Linear acceleration is measured
+    /// there, so turns add the lever arm from the center of mass.
+    /// </summary>
+    private static readonly Vector3 imuPosition = new Vector3(0, 1.05f, 0.775f);
     #endregion
 
     #region Public Interface
@@ -116,7 +123,7 @@ public class PhysicsModule : RacecarModule
 
     private void Start()
     {
-        this.prevWorldVelocity = this.rBody.linearVelocity / 10;
+        this.prevWorldVelocity = this.ImuVelocity();
     }
 
     private void Update()
@@ -131,8 +138,8 @@ public class PhysicsModule : RacecarModule
     {
         // Differentiate the world-space velocity read fresh each physics step, then rotate into the
         // car frame. Differentiating in the world frame keeps the centripetal term that a car-frame
-        // derivative drops. The sim world is 10x scale, so divide by 10 for real-world units.
-        Vector3 worldVelocity = this.rBody.linearVelocity / 10;
+        // derivative drops.
+        Vector3 worldVelocity = this.ImuVelocity();
         Vector3 worldAcceleration = (worldVelocity - this.prevWorldVelocity) / Time.fixedDeltaTime;
         this.prevWorldVelocity = worldVelocity;
 
@@ -154,5 +161,15 @@ public class PhysicsModule : RacecarModule
     {
         this.linearVelocity = null;
         this.angularVelocity = null;
+    }
+
+    /// <summary>
+    /// The world-space velocity of the IMU (in real-world meters/second). The sim world is 10x
+    /// scale, so divide by 10. Reads the Rigidbody pose, which interpolation does not move.
+    /// </summary>
+    private Vector3 ImuVelocity()
+    {
+        Vector3 imu = this.rBody.position + this.rBody.rotation * PhysicsModule.imuPosition;
+        return this.rBody.GetPointVelocity(imu) / 10;
     }
 }

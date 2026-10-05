@@ -4,10 +4,11 @@ _The MIT Beaver Works RACECAR simulation environment_
 
 You can learn more about RacecarSim and download the current version [here](https://sites.mit.edu/mit-racecar/resources/).
 
-> **Note**: As of update v2.9.1, the Racecar Neo Simulator is built using Unity `v6000.4.5f1`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
+> **Note**: As of update v2.9.2, the Racecar Neo Simulator is built using Unity `v6000.4.5f1`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
 
 ## Table of Contents
 - [Changelog](#changelog)
+    - [v2.9.2](#v292-update---model-update-1052026)
     - [v2.9.1](#v291-update---unity-6-and-stability-9272026)
     - [v2.8.0](#v280-update---mini-grand-prix-fall-2025-11222025)
     - [pre-v2.8.0](#pre-2870-updates)
@@ -21,6 +22,46 @@ You can learn more about RacecarSim and download the current version [here](http
 - [Modeling Error](#modeling-error)
 
 ## Changelog
+
+### v2.9.2 Update - Model update [10/5/2026]
+**Requirements**
+- Python programs need the racecar_core version that reads 1080 LIDAR
+  samples per scan; older versions read only the first 720.
+
+**Car**
+- The simulated car is the RACECAR Neo V2: its model, measured dimensions,
+  mass (2.36 kg) and center of mass, four-wheel drive, and Ackermann
+  steering matched to the physical car's full-lock turning circle.
+- Physics at real scale: 1 g gravity, suspension, and tire grip. The car
+  leans in hard turns, slides when cornering too fast, and can roll with a
+  raised center of mass (Lab 6a).
+- Speed control as on the physical car: full speed is 4.0 m/s times
+  `max_speed` (1.0 m/s at the default 0.25). The car holds that speed,
+  reaches 90 percent of it in about 0.4 s, and brakes to a stop when the
+  speed is set to 0 (about 0.3 m from 1 m/s, as measured on the car).
+  Reverse starts at once.
+
+**Sensors**
+- LIDAR: 1080 samples per scan at 7.4 Hz, range 0.05 to 12 m, scan plane at
+  the measured 195 mm. It sees the car's antennas behind it, as on the
+  physical car.
+- Camera at the measured lens height (112.5 mm).
+- IMU acceleration measured at the IMU's position on the car, so turns add
+  the offset from the center of mass, as on the physical car. Axes match
+  racecar_core on the physical car.
+
+**Levels**
+- Cones are 23 cm tall so the LIDAR sees them.
+- Lab 6a: Roll Prevention uses a higher center of mass so the car still
+  rolls at full default speed.
+- Fixed: Lab 1's speed task could pass from the car dropping onto the track
+  at the start.
+
+**Performance**
+- Lower CPU and GPU cost per frame: the depth camera no longer renders the
+  scene, depth images use parallel ray casts, and the HUD LIDAR view is
+  cheaper. Unused assets removed; opening the project no longer needs
+  Blender.
 
 ### v2.9.1 Update - Unity 6 and Stability [9/27/2026]
 **Requirements**

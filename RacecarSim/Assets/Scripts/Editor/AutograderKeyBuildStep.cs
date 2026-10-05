@@ -30,10 +30,15 @@ public class AutograderKeyBuildStep : IPreprocessBuildWithReport, IPostprocessBu
     /// <inheritdoc />
     public int callbackOrder { get { return 0; } }
 
+    /// <summary>
+    /// True if the key file holds a valid key, so the next player build embeds it.
+    /// </summary>
+    public static bool HasValidKey { get { return AutograderKeyBuildStep.ReadKey() != null; } }
+
     /// <inheritdoc />
     public void OnPreprocessBuild(BuildReport report)
     {
-        byte[] key = File.Exists(Utilities.KeyFilePath) ? Utilities.ParseKeyHex(File.ReadAllText(Utilities.KeyFilePath)) : null;
+        byte[] key = AutograderKeyBuildStep.ReadKey();
         if (key == null)
         {
             Debug.LogWarning($"No valid autograder key at {Utilities.KeyFilePath}; score codes are disabled in this build.");
@@ -57,6 +62,11 @@ public class AutograderKeyBuildStep : IPreprocessBuildWithReport, IPostprocessBu
     public void OnPostprocessBuild(BuildReport report)
     {
         AutograderKeyBuildStep.RemoveGenerated();
+    }
+
+    private static byte[] ReadKey()
+    {
+        return File.Exists(Utilities.KeyFilePath) ? Utilities.ParseKeyHex(File.ReadAllText(Utilities.KeyFilePath)) : null;
     }
 
     private static void RemoveGenerated()

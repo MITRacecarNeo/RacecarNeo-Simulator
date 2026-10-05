@@ -157,6 +157,8 @@ public class PythonInterface
     /// </summary>
     public void HandleUpdate()
     {
+        // Includes the wait for each program's reply
+        using SimProfiler.Scope profile = SimProfiler.Measure(SimProfiler.Section.PythonSync);
         this.PythonCall(Header.unity_update);
     }
 

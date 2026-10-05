@@ -13,6 +13,7 @@ using System.Linq;
 /// -racecarsim-diagnostics CSV enables SimDiagnostics, with -racecarsim-screenshot-interval
 /// and -racecarsim-restart-interval in seconds. -racecarsim-username sets the username for this
 /// session only (not saved), so an unattended autograder run produces a score code.
+/// -racecarsim-frametime CSV enables FrameTimeLog.
 /// </summary>
 public static class LaunchOptions
 {
@@ -31,6 +32,7 @@ public static class LaunchOptions
         public float ScreenshotInterval;
         public float RestartInterval;
         public string Username;
+        public string FrameTimePath;
     }
 
     /// <summary>
@@ -88,6 +90,9 @@ public static class LaunchOptions
                     break;
                 case "-racecarsim-username":
                     options.Username = next;
+                    break;
+                case "-racecarsim-frametime":
+                    options.FrameTimePath = next;
                     break;
                 case "-racecarsim-restart-interval":
                     options.RestartInterval = LaunchOptions.ParsePositive(next, 0);

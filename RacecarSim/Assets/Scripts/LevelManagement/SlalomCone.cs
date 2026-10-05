@@ -27,7 +27,8 @@ public class SlalomCone : MonoBehaviour
     private float timePenalty = 5;
 
     /// <summary>
-    /// The max speed the car can have before getting penalized if they pass the cone on the incorrect side.
+    /// The speed (in units/s; 8 is 0.8 m/s) above which passing the cone on the incorrect side
+    /// halves the car's velocity, if penalty is set to SlowDown.
     /// </summary>
     [SerializeField]
     private float maxSpeed = 8;

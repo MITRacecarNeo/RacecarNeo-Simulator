@@ -13,13 +13,13 @@ public class Racecar : MonoBehaviour
     private Camera[] playerCameras;
 
     /// <summary>
-    /// The front half of the car's chassis.
+    /// The model part recolored with the customization's front color (the shell stripe).
     /// </summary>
     [SerializeField]
     private GameObject chassisFront;
 
     /// <summary>
-    /// The rear half of the car's chassis.
+    /// The model part recolored with the customization's back color (the shell logos).
     /// </summary>
     [SerializeField]
     private GameObject chassisBack;
@@ -40,6 +40,11 @@ public class Racecar : MonoBehaviour
     /// The speed at which the camera follows the car.
     /// </summary>
     private const float cameraSpeed = 6;
+
+    /// <summary>
+    /// Height of Center above the car root (tire contact plane).
+    /// </summary>
+    private const float centerHeight = 1.22f;
     #endregion
 
     #region Public Interface
@@ -74,13 +79,14 @@ public class Racecar : MonoBehaviour
     public Hud Hud { get; set; }
 
     /// <summary>
-    /// The center point of the car.
+    /// The center point of the car, inside the payload shell collider (mid-height of the lower
+    /// shell). Level objects aim raycasts at it to find the car's surface.
     /// </summary>
     public Vector3 Center
     {
         get
         {
-            return this.transform.position + this.transform.up * 0.8f; 
+            return this.transform.position + this.transform.up * Racecar.centerHeight;
         }
     }
 

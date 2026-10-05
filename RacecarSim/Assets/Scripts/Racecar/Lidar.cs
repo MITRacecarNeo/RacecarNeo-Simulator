@@ -8,26 +8,25 @@ public class Lidar : RacecarModule
 {
     #region Constants
     /// <summary>
-    /// The number of samples captured in a single rotation.
-    /// Based on the YDLIDAR X4 datasheet.
+    /// The number of samples captured in a single rotation, as sent to Python programs; the
+    /// RACECAR Neo V2 LIDAR returns 1080.
     /// </summary>
-    public const int NumSamples = 720;
+    public const int NumSamples = 1080;
 
     /// <summary>
-    /// The frequency of the LIDAR motor in hz.
+    /// The frequency of the LIDAR motor in hz, as measured on the RACECAR Neo V2 LIDAR.
     /// </summary>
-    private const int motorFrequency = 6;
+    private const float motorFrequency = 7.4f;
 
     /// <summary>
     /// The number of sample taken per second.
     /// </summary>
-    private const int samplesPerSecond = Lidar.NumSamples * Lidar.motorFrequency;
+    private const float samplesPerSecond = Lidar.NumSamples * Lidar.motorFrequency;
 
     /// <summary>
-    /// The minimum distance that can be detected (in dm).
-    /// Based on the YDLIDAR X4 datasheet.
+    /// The minimum distance that can be detected (in dm), as measured on the RACECAR Neo V2 LIDAR.
     /// </summary>
-    private const float minRange = 1.2f;
+    private const float minRange = 0.5f;
 
     /// <summary>
     /// The value recorded for a sample less than minRange.
@@ -35,10 +34,9 @@ public class Lidar : RacecarModule
     private const float minCode = 0.0f;
 
     /// <summary>
-    /// The maximum distance that can be detected (in dm).
-    /// Based on the YDLIDAR X4 datasheet.
+    /// The maximum distance that can be detected (in dm), as measured on the RACECAR Neo V2 LIDAR.
     /// </summary>
-    private const float maxRange = 100;
+    private const float maxRange = 120;
 
     /// <summary>
     /// The value recorded for a sample greater than maxRange.
@@ -81,17 +79,22 @@ public class Lidar : RacecarModule
     {
         Unity.Collections.NativeArray<Color32> rawData = texture.GetRawTextureData<Color32>();
 
-        // Create background: gray for in range and black for out of range
-        int circleBoundary = Math.Min(texture.width, texture.height) * Math.Min(texture.width, texture.height) / 4;
-        for (int r = 0; r < texture.height; r++)
+        // Background: gray for in range and black for out of range, drawn once per texture size
+        if (this.visualizationBackground == null || this.visualizationBackground.Length != rawData.Length)
         {
-            for (int c = 0; c < texture.width; c++)
+            this.visualizationBackground = new Color32[rawData.Length];
+            int circleBoundary = Math.Min(texture.width, texture.height) * Math.Min(texture.width, texture.height) / 4;
+            for (int r = 0; r < texture.height; r++)
             {
-                float x = r - texture.height / 2;
-                float y = c - texture.width / 2;
-                rawData[r * texture.width + c] = x * x + y * y < circleBoundary ? Hud.SensorBackgroundColor : Color.black;
+                for (int c = 0; c < texture.width; c++)
+                {
+                    float x = r - texture.height / 2;
+                    float y = c - texture.width / 2;
+                    this.visualizationBackground[r * texture.width + c] = x * x + y * y < circleBoundary ? Hud.SensorBackgroundColor : Color.black;
+                }
             }
         }
+        rawData.CopyFrom(this.visualizationBackground);
 
         // Render each sample as a red pixel
         Vector2 center = new Vector2(texture.width / 2, texture.height / 2);
@@ -109,6 +112,11 @@ public class Lidar : RacecarModule
         texture.Apply();
     }
     #endregion
+
+    /// <summary>
+    /// The LIDAR visualization background, cached for the HUD texture's size.
+    /// </summary>
+    private Color32[] visualizationBackground;
 
     /// <summary>
     /// The index of the most recently captured sample.
@@ -135,12 +143,14 @@ public class Lidar : RacecarModule
     {
         if (this.racecar.Hud != null)
         {
+            using SimProfiler.Scope profile = SimProfiler.Measure(SimProfiler.Section.LidarHud);
             this.VisualizeLidar(this.racecar.Hud.LidarVisualization);
         }
     }
 
     private void FixedUpdate()
     {
+        using SimProfiler.Scope profile = SimProfiler.Measure(SimProfiler.Section.LidarScan);
         this.sampleAccumulator += Lidar.samplesPerSecond * Time.fixedDeltaTime;
         int wholeSamples = Mathf.FloorToInt(this.sampleAccumulator);
         this.sampleAccumulator -= wholeSamples;

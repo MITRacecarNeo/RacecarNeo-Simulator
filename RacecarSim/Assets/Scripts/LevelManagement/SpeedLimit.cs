@@ -26,9 +26,10 @@ public class SpeedLimit : MonoBehaviour
     }            
 
     /// <summary>
-    /// The cars currently within the speed limit zone.
+    /// The number of each car's colliders inside the zone. A car counts as inside until its last
+    /// collider leaves.
     /// </summary>
-    private readonly HashSet<Racecar> cars = new HashSet<Racecar>();
+    private readonly Dictionary<Racecar, int> collidersInside = new Dictionary<Racecar, int>();
 
     /// <summary>
     /// Cars that already failed in this zone; each car fails once.
@@ -37,7 +38,7 @@ public class SpeedLimit : MonoBehaviour
 
     private void Update()
     {
-        foreach (Racecar car in this.cars)
+        foreach (Racecar car in this.collidersInside.Keys)
         {
             if (car.Physics.LinearVelocity.magnitude > this.maxSpeed && this.failedCars.Add(car))
             {
@@ -51,16 +52,24 @@ public class SpeedLimit : MonoBehaviour
         Racecar car = other.GetComponentInParent<Racecar>();
         if (car != null)
         {
-            cars.Add(car);
+            this.collidersInside.TryGetValue(car, out int count);
+            this.collidersInside[car] = count + 1;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
         Racecar car = other.GetComponentInParent<Racecar>();
-        if (car != null)
+        if (car != null && this.collidersInside.TryGetValue(car, out int count))
         {
-            cars.Remove(car);
+            if (count > 1)
+            {
+                this.collidersInside[car] = count - 1;
+            }
+            else
+            {
+                this.collidersInside.Remove(car);
+            }
         }
     }
 }

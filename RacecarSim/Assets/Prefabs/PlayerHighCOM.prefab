@@ -59,12 +59,12 @@ PrefabInstance:
     - target: {fileID: 6763771216156239461, guid: 17243f7e049157d4b950695aacf25b36,
         type: 3}
       propertyPath: Com.y
-      value: 1.8
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 6763771216156239461, guid: 17243f7e049157d4b950695aacf25b36,
         type: 3}
       propertyPath: Com.z
-      value: 0.2
+      value: 0.085
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

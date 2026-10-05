@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Player;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using Process = System.Diagnostics.Process;
+using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
 /// <summary>
 /// Builds Windows, macOS, and Linux players from the enabled scenes in the build settings, and
@@ -76,6 +79,14 @@ public static class PlayerBuilds
         string[] scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(scene => scene.path).ToArray();
         string versionFolder = Path.Combine(root, $"v{PlayerSettings.bundleVersion}");
         bool allSucceeded = true;
+        BuildManifest manifest = new BuildManifest()
+        {
+            version = PlayerSettings.bundleVersion,
+            commit = PlayerBuilds.Git("rev-parse HEAD"),
+            treeClean = PlayerBuilds.Git("status --porcelain") == string.Empty,
+            builtUtc = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            keyEmbedded = AutograderKeyBuildStep.HasValidKey,
+        };
 
         foreach ((BuildTarget target, string folder, string executable) in PlayerBuilds.Platforms)
         {
@@ -92,8 +103,56 @@ public static class PlayerBuilds
             bool succeeded = report.summary.result == BuildResult.Succeeded;
             allSucceeded &= succeeded;
             Debug.Log($"Player build [{target}] v{PlayerSettings.bundleVersion}: {report.summary.result}, {report.summary.totalErrors} errors, {report.summary.totalSize / 1e6:F0} MB, {report.summary.totalTime.TotalSeconds:F0} s -> {options.locationPathName}");
+            manifest.platforms.Add($"{folder}: {report.summary.result}");
         }
+
+        File.WriteAllText(Path.Combine(versionFolder, PlayerBuilds.ManifestFile), JsonUtility.ToJson(manifest, true));
         return allSucceeded;
+    }
+
+    /// <summary>
+    /// Name of the file, next to the platform folders, that records how the players were built.
+    /// </summary>
+    public const string ManifestFile = "build.json";
+
+    /// <summary>
+    /// Contents of ManifestFile.
+    /// </summary>
+    [Serializable]
+    private class BuildManifest
+    {
+        public string version;
+        public string commit;
+        public bool treeClean;
+        public string builtUtc;
+        public bool keyEmbedded;
+        public List<string> platforms = new List<string>();
+    }
+
+    /// <summary>
+    /// Runs git in the project folder and returns its trimmed output, or "unknown" if git is unavailable.
+    /// </summary>
+    private static string Git(string arguments)
+    {
+        try
+        {
+            ProcessStartInfo start = new ProcessStartInfo("git", arguments)
+            {
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            using (Process process = Process.Start(start))
+            {
+                string output = process.StandardOutput.ReadToEnd().Trim();
+                process.WaitForExit();
+                return process.ExitCode == 0 ? output : "unknown";
+            }
+        }
+        catch (Exception)
+        {
+            return "unknown";
+        }
     }
 
     /// <summary>

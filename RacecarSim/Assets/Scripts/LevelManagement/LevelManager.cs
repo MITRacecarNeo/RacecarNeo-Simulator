@@ -527,6 +527,10 @@ public class LevelManager : MonoBehaviour
         {
             this.gameObject.AddComponent<SimDiagnostics>();
         }
+        if (!string.IsNullOrEmpty(LaunchOptions.Current.FrameTimePath))
+        {
+            this.gameObject.AddComponent<FrameTimeLog>();
+        }
 
         switch (LevelManager.LevelManagerMode)
         {

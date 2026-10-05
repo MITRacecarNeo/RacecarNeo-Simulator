@@ -11,7 +11,8 @@ public class LaunchOptionsTests
         LaunchOptions.Options options = LaunchOptions.Parse(new[]
         {
             "RacecarSim.exe", "-racecarsim-level", "grand-prix-2026", "-racecarsim-mode", "Exploration",
-            "-racecarsim-cars", "3", "-racecarsim-autostart", "-racecarsim-data-dir", "C:/temp/sim"
+            "-racecarsim-cars", "3", "-racecarsim-autostart", "-racecarsim-data-dir", "C:/temp/sim",
+            "-racecarsim-frametime", "C:/temp/frames.csv"
         });
 
         Assert.AreEqual("grand-prix-2026", options.LevelId);
@@ -19,6 +20,7 @@ public class LaunchOptionsTests
         Assert.AreEqual(3, options.NumCars);
         Assert.IsTrue(options.AutoStart);
         Assert.AreEqual("C:/temp/sim", options.DataDirectory);
+        Assert.AreEqual("C:/temp/frames.csv", options.FrameTimePath);
     }
 
     [Test]

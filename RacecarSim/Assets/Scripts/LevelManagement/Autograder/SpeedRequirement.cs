@@ -15,7 +15,9 @@ public class SpeedRequirement : AutograderTask
 
     private void Update()
     {
-        if (LevelManager.GetCar().Physics.LinearVelocity.magnitude > this.speed)
+        // Ground speed only, so the car dropping onto the track at spawn does not count
+        Vector3 velocity = LevelManager.GetCar().Physics.LinearVelocity;
+        if (new Vector2(velocity.x, velocity.z).magnitude > this.speed)
         {
             AutograderManager.CompleteTask(this);
         }

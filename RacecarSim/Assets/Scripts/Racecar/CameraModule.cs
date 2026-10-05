@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Unity.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -57,6 +58,11 @@ public class CameraModule : RacecarModule
     /// normally returns after one frame; the limit applies while no frames run (scene loading).
     /// </summary>
     private const int asyncWaitTime = 1000;
+
+    /// <summary>
+    /// Depth ray casts per job in the batched depth image.
+    /// </summary>
+    private const int raycastsPerJob = 64;
 
     /// <summary>
     /// Seconds between refreshes of the HUD depth view.
@@ -322,6 +328,10 @@ public class CameraModule : RacecarModule
     {
         this.colorCamera.fieldOfView = CameraModule.fieldOfView.y;
         this.depthCamera.fieldOfView = CameraModule.fieldOfView.y;
+
+        // The depth camera only defines the depth ray directions; rendering it would draw the
+        // scene a second time into the color camera's target every frame
+        this.depthCamera.enabled = false;
     }
 
     private void Update()
@@ -339,6 +349,8 @@ public class CameraModule : RacecarModule
         // The HUD depth view raycasts the full depth image, so refresh it at a fixed rate rather than every frame
         if (this.racecar.Hud != null && Time.unscaledTime >= this.nextDepthVisualizationTime)
         {
+            // Includes the depth raycasts when no program read the depth image this frame
+            using SimProfiler.Scope profile = SimProfiler.Measure(SimProfiler.Section.DepthHud);
             this.VisualizeDepth(this.racecar.Hud.DepthVisualization);
             this.nextDepthVisualizationTime = Time.unscaledTime + CameraModule.depthVisualizationInterval;
         }
@@ -391,6 +403,7 @@ public class CameraModule : RacecarModule
     /// </summary>
     private void UpdateColorImageRaw()
     {
+        using SimProfiler.Scope profile = SimProfiler.Measure(SimProfiler.Section.ColorReadback);
         RenderTexture activeRenderTexture = RenderTexture.active;
         RenderTexture.active = this.ColorImage;
 
@@ -426,32 +439,54 @@ public class CameraModule : RacecarModule
     }
 
     /// <summary>
-    /// Update depthImage by performing a ray cast for each depth pixel.
-    /// Warning: this operation is very expensive.
+    /// Update depthImage with one ray cast per depth pixel, run as a batch on the job threads.
     /// </summary>
     private void UpdateDepthImage()
     {
-        for (int r = 0; r < CameraModule.DepthHeight; r++)
+        using SimProfiler.Scope profile = SimProfiler.Measure(SimProfiler.Section.DepthImage);
+        int width = CameraModule.DepthWidth;
+        int height = CameraModule.DepthHeight;
+        NativeArray<RaycastCommand> commands = new NativeArray<RaycastCommand>(width * height, Allocator.TempJob);
+        NativeArray<RaycastHit> hits = new NativeArray<RaycastHit>(width * height, Allocator.TempJob);
+        try
         {
-            for (int c = 0; c < CameraModule.DepthWidth; c++)
+            QueryParameters query = new QueryParameters(Constants.IgnoreUIMask);
+            for (int r = 0; r < height; r++)
             {
-                Ray ray = this.depthCamera.ViewportPointToRay(new Vector3(
-                    (float)c / (CameraModule.DepthWidth - 1),
-                    (CameraModule.DepthHeight - r - 1.0f) / (CameraModule.DepthHeight - 1),
-                    0));
-
-                if (Physics.Raycast(ray, out RaycastHit raycastHit, CameraModule.maxRange, Constants.IgnoreUIMask))
+                for (int c = 0; c < width; c++)
                 {
-                    float distance = Settings.IsRealism 
-                        ? raycastHit.distance * NormalDist.Random(1, CameraModule.averageErrorFactor) 
-                        : raycastHit.distance;
-                    this.depthImage[r][c] = distance > CameraModule.minRange ? distance * 10 : CameraModule.minCode;
-                }
-                else
-                {
-                    this.depthImage[r][c] = CameraModule.maxCode;
+                    Ray ray = this.depthCamera.ViewportPointToRay(new Vector3(
+                        (float)c / (width - 1),
+                        (height - r - 1.0f) / (height - 1),
+                        0));
+                    commands[r * width + c] = new RaycastCommand(ray.origin, ray.direction, query, CameraModule.maxRange);
                 }
             }
+            RaycastCommand.ScheduleBatch(commands, hits, CameraModule.raycastsPerJob).Complete();
+
+            for (int r = 0; r < height; r++)
+            {
+                for (int c = 0; c < width; c++)
+                {
+                    RaycastHit raycastHit = hits[r * width + c];
+                    if (raycastHit.collider != null)
+                    {
+                        float distance = Settings.IsRealism
+                            ? raycastHit.distance * NormalDist.Random(1, CameraModule.averageErrorFactor)
+                            : raycastHit.distance;
+                        this.depthImage[r][c] = distance > CameraModule.minRange ? distance * 10 : CameraModule.minCode;
+                    }
+                    else
+                    {
+                        this.depthImage[r][c] = CameraModule.maxCode;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            commands.Dispose();
+            hits.Dispose();
         }
 
         this.isDepthImageValid = true;

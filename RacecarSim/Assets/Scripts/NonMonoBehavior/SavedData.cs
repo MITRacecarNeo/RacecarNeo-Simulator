@@ -92,7 +92,7 @@ public class SavedData
     {
         this.CarCustomizations = new CarCustomization[]
         {
-            new CarCustomization(Color.white),
+            new CarCustomization(Color.white, Color.red),
             new CarCustomization(Color.red),
             new CarCustomization(Color.blue),
             new CarCustomization(Color.yellow)
