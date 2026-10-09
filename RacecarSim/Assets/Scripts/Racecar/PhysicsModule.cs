@@ -1,8 +1,15 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Simulates the IMU.
+/// Simulates the IMU: the accelerometer and gyro read by racecar_core, and the LSM9DS1
+/// magnetometer.
 /// </summary>
+/// <remarks>
+/// Readings use REP-103 body axes, as the physical car's driver publishes them: x forward, y left,
+/// z up. The accelerometer reports specific force, so a car at rest reads (0, 0, +9.81); rotation
+/// rates follow the right-hand rule, so a left turn is positive about z. Protocol version 1
+/// clients get the protocol version 1 frame (Legacy properties).
+/// </remarks>
 public class PhysicsModule : RacecarModule
 {
     #region Constants
@@ -10,6 +17,11 @@ public class PhysicsModule : RacecarModule
     /// The number of past samples to average for linear acceleration.
     /// </summary>
     private const int accelerationSamples = 4;
+
+    /// <summary>
+    /// Gravitational acceleration (in m/s^2).
+    /// </summary>
+    private const float gravity = 9.81f;
 
     /// <summary>
     /// The average relative error of linear acceleration measurements.
@@ -36,6 +48,45 @@ public class PhysicsModule : RacecarModule
     private const float angularErrorFixed = 0.005f;
 
     /// <summary>
+    /// Standard deviation of the per-level accelerometer bias in realism mode (in m/s^2).
+    /// </summary>
+    private const float linearBiasSigma = 0.05f;
+
+    /// <summary>
+    /// Standard deviation of the per-level gyro bias in realism mode (in rad/s).
+    /// </summary>
+    private const float angularBiasSigma = 0.005f;
+
+    /// <summary>
+    /// Random walk of the accelerometer and gyro biases after one second, as a fraction of their
+    /// standard deviation: about one standard deviation over ten minutes.
+    /// </summary>
+    private const float biasDriftPerRootSecond = 0.04f;
+
+    /// <summary>
+    /// Earth's magnetic field at MIT (WMM2025, 2026.77) in world space (in Tesla): 20.66 uT
+    /// horizontal toward magnetic north, which is world +Z in every level, and 46.78 uT down.
+    /// </summary>
+    private static readonly Vector3 earthField = new Vector3(0, -46.78e-6f, 20.66e-6f);
+
+    /// <summary>
+    /// Standard deviation of the per-level residual hard-iron bias after calibration, per axis, in
+    /// realism mode (in Tesla).
+    /// </summary>
+    private const float magneticBiasSigma = 1.0e-6f;
+
+    /// <summary>
+    /// RMS noise of the magnetometer in realism mode (in Tesla), from the LIS3MDL (the same die)
+    /// at 3.2 to 4.1 mgauss.
+    /// </summary>
+    private const float magneticNoise = 0.35e-6f;
+
+    /// <summary>
+    /// LSM9DS1 magnetometer resolution at 8 gauss full scale, 0.29 mgauss (in Tesla).
+    /// </summary>
+    private const float magneticStep = 0.029e-6f;
+
+    /// <summary>
     /// Position of the IMU in car root coordinates (in dm): the breakout on the RACECAR Neo V2,
     /// 190 mm ahead of the rear axle and 105 mm above the ground. Linear acceleration is measured
     /// there, so turns add the lever arm from the center of mass.
@@ -45,9 +96,17 @@ public class PhysicsModule : RacecarModule
 
     #region Public Interface
     /// <summary>
-    /// The linear acceleration of the car relative to the car's transform (in meters/second^2).
+    /// Specific force at the IMU in REP-103 body axes (in m/s^2): (0, 0, +9.81) at rest.
     /// </summary>
-    public Vector3 LinearAcceleration { get; private set; } = Vector3.zero;
+    public Vector3 LinearAcceleration
+    {
+        get { return PhysicsModule.ToBodyAxes(this.localSpecificForce); }
+    }
+
+    /// <summary>
+    /// Linear acceleration in the protocol version 1 frame (in m/s^2): x right, y up, z forward, with gravity added, so a car at rest reads (0, -9.81, 0).
+    /// </summary>
+    public Vector3 LegacyLinearAcceleration { get; private set; } = Vector3.zero;
 
     /// <summary>
     /// The linear velocity of the car relative to the car's transform (in meters/second)
@@ -65,32 +124,58 @@ public class PhysicsModule : RacecarModule
     }
 
     /// <summary>
-    /// The angular velocity of the car (in radians/second) about the car's own axes: x right,
-    /// y up, z forward. Positive values follow the right-hand rule (counterclockwise when viewed
-    /// from the positive end of the axis), so a left turn has positive y.
+    /// The angular velocity of the car in REP-103 body axes (in rad/s), right-hand rule: a left
+    /// turn is positive about z.
     /// </summary>
     public Vector3 AngularVelocity
     {
+        get { return PhysicsModule.ToBodyAxes(this.LocalAngularVelocity); }
+    }
+
+    /// <summary>
+    /// Angular velocity in the protocol version 1 frame (in rad/s): about x right, y up, z forward, right-hand rule, so a left turn is positive about y.
+    /// </summary>
+    public Vector3 LegacyAngularVelocity
+    {
+        get { return this.LocalAngularVelocity; }
+    }
+
+    /// <summary>
+    /// The magnetic field at the magnetometer in REP-103 body axes (in Tesla). A level car facing
+    /// magnetic north (world +Z) reads about (20.7, 0, -46.8) uT.
+    /// </summary>
+    public Vector3 MagneticField
+    {
         get
         {
-            if (!this.angularVelocity.HasValue)
+            if (!this.magneticField.HasValue)
             {
-                // Unity reports world-space rates with left-hand-rule signs; the API uses car-frame
-                // axes with right-hand-rule signs
-                Vector3 angVel = -this.transform.InverseTransformDirection(this.rBody.angularVelocity);
-
+                Vector3 field = PhysicsModule.ToBodyAxes(this.transform.InverseTransformDirection(PhysicsModule.earthField));
                 if (Settings.IsRealism)
                 {
-                    angVel *= NormalDist.Random(1, PhysicsModule.angularErrorFactor);
-                    angVel.x += NormalDist.Random(0, PhysicsModule.angularErrorFixed);
-                    angVel.y += NormalDist.Random(0, PhysicsModule.angularErrorFixed);
-                    angVel.z += NormalDist.Random(0, PhysicsModule.angularErrorFixed);
+                    field += this.magneticBias.Value + new Vector3(
+                        NormalDist.Random(0, PhysicsModule.magneticNoise),
+                        NormalDist.Random(0, PhysicsModule.magneticNoise),
+                        NormalDist.Random(0, PhysicsModule.magneticNoise));
+                    field = new Vector3(
+                        Mathf.Round(field.x / PhysicsModule.magneticStep) * PhysicsModule.magneticStep,
+                        Mathf.Round(field.y / PhysicsModule.magneticStep) * PhysicsModule.magneticStep,
+                        Mathf.Round(field.z / PhysicsModule.magneticStep) * PhysicsModule.magneticStep);
                 }
-
-                this.angularVelocity = angVel;
+                this.magneticField = field;
             }
-            return this.angularVelocity.Value;
+            return this.magneticField.Value;
         }
+    }
+
+    /// <summary>
+    /// Converts a vector from Unity car-local axes (x right, y up, z forward) to REP-103 body axes
+    /// (x forward, y left, z up). Rotation rates convert the same way when both use the
+    /// right-hand rule about their axes.
+    /// </summary>
+    public static Vector3 ToBodyAxes(Vector3 local)
+    {
+        return new Vector3(local.z, -local.x, local.y);
     }
     #endregion
 
@@ -105,14 +190,60 @@ public class PhysicsModule : RacecarModule
     private Vector3 prevWorldVelocity;
 
     /// <summary>
+    /// Running average of the specific force in car-local axes (in m/s^2).
+    /// </summary>
+    private Vector3 localSpecificForce = Vector3.zero;
+
+    /// <summary>
     /// Private member for the LinearVelocity accessor
     /// </summary>
     private Vector3? linearVelocity = null;
 
     /// <summary>
-    /// Private member for the AngularVelocity accessor
+    /// Private member for the LocalAngularVelocity accessor
     /// </summary>
     private Vector3? angularVelocity = null;
+
+    /// <summary>
+    /// Private member for the MagneticField accessor
+    /// </summary>
+    private Vector3? magneticField = null;
+
+    /// <summary>
+    /// Realism biases, drawn when the car is created (on every level load), in car-local axes for
+    /// the accelerometer and gyro and in body axes for the magnetometer.
+    /// </summary>
+    private readonly SensorBias linearBias = new SensorBias(PhysicsModule.linearBiasSigma, PhysicsModule.biasDriftPerRootSecond);
+    private readonly SensorBias angularBias = new SensorBias(PhysicsModule.angularBiasSigma, PhysicsModule.biasDriftPerRootSecond);
+    private readonly SensorBias magneticBias = new SensorBias(PhysicsModule.magneticBiasSigma, 0);
+
+    /// <summary>
+    /// The angular velocity in car-local axes (in rad/s), right-hand rule about each axis.
+    /// </summary>
+    private Vector3 LocalAngularVelocity
+    {
+        get
+        {
+            if (!this.angularVelocity.HasValue)
+            {
+                // Unity reports world-space rates with left-hand-rule signs; negate for
+                // right-hand-rule rates about the car-local axes
+                Vector3 angVel = -this.transform.InverseTransformDirection(this.rBody.angularVelocity);
+
+                if (Settings.IsRealism)
+                {
+                    angVel *= NormalDist.Random(1, PhysicsModule.angularErrorFactor);
+                    angVel.x += NormalDist.Random(0, PhysicsModule.angularErrorFixed);
+                    angVel.y += NormalDist.Random(0, PhysicsModule.angularErrorFixed);
+                    angVel.z += NormalDist.Random(0, PhysicsModule.angularErrorFixed);
+                    angVel += this.angularBias.Value;
+                }
+
+                this.angularVelocity = angVel;
+            }
+            return this.angularVelocity.Value;
+        }
+    }
 
     protected override void Awake()
     {
@@ -128,6 +259,12 @@ public class PhysicsModule : RacecarModule
 
     private void Update()
     {
+        this.racecar.Readings.LinearAcceleration = this.LinearAcceleration;
+        this.racecar.Readings.AngularVelocity = this.AngularVelocity;
+        this.racecar.Readings.LegacyLinearAcceleration = this.LegacyLinearAcceleration;
+        this.racecar.Readings.LegacyAngularVelocity = this.LegacyAngularVelocity;
+        this.racecar.Readings.MagneticField = this.MagneticField;
+
         if (this.racecar.Hud != null)
         {
             this.racecar.Hud.UpdatePhysics(this.LinearVelocity.magnitude, this.LinearAcceleration, this.AngularVelocity);
@@ -143,24 +280,36 @@ public class PhysicsModule : RacecarModule
         Vector3 worldAcceleration = (worldVelocity - this.prevWorldVelocity) / Time.fixedDeltaTime;
         this.prevWorldVelocity = worldVelocity;
 
-        // Calculate current linear acceleration, incorporating gravity and error rate
-        Vector3 curAcceleration = this.transform.InverseTransformDirection(worldAcceleration + Vector3.down * 9.81f);
+        Vector3 acceleration = this.transform.InverseTransformDirection(worldAcceleration);
+        Vector3 down = this.transform.InverseTransformDirection(Vector3.down * PhysicsModule.gravity);
+
+        // Specific force (what an accelerometer measures) and the legacy acceleration plus gravity
+        Vector3 specificForce = acceleration - down;
+        Vector3 legacy = acceleration + down;
         if (Settings.IsRealism)
         {
-            curAcceleration *= NormalDist.Random(1, PhysicsModule.linearErrorFactor);
-            curAcceleration.x += NormalDist.Random(0, PhysicsModule.linearErrorFixed);
-            curAcceleration.y += NormalDist.Random(0, PhysicsModule.linearErrorFixed);
-            curAcceleration.z += NormalDist.Random(0, PhysicsModule.linearErrorFixed);
+            this.linearBias.Step(Time.fixedDeltaTime);
+            this.angularBias.Step(Time.fixedDeltaTime);
+
+            float scale = NormalDist.Random(1, PhysicsModule.linearErrorFactor);
+            Vector3 error = this.linearBias.Value + new Vector3(
+                NormalDist.Random(0, PhysicsModule.linearErrorFixed),
+                NormalDist.Random(0, PhysicsModule.linearErrorFixed),
+                NormalDist.Random(0, PhysicsModule.linearErrorFixed));
+            specificForce = specificForce * scale + error;
+            legacy = legacy * scale + error;
         }
 
-        // Update linear acceleration running average
-        this.LinearAcceleration += (curAcceleration - this.LinearAcceleration) / PhysicsModule.accelerationSamples;
+        // Update the running averages
+        this.localSpecificForce += (specificForce - this.localSpecificForce) / PhysicsModule.accelerationSamples;
+        this.LegacyLinearAcceleration += (legacy - this.LegacyLinearAcceleration) / PhysicsModule.accelerationSamples;
     }
 
     private void LateUpdate()
     {
         this.linearVelocity = null;
         this.angularVelocity = null;
+        this.magneticField = null;
     }
 
     /// <summary>

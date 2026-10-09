@@ -11,7 +11,7 @@ public class SavedData
     /// <summary>
     /// The save format version written by this build.
     /// </summary>
-    public const int CurrentVersion = 2;
+    public const int CurrentVersion = 3;
 
     /// <summary>
     /// The save format version of this data.
@@ -90,12 +90,14 @@ public class SavedData
     /// </summary>
     public void ClearCustomization()
     {
+        // Car 1 has the physical car's shell color; the others avoid red and yellow so the R logo
+        // and the beaver stay visible
         this.CarCustomizations = new CarCustomization[]
         {
-            new CarCustomization(Color.white, Color.red),
-            new CarCustomization(Color.red),
-            new CarCustomization(Color.blue),
-            new CarCustomization(Color.yellow)
+            new CarCustomization(CarCustomization.DefaultShellColor),
+            new CarCustomization(new Color(0.12f, 0.35f, 0.85f)),
+            new CarCustomization(new Color(0.1f, 0.6f, 0.25f)),
+            new CarCustomization(new Color(0.45f, 0.2f, 0.75f))
         };
     }
 }

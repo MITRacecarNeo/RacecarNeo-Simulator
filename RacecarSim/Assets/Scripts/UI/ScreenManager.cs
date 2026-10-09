@@ -20,7 +20,7 @@ public abstract class ScreenManager : MonoBehaviour
     /// <summary>
     /// The color of text used in an error message.
     /// </summary>
-    private static readonly Color errorColor = new Color(1, 0.25f, 0.25f);
+    protected static readonly Color errorColor = new Color(1, 0.25f, 0.25f);
 
     /// <summary>
     /// The minimum time (in seconds) that a warning message can be shown.

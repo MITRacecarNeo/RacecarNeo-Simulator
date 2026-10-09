@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using UnityEngine;
 using UnityEngine.TestTools;
 
 /// <summary>
@@ -63,5 +64,30 @@ public class LevelLoadTests
         }
 
         Assert.IsNotNull(LevelManager.GetCar(), $"{levelScene} spawned no car.");
+    }
+
+    /// <summary>
+    /// Grand Prix 2024's gates move along their own directions: two slide forward, three lift.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator GrandPrix2024_GatesMoveAlongTheirDirections()
+    {
+        LevelInfo level = PlayModeLevels.Find("Grand Prix 2024");
+        yield return PlayModeLevels.Load(level, LevelManagerMode.Exploration, level.BuildIndex);
+        MovingGate[] gates = Object.FindObjectsByType<MovingGate>();
+        Vector3[] starts = gates.Select(gate => gate.transform.position).ToArray();
+        yield return new WaitForSeconds(1);
+
+        int forward = 0;
+        int up = 0;
+        for (int i = 0; i < gates.Length; i++)
+        {
+            Vector3 moved = gates[i].transform.position - starts[i];
+            Assert.Greater(moved.magnitude, 0.5f, $"{gates[i].name} moved");
+            forward += Vector3.Angle(moved, Vector3.forward) < 1 || Vector3.Angle(moved, Vector3.back) < 1 ? 1 : 0;
+            up += Vector3.Angle(moved, Vector3.up) < 1 || Vector3.Angle(moved, Vector3.down) < 1 ? 1 : 0;
+        }
+        Assert.AreEqual(2, forward, "sliding gates");
+        Assert.AreEqual(3, up, "lifting gates");
     }
 }

@@ -4,10 +4,11 @@ _The MIT Beaver Works RACECAR simulation environment_
 
 You can learn more about RacecarSim and download the current version [here](https://sites.mit.edu/mit-racecar/resources/).
 
-> **Note**: As of update v2.9.2, the Racecar Neo Simulator is built using Unity `v6000.4.5f1`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
+> **Note**: As of update v2.9.3, the Racecar Neo Simulator is built using Unity `v6000.4.5f1`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
 
 ## Table of Contents
 - [Changelog](#changelog)
+    - [v2.9.3](#v293-update---sensors-and-actuators-1092026)
     - [v2.9.2](#v292-update---model-update-1052026)
     - [v2.9.1](#v291-update---unity-6-and-stability-9272026)
     - [v2.8.0](#v280-update---mini-grand-prix-fall-2025-11222025)
@@ -22,6 +23,48 @@ You can learn more about RacecarSim and download the current version [here](http
 - [Modeling Error](#modeling-error)
 
 ## Changelog
+
+### v2.9.3 Update - Sensors and actuators [10/9/2026]
+**Requirements**
+- Use racecar_core `v2.9.3-sim` (update the library with the installer) for
+  the new sensors and actuators below. Older racecar_core versions still
+  connect and read the IMU in their old axes; the new racecar_core on an
+  older simulator shows "Download the newest version of RacecarSim".
+
+**Sensors**
+- IMU axes match the physical car (REP-103): x forward, y left, z up.
+  Acceleration at rest reads (0, 0, +9.81); a left turn is positive about z.
+- Magnetometer: Earth's field at MIT, with magnetic north along each
+  level's +Z direction.
+- Drive encoder speed. With Realism on, it reads the wheels as the car's
+  hall encoder does, so wheel slip shows and speeds below about 0.075 m/s
+  read 0.
+- Battery voltage and current from a 5000 mAh 2S pack that drains while the
+  car runs and sags under load.
+- Realism adds slowly drifting IMU and magnetometer biases and noise.
+- Every sensor can be read from Jupyter (async) as well as from a program.
+
+**Actuators**
+- Dot matrix: `set_matrix` and `show_text` (with scrolling) show on an 8x24
+  panel when Settings > "Show dot matrix" is on. The panel shows the car's
+  idle and mode screens when no program draws on it.
+- LED strip: the 84 LEDs in the car's light band, from the front-left end
+  around the rear to the front-right end. Without a program they show the
+  battery level, as on the physical car.
+
+**Car and settings**
+- Battery mode (Settings): stops the car when the battery runs out and shows
+  its voltage and current on screen. Autograder levels never stop the car.
+- Each car has one shell color (Settings > Car N Shell, with a shiny
+  option); the R logo and the beaver stay in their colors. Saved car colors
+  reset once to black, blue, green, and purple.
+- Camera: Space cycles nine views (chase, overhead, front, 45 degree
+  overhead, 45 degree front, both sides, both rear quarters); the scroll
+  wheel zooms; C returns to the chase view. In levels where the scroll
+  wheel resizes a cone or turns an AR marker, it keeps doing that.
+
+**Levels**
+- Parking tasks show the angle and distance readout during autograder runs.
 
 ### v2.9.2 Update - Model update [10/5/2026]
 **Requirements**

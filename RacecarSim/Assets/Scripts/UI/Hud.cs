@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,6 +50,18 @@ public class Hud : ScreenManager, IAutograderHud
     /// </summary>
     [SerializeField]
     private Text angularVelocityText;
+
+    /// <summary>
+    /// The battery voltage and current.
+    /// </summary>
+    [SerializeField]
+    private Text batteryText;
+
+    /// <summary>
+    /// The car's dot matrix, shown when Settings.ShowDotMatrix is on.
+    /// </summary>
+    [SerializeField]
+    private DotMatrixPanel dotMatrixPanel;
 
     /// <summary>
     /// The simulation mode label.
@@ -197,12 +210,16 @@ public class Hud : ScreenManager, IAutograderHud
     public override void UpdateConnectedPrograms(bool[] connectedPrograms)
     {
         this.connectedProgram.color = connectedPrograms.Length > 0 ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, Hud.unconnectedScriptAlpha);
+        this.isProgramConnected = connectedPrograms.Length > 0 && connectedPrograms[0];
+        this.dotMatrixPanel.SetDriveMode(this.simulationMode, this.isProgramConnected);
     }
 
     public override void UpdateMode(SimulationMode mode)
     {
         this.modeText.text = Hud.modeNames[(int)mode];
         this.modeBackground.color = Hud.modeColors[(int)mode];
+        this.simulationMode = mode;
+        this.dotMatrixPanel.SetDriveMode(this.simulationMode, this.isProgramConnected);
     }
 
     public override void UpdateTimeScale(float timeScale)
@@ -326,7 +343,31 @@ public class Hud : ScreenManager, IAutograderHud
         this.linearAccelerationText.text = FormatVector3(linearAcceleration);
         this.angularVelocityText.text = FormatVector3(angularVelocity);
     }
+
+    /// <summary>
+    /// Update the battery reading shown on the HUD, which appears only in battery mode.
+    /// </summary>
+    /// <param name="volts">Bus voltage in V.</param>
+    /// <param name="amps">Current draw in A.</param>
+    /// <param name="isEmpty">True to show the reading in the error color.</param>
+    public void UpdateBattery(float volts, float amps, bool isEmpty)
+    {
+        GameObject readout = this.batteryText.transform.parent.gameObject;
+        if (readout.activeSelf != Settings.IsBatteryMode)
+        {
+            readout.SetActive(Settings.IsBatteryMode);
+        }
+
+        this.batteryText.text = $"{volts.ToString("F2", CultureInfo.InvariantCulture)} V   {amps.ToString("F2", CultureInfo.InvariantCulture)} A";
+        this.batteryText.color = isEmpty ? ScreenManager.errorColor : Color.white;
+    }
     #endregion
+
+    /// <summary>
+    /// The latest simulation mode and program connection, for the dot matrix idle display.
+    /// </summary>
+    private SimulationMode simulationMode = SimulationMode.DefaultDrive;
+    private bool isProgramConnected;
 
     /// <summary>
     /// Message box anchors during autograder runs: above the trial title (0.08-0.14) and

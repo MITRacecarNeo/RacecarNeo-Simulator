@@ -4920,12 +4920,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 256653709}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a11b3e10fa23434dab8c7f2b2eae4a7, type: 3}
+  m_Script: {fileID: 11500000, guid: 619a77c381fd439468bc199dcb49c46d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveDistance: 8
   moveSpeed: 3
   holdTime: 5
+  direction: {x: 0, y: 0, z: 1}
 --- !u!4 &260628863 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7690868284879728196, guid: 76c7aa57684f0b84cb50ccfc6f5473c2,
@@ -33653,12 +33654,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1666279067}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a11b3e10fa23434dab8c7f2b2eae4a7, type: 3}
+  m_Script: {fileID: 11500000, guid: 619a77c381fd439468bc199dcb49c46d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveDistance: -8
   moveSpeed: 3
   holdTime: 5
+  direction: {x: 0, y: 0, z: 1}
 --- !u!1001 &1667475220
 PrefabInstance:
   m_ObjectHideFlags: 0

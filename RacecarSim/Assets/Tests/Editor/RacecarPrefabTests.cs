@@ -146,11 +146,15 @@ public class RacecarPrefabTests
     }
 
     [Test]
-    public void RecolorTargets_AreModelAccents()
+    public void RecolorTarget_IsShellAndLedStripIsBand()
     {
         SerializedObject racecar = new SerializedObject(this.prefab.GetComponent<Racecar>());
-        Assert.AreEqual("AccentStripe", racecar.FindProperty("chassisFront").objectReferenceValue.name);
-        Assert.AreEqual("AccentLogo", racecar.FindProperty("chassisBack").objectReferenceValue.name);
+        Assert.AreEqual("Shell", racecar.FindProperty("shell").objectReferenceValue.name);
+        SerializedObject strip = new SerializedObject(this.prefab.GetComponent<LedStrip>());
+        Renderer band = (Renderer)strip.FindProperty("band").objectReferenceValue;
+        Assert.AreEqual("LedBar", band.name);
+        Assert.AreEqual(RacecarPrefabSetup.LedBandMaterialPath, AssetDatabase.GetAssetPath(band.sharedMaterial));
+        Assert.IsTrue(band.sharedMaterial.IsKeywordEnabled("_EMISSION"));
     }
 
     [Test]

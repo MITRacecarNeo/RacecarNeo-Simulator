@@ -7,35 +7,19 @@ public class Racecar : MonoBehaviour
 {
     #region Set in Unity Editor
     /// <summary>
-    /// The cameras through which the user can observe the car.
+    /// The cameras through which the user can observe the car; the first shows every view (PlayerCameraViews).
     /// </summary>
     [SerializeField]
     private Camera[] playerCameras;
 
     /// <summary>
-    /// The model part recolored with the customization's front color (the shell stripe).
+    /// The model part recolored with the customization's shell color (the payload shell).
     /// </summary>
     [SerializeField]
-    private GameObject chassisFront;
-
-    /// <summary>
-    /// The model part recolored with the customization's back color (the shell logos).
-    /// </summary>
-    [SerializeField]
-    private GameObject chassisBack;
+    private GameObject shell;
     #endregion
 
     #region Constants
-    /// <summary>
-    /// The distance from which each player camera follows the car.
-    /// </summary>
-    private static readonly Vector3[] cameraOffsets =
-    {
-        new Vector3(0, 4, -8),
-        new Vector3(0, 20, -2),
-        new Vector3(0, 4, 8)
-    };
-
     /// <summary>
     /// The speed at which the camera follows the car.
     /// </summary>
@@ -72,6 +56,16 @@ public class Racecar : MonoBehaviour
     /// Exposes the RealSense D435i IMU.
     /// </summary>
     public PhysicsModule Physics { get; private set; }
+
+    /// <summary>
+    /// The latest sensor values for Python, safe to read from the async thread.
+    /// </summary>
+    public SensorReadings Readings { get; } = new SensorReadings();
+
+    /// <summary>
+    /// The dot matrix and LED strip contents sent by Python.
+    /// </summary>
+    public ActuatorCommands Actuators { get; } = new ActuatorCommands();
 
     /// <summary>
     /// The heads-up display controlled by this car, if any.
@@ -144,57 +138,57 @@ public class Racecar : MonoBehaviour
         CarCustomization customization = SavedDataManager.Data.CarCustomizations[index];
 
         // Renderer.material creates a per-car copy, destroyed in OnDestroy
-        Destroy(this.frontMaterial);
-        this.frontMaterial = this.chassisFront.GetComponent<Renderer>().material;
-        this.frontMaterial.color = customization.FrontColor.Color;
-        this.frontMaterial.SetFloat("_Metallic", customization.IsFrontShiny ? 1 : 0);
-
-        Destroy(this.backMaterial);
-        this.backMaterial = this.chassisBack.GetComponent<Renderer>().material;
-        this.backMaterial.color = customization.BackColor.Color;
-        this.backMaterial.SetFloat("_Metallic", customization.IsBackShiny ? 1 : 0);
+        Destroy(this.shellMaterial);
+        this.shellMaterial = this.shell.GetComponent<Renderer>().material;
+        this.shellMaterial.color = customization.ShellColor.Color;
+        this.shellMaterial.SetFloat("_Metallic", customization.IsShellShiny ? 1 : 0);
     }
 
     /// <summary>
-    /// Sets the player camera which shows the user's view of the car.
+    /// The current view index in PlayerCameraViews.
     /// </summary>
-    /// <param name="cameraIndex">The index of the player camera to use.</param>
+    public int CameraView { get; private set; }
+
+    /// <summary>
+    /// The current zoom factor; 1 is the view's default distance.
+    /// </summary>
+    public float CameraZoom { get; private set; } = 1;
+
+    /// <summary>
+    /// Switches to a view at its default distance.
+    /// </summary>
+    /// <param name="cameraIndex">The view index in PlayerCameraViews.</param>
     public void SetCamera(int cameraIndex)
     {
-        this.playerCameras[this.curCamera].enabled = false;
-        this.curCamera = cameraIndex;
-        this.playerCameras[this.curCamera].enabled = true;
+        this.CameraView = cameraIndex;
+        this.CameraZoom = 1;
+        if (this.playerCameras.Length > 0)
+        {
+            this.playerCameras[0].transform.position = PlayerCameraViews.Position(this.transform, this.Center, this.CameraView, this.CameraZoom);
+            this.playerCameras[0].transform.LookAt(this.Center);
+        }
     }
     #endregion
 
     /// <summary>
-    /// The index in PlayerCameras of the current active camera.
+    /// Per-car copy of the shell material created by SetIndex.
     /// </summary>
-    private int curCamera;
-
-    /// <summary>
-    /// Per-car copies of the chassis materials created by SetIndex.
-    /// </summary>
-    private Material frontMaterial;
-    private Material backMaterial;
+    private Material shellMaterial;
 
     private void OnDestroy()
     {
-        Destroy(this.frontMaterial);
-        Destroy(this.backMaterial);
+        Destroy(this.shellMaterial);
     }
 
     private void Awake()
     {
-        this.curCamera = 0;
-
         // Find submodules
         this.Camera = this.GetComponent<CameraModule>();
         this.Drive = this.GetComponent<Drive>();
         this.Lidar = this.GetComponentInChildren<Lidar>();
         this.Physics = this.GetComponent<PhysicsModule>();
 
-        // Begin with main player camera (0th camera)
+        // The first camera shows every view; the others stay off
         if (this.playerCameras.Length > 0)
         {
             this.playerCameras[0].enabled = true;
@@ -207,27 +201,35 @@ public class Racecar : MonoBehaviour
 
     private void Update()
     {
-        // Toggle camera when the space bar is pressed
+        // Space cycles the views and C returns to the first; each view starts at its default distance
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            this.playerCameras[this.curCamera].enabled = false;
-            this.curCamera = (this.curCamera + 1) % this.playerCameras.Length;
-            this.playerCameras[this.curCamera].enabled = true;
+            this.SetCamera((this.CameraView + 1) % PlayerCameraViews.Count);
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            this.SetCamera(0);
+        }
+
+        float scroll = Input.mouseScrollDelta.y;
+        if (scroll != 0 && PlayerCameraViews.ScrollCaptures.Count == 0)
+        {
+            this.CameraZoom = PlayerCameraViews.Zoom(this.CameraZoom, scroll);
         }
     }
 
     private void LateUpdate()
     {
-        for (int i = 0; i < this.playerCameras.Length; i++)
+        if (this.playerCameras.Length == 0)
         {
-            Vector3 followPoint = this.transform.forward * Racecar.cameraOffsets[i].z;
-            Vector3 targetCameraPosition = this.transform.position + new Vector3(followPoint.x, Racecar.cameraOffsets[i].y, followPoint.z);
-            this.playerCameras[i].transform.position = Vector3.Lerp(
-                this.playerCameras[i].transform.position,
-                targetCameraPosition,
-                Racecar.cameraSpeed * Time.deltaTime);
-
-            this.playerCameras[i].transform.LookAt(this.transform.position);
+            return;
         }
+
+        Transform cameraTransform = this.playerCameras[0].transform;
+        cameraTransform.position = Vector3.Lerp(
+            cameraTransform.position,
+            PlayerCameraViews.Position(this.transform, this.Center, this.CameraView, this.CameraZoom),
+            Racecar.cameraSpeed * Time.deltaTime);
+        cameraTransform.LookAt(this.Center);
     }
 }

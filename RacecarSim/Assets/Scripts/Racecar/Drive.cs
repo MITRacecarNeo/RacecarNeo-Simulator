@@ -116,6 +116,23 @@ public class Drive : RacecarModule
     public float MaxSpeed { get; set; } = Drive.DefaultMaxSpeed;
 
     /// <summary>
+    /// The car's battery, full when the car is created (on every level load).
+    /// </summary>
+    public BatteryModel Battery { get; } = new BatteryModel();
+
+    /// <summary>
+    /// True when the battery is empty and battery mode holds the car still. Autograder levels
+    /// never cut off.
+    /// </summary>
+    public bool IsBatteryCutoff
+    {
+        get
+        {
+            return this.Battery.IsEmpty && Settings.IsBatteryMode && LevelManager.LevelManagerMode != LevelManagerMode.Autograder;
+        }
+    }
+
+    /// <summary>
     /// Stops the car (equivalent to setting Speed and Angle to 0).
     /// </summary>
     public void Stop()
@@ -180,6 +197,16 @@ public class Drive : RacecarModule
     /// The bicycle-model steering angle after the servo rate limit, in degrees.
     /// </summary>
     private float steerAngle;
+
+    /// <summary>
+    /// The motor's hall encoder, read through the drivetrain from the wheels.
+    /// </summary>
+    private readonly HallEncoder encoder = new HallEncoder();
+
+    /// <summary>
+    /// True once the battery-empty warning has been shown.
+    /// </summary>
+    private bool wasCutoffShown;
 
     /// <summary>
     /// Left and right front wheel angles for a bicycle-model steering angle. Positive angles turn
@@ -251,15 +278,30 @@ public class Drive : RacecarModule
         }
     }
 
+    private void Update()
+    {
+        if (this.racecar.Hud != null)
+        {
+            this.racecar.Hud.UpdateBattery(this.racecar.Readings.BatteryVoltage, this.racecar.Readings.BatteryCurrent, this.Battery.IsEmpty);
+            if (this.IsBatteryCutoff && !this.wasCutoffShown)
+            {
+                this.racecar.Hud.ShowError("Battery empty: the car cannot drive. Restart the level to recharge, or turn off Battery mode in Settings.");
+                this.wasCutoffShown = true;
+            }
+        }
+    }
+
     private void FixedUpdate()
     {
         using SimProfiler.Scope profile = SimProfiler.Measure(SimProfiler.Section.Drive);
         // Speed 0 is neutral, as on the physical car: no drive torque, the ESC's drag brake, and a
-        // cleared integrator. Otherwise feedforward plus PI control holds the target speed.
-        float target = this.Speed * this.MaxSpeed * Drive.FullCommandSpeed;
+        // cleared integrator. Otherwise feedforward plus PI control holds the target speed. An
+        // empty battery in battery mode leaves the drive neutral.
+        float speed = this.IsBatteryCutoff ? 0 : this.Speed;
+        float target = speed * this.MaxSpeed * Drive.FullCommandSpeed;
         float torque = 0;
         float brakeTorque = 0;
-        if (this.Speed == 0)
+        if (speed == 0)
         {
             brakeTorque = Drive.dragBrakeTorque / this.WheelColliders.Length;
             this.speedErrorIntegral = 0;
@@ -283,6 +325,30 @@ public class Drive : RacecarModule
             wheel.brakeTorque = brakeTorque;
             wheel.motorTorque = torque / this.WheelColliders.Length;
         }
+
+        // Realism off: the encoder reports the car's true forward speed. Realism on: one motor
+        // drives all four wheels through the differentials, so the motor (and its hall encoder)
+        // turns with the mean wheel speed, including wheel spin. WheelCollider.rpm is positive
+        // rolling forward on every wheel, including the left colliders turned to face backward.
+        float encoderInput;
+        if (Settings.IsRealism)
+        {
+            encoderInput = 0;
+            foreach (WheelCollider wheel in this.WheelColliders)
+            {
+                encoderInput += HallEncoder.WheelSpeed(wheel.rpm) / this.WheelColliders.Length;
+            }
+        }
+        else
+        {
+            encoderInput = Vector3.Dot(this.rBody.linearVelocity, this.transform.forward) / 10;
+        }
+        this.racecar.Readings.EncoderSpeed = this.encoder.Step(encoderInput, Time.fixedDeltaTime, Settings.IsRealism);
+
+        // The motor draws current while commanded, more with speed
+        this.Battery.Step(Time.fixedDeltaTime, speed != 0, this.racecar.Readings.EncoderSpeed);
+        this.racecar.Readings.BatteryVoltage = this.Battery.ReadVoltage(Settings.IsRealism);
+        this.racecar.Readings.BatteryCurrent = this.Battery.ReadCurrent(Settings.IsRealism);
 
         // Servo rate limit, then Ackermann angles for the two front wheels
         this.steerAngle = Mathf.MoveTowards(this.steerAngle, this.Angle * Drive.maxDriveAngle, Drive.maxSteerRate * Time.fixedDeltaTime);

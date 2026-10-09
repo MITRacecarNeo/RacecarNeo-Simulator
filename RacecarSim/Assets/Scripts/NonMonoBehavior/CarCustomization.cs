@@ -8,44 +8,28 @@ using UnityEngine;
 public class CarCustomization
 {
     /// <summary>
-    /// The color of the stripe around the payload shell (white on the physical car).
+    /// The CAD color of the payload shell (near black on the physical car).
     /// </summary>
-    public SerializableColor FrontColor;
+    public static readonly Color DefaultShellColor = new Color(0x19 / 255f, 0x19 / 255f, 0x19 / 255f);
 
     /// <summary>
-    /// True if the stripe should be metallic.
+    /// The color of the payload shell (top cap and main body). The R logo, the beaver, and the LED
+    /// bar keep their own colors.
     /// </summary>
-    public bool IsFrontShiny;
+    public SerializableColor ShellColor;
 
     /// <summary>
-    /// The color of the logos on the payload shell (red on the physical car).
+    /// True if the shell should be metallic.
     /// </summary>
-    public SerializableColor BackColor;
+    public bool IsShellShiny;
 
     /// <summary>
-    /// True if the logos should be metallic.
+    /// Creates a matte customization.
     /// </summary>
-    public bool IsBackShiny;
-
-    /// <summary>
-    /// Creates a customization containing a single matte color.
-    /// </summary>
-    /// <param name="mainColor">The color applied to the stripe and the logos.</param>
-    public CarCustomization(Color mainColor)
-        : this(mainColor, mainColor)
+    /// <param name="shellColor">The color of the payload shell.</param>
+    public CarCustomization(Color shellColor)
     {
-    }
-
-    /// <summary>
-    /// Creates a matte customization with separate stripe and logo colors.
-    /// </summary>
-    /// <param name="stripeColor">The color of the stripe.</param>
-    /// <param name="logoColor">The color of the logos.</param>
-    public CarCustomization(Color stripeColor, Color logoColor)
-    {
-        this.FrontColor = new SerializableColor(stripeColor);
-        this.IsFrontShiny = false;
-        this.BackColor = new SerializableColor(logoColor);
-        this.IsBackShiny = false;
+        this.ShellColor = new SerializableColor(shellColor);
+        this.IsShellShiny = false;
     }
 }

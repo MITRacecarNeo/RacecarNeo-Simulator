@@ -119,6 +119,16 @@ public class ArMarkerToggle : MonoBehaviour
         set
         {
             this.selected = value;
+
+            // The scroll wheel rotates a selected marker instead of zooming the player camera
+            if (this.selected)
+            {
+                PlayerCameraViews.ScrollCaptures.Add(this);
+            }
+            else
+            {
+                PlayerCameraViews.ScrollCaptures.Remove(this);
+            }
             this.renderers[(int)Renderers.Padding].material.SetColor("_Color", this.selected ? ArMarkerToggle.selectedColor : Color.white);
         }
     }
@@ -126,6 +136,11 @@ public class ArMarkerToggle : MonoBehaviour
     private void Awake()
     {
         this.renderers = this.GetComponentsInChildren<Renderer>();
+    }
+
+    private void OnDisable()
+    {
+        PlayerCameraViews.ScrollCaptures.Remove(this);
     }
 
     private void Start()

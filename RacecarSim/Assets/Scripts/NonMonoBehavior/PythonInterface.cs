@@ -27,8 +27,15 @@ public class PythonInterface
     /// When the communication protocol between RacecarSim and racecar_core are changed, this version number
     /// should be incremented both here and in racecar_core_sim.py. This allows us to immediately detect
     /// if a user attempts to use incompatible versions of RacecarSim and racecar_core.
+    /// Version 2 adds headers 29 to 35 (magnetometer, encoder, battery, dot matrix, LED strip).
     /// </remarks>
-    private const int version = 1;
+    private const int version = 2;
+
+    /// <summary>
+    /// The oldest racecar_core protocol version that can still connect. Version 1 libraries never
+    /// send the headers added in version 2.
+    /// </summary>
+    private const int oldestSupportedVersion = 1;
 
     /// <summary>
     /// The UDP port used by the Unity simulation (this program).
@@ -201,7 +208,12 @@ public class PythonInterface
         {
             return false;
         }
-        return data.Length >= PythonInterface.RequiredLength((Header)data[0]);
+        if (data.Length < PythonInterface.RequiredLength((Header)data[0]))
+        {
+            return false;
+        }
+        // The length byte must not claim more text than the packet holds
+        return (Header)data[0] != Header.display_show_text || data.Length >= 2 + data[1];
     }
     #endregion
 
@@ -239,6 +251,13 @@ public class PythonInterface
         lidar_get_samples,
         physics_get_linear_acceleration,
         physics_get_angular_velocity,
+        physics_get_magnetic_field,
+        physics_get_encoder_speed,
+        physics_get_battery_voltage,
+        physics_get_battery_current,
+        display_set_matrix,
+        display_show_text,
+        led_set_pixels,
     }
 
     /// <summary>
@@ -278,7 +297,12 @@ public class PythonInterface
             case Header.controller_was_released:
             case Header.controller_get_trigger:
             case Header.controller_get_joystick:
+            case Header.display_show_text:
                 return 2;
+            case Header.display_set_matrix:
+                return 1 + ActuatorCommands.MatrixFrameBytes;
+            case Header.led_set_pixels:
+                return 1 + ActuatorCommands.LedFrameBytes;
             case Header.drive_set_speed_angle:
                 return 12;
             case Header.drive_set_max_speed:
@@ -337,6 +361,22 @@ public class PythonInterface
     /// Source addresses already reported as rejected, so each is shown once.
     /// </summary>
     private readonly HashSet<IPAddress> reportedRejected = new HashSet<IPAddress>();
+
+    /// <summary>
+    /// The protocol version each connected program announced, by endpoint. Written on the main
+    /// thread (connect), read on both threads.
+    /// </summary>
+    private readonly ConcurrentDictionary<IPEndPoint, int> clientVersions = new ConcurrentDictionary<IPEndPoint, int>();
+
+    /// <summary>
+    /// True if a program uses protocol version 1, whose physics replies use the legacy frame.
+    /// Unknown endpoints (for example a Jupyter notebook that never connected) get the current
+    /// version.
+    /// </summary>
+    private bool IsLegacyClient(IPEndPoint endPoint)
+    {
+        return this.clientVersions.TryGetValue(endPoint, out int clientVersion) && clientVersion < 2;
+    }
 
     /// <summary>
     /// Headers already reported as unsupported, so each is logged once.
@@ -406,11 +446,12 @@ public class PythonInterface
     private void HandleConnect(PendingRequest request)
     {
         byte[] reply;
-        if (PythonInterface.version == request.PythonVersion)
+        if (request.PythonVersion >= PythonInterface.oldestSupportedVersion && request.PythonVersion <= PythonInterface.version)
         {
             int? index = this.ConnectSyncClient(request.EndPoint);
             if (index.HasValue)
             {
+                this.clientVersions[new IPEndPoint(request.EndPoint.Address, request.EndPoint.Port)] = request.PythonVersion;
                 reply = new byte[] { (byte)Header.connect, (byte)index.Value };
             }
             else
@@ -419,7 +460,7 @@ public class PythonInterface
                 reply = PythonInterface.ErrorPacket(Error.no_free_car);
             }
         }
-        else if (PythonInterface.version > request.PythonVersion)
+        else if (request.PythonVersion < PythonInterface.oldestSupportedVersion)
         {
             this.ShowConnectError("A Python program uses an outdated, incompatible version of racecar_core. Update the Python racecar libraries to the newest version.");
             reply = PythonInterface.ErrorPacket(Error.python_outdated);
@@ -510,8 +551,17 @@ public class PythonInterface
     {
         // Set the endpoint to null rather than removing it from the list to maintain
         // the mapping of remaining endpoints to cars
+        if (this.pythonEndPoints[index] != null)
+        {
+            this.clientVersions.TryRemove(this.pythonEndPoints[index], out _);
+        }
         this.pythonEndPoints[index] = null;
-        LevelManager.GetCar(index)?.Drive.Stop();
+        Racecar racecar = LevelManager.GetCar(index);
+        if (racecar != null)
+        {
+            racecar.Drive.Stop();
+            racecar.Actuators.Clear();
+        }
 
         // We can safely remove any trailing null endpoints at the end of the list
         for (int i = this.pythonEndPoints.Count - 1; i >= 0 && this.pythonEndPoints[i] == null; i--)
@@ -669,20 +719,19 @@ public class PythonInterface
                         break;
 
                     case Header.physics_get_linear_acceleration:
-                        Vector3 linearAcceleration = racecar.Physics.LinearAcceleration;
-                        sendData = new byte[sizeof(float) * 3];
-                        Buffer.BlockCopy(new float[] { linearAcceleration.x, linearAcceleration.y, linearAcceleration.z }, 0, sendData, 0, sendData.Length);
+                        sendData = PythonInterface.VectorBytes(this.IsLegacyClient(endPoint) ? racecar.Physics.LegacyLinearAcceleration : racecar.Physics.LinearAcceleration);
                         break;
 
                     case Header.physics_get_angular_velocity:
-                        Vector3 angularVelocity = racecar.Physics.AngularVelocity;
-                        sendData = new byte[sizeof(float) * 3];
-                        Buffer.BlockCopy(new float[] { angularVelocity.x, angularVelocity.y, angularVelocity.z }, 0, sendData, 0, sendData.Length);
+                        sendData = PythonInterface.VectorBytes(this.IsLegacyClient(endPoint) ? racecar.Physics.LegacyAngularVelocity : racecar.Physics.AngularVelocity);
                         break;
 
                     default:
-                        this.RejectRequest(data, endPoint);
-                        pythonFinished = true;
+                        if (!PythonInterface.TryHandleReadingOrCommand(header, data, racecar, out sendData))
+                        {
+                            this.RejectRequest(data, endPoint);
+                            pythonFinished = true;
+                        }
                         break;
                 }
 
@@ -691,6 +740,64 @@ public class PythonInterface
                     this.TrySend(this.udpClient, sendData, endPoint);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Packs a vector as three little-endian floats.
+    /// </summary>
+    private static byte[] VectorBytes(Vector3 vector)
+    {
+        byte[] bytes = new byte[sizeof(float) * 3];
+        Buffer.BlockCopy(new float[] { vector.x, vector.y, vector.z }, 0, bytes, 0, bytes.Length);
+        return bytes;
+    }
+
+    /// <summary>
+    /// Handles the protocol version 2 sensor reads and actuator commands, which work the same on
+    /// the sync and async ports: reads come from SensorReadings and writes go to ActuatorCommands,
+    /// both safe on either thread.
+    /// </summary>
+    /// <param name="header">The request header.</param>
+    /// <param name="data">The request packet, already checked by IsWellFormed.</param>
+    /// <param name="racecar">The car the request is for.</param>
+    /// <param name="reply">The reply, or null for a command without one.</param>
+    /// <returns>False if the header is not one of these requests.</returns>
+    private static bool TryHandleReadingOrCommand(Header header, byte[] data, Racecar racecar, out byte[] reply)
+    {
+        reply = null;
+        switch (header)
+        {
+            case Header.physics_get_magnetic_field:
+                reply = PythonInterface.VectorBytes(racecar.Readings.MagneticField);
+                return true;
+
+            case Header.physics_get_encoder_speed:
+                reply = BitConverter.GetBytes(racecar.Readings.EncoderSpeed);
+                return true;
+
+            case Header.physics_get_battery_voltage:
+                reply = BitConverter.GetBytes(racecar.Readings.BatteryVoltage);
+                return true;
+
+            case Header.physics_get_battery_current:
+                reply = BitConverter.GetBytes(racecar.Readings.BatteryCurrent);
+                return true;
+
+            case Header.display_set_matrix:
+                racecar.Actuators.SetMatrix(ActuatorCommands.DecodeMatrix(data, 1));
+                return true;
+
+            case Header.display_show_text:
+                racecar.Actuators.SetText(ActuatorCommands.DecodeText(data, 1));
+                return true;
+
+            case Header.led_set_pixels:
+                racecar.Actuators.SetLeds(ActuatorCommands.DecodeLeds(data, 1));
+                return true;
+
+            default:
+                return false;
         }
     }
 
@@ -949,9 +1056,30 @@ public class PythonInterface
                 this.TrySend(this.udpClientAsync, sendData, receiveEndPoint);
                 break;
 
+            // The physics properties read the Rigidbody, which only the main thread may touch
+            case Header.physics_get_linear_acceleration:
+                Vector3 acceleration = this.IsLegacyClient(receiveEndPoint) ? racecar.Readings.LegacyLinearAcceleration : racecar.Readings.LinearAcceleration;
+                this.TrySend(this.udpClientAsync, PythonInterface.VectorBytes(acceleration), receiveEndPoint);
+                break;
+
+            case Header.physics_get_angular_velocity:
+                Vector3 rate = this.IsLegacyClient(receiveEndPoint) ? racecar.Readings.LegacyAngularVelocity : racecar.Readings.AngularVelocity;
+                this.TrySend(this.udpClientAsync, PythonInterface.VectorBytes(rate), receiveEndPoint);
+                break;
+
             default:
-                this.ReportUnsupportedOnce(header, "is not supported by RacecarSim for async calls");
-                this.TrySend(this.udpClientAsync, PythonInterface.ErrorPacket(Error.generic), receiveEndPoint);
+                if (PythonInterface.TryHandleReadingOrCommand(header, data, racecar, out byte[] reply))
+                {
+                    if (reply != null)
+                    {
+                        this.TrySend(this.udpClientAsync, reply, receiveEndPoint);
+                    }
+                }
+                else
+                {
+                    this.ReportUnsupportedOnce(header, "is not supported by RacecarSim for async calls");
+                    this.TrySend(this.udpClientAsync, PythonInterface.ErrorPacket(Error.generic), receiveEndPoint);
+                }
                 break;
         }
     }

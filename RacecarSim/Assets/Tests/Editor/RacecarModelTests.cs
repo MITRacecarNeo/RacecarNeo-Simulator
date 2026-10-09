@@ -73,11 +73,37 @@ public class RacecarModelTests
         Assert.LessOrEqual(triangles, 110000);
     }
 
-    [TestCase("AccentStripe")]
-    [TestCase("AccentLogo")]
+    [TestCase("Shell")]
+    [TestCase("LedBar")]
     public void RecolorTarget_HasRenderer(string name)
     {
         Assert.IsNotNull(this.Part(name).GetComponent<MeshRenderer>());
+    }
+
+    [Test]
+    public void LedBar_UvRunsFromFrontLeftAroundTheRearToFrontRight()
+    {
+        Mesh mesh = this.Part("LedBar").GetComponent<MeshFilter>().sharedMesh;
+        Vector3[] vertices = mesh.vertices;
+        Vector2[] uvs = mesh.uv;
+        Assert.AreEqual(vertices.Length, uvs.Length, "every vertex has a UV");
+        float front = vertices.Max(v => v.z);
+        float rear = vertices.Min(v => v.z);
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            Vector3 v = vertices[i];
+            float u = uvs[i].x;
+            Assert.That(u, Is.InRange(0f, 1f));
+            if (v.z > front - 0.01f)
+            {
+                // Unity car frame: x right, so the left side is negative x
+                Assert.AreEqual(v.x < 0 ? 0f : 1f, u, 0.01f, $"front end at {v}");
+            }
+            if (v.z < rear + 0.01f && Mathf.Abs(v.x) < 0.05f)
+            {
+                Assert.AreEqual(0.5f, u, 0.02f, $"rear center at {v}");
+            }
+        }
     }
 
     private Transform Part(string name)

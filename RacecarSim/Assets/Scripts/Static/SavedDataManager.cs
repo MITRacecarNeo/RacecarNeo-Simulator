@@ -108,10 +108,13 @@ public static class SavedDataManager
         }
         data.BestTimes.RemoveAll(entry => entry == null || string.IsNullOrEmpty(entry.LevelId));
 
-        if (data.CarCustomizations == null || data.CarCustomizations.Length < SavedData.Default.CarCustomizations.Length)
+        // Saves before version 3 hold stripe and logo colors, which do not map onto the shell
+        if (data.Version < 3 || data.CarCustomizations == null || data.CarCustomizations.Length < SavedData.Default.CarCustomizations.Length
+            || Array.Exists(data.CarCustomizations, customization => customization == null || customization.ShellColor == null))
         {
             data.ClearCustomization();
         }
+        data.Version = SavedData.CurrentVersion;
         return data;
     }
 

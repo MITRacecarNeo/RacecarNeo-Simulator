@@ -18,7 +18,7 @@ public class PythonInterfaceTests
     private const byte headerError = 0;
     private const byte headerConnect = 1;
     private const byte headerPythonExit = 7;
-    private const byte protocolVersion = 1;
+    private const byte protocolVersion = 2;
 
     private PythonInterface pythonInterface;
 
@@ -43,9 +43,28 @@ public class PythonInterfaceTests
     [TestCase(new byte[] { 22, 0, 0, 0, 0, 0, 0, 0 }, false)]
     [TestCase(new byte[] { 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, true)]
     [TestCase(new byte[] { 24, 0, 0, 0 }, false)]
+    [TestCase(new byte[] { 29 }, true)]
+    [TestCase(new byte[] { 32 }, true)]
+    [TestCase(new byte[] { 34 }, false)]
+    [TestCase(new byte[] { 34, 0 }, true)]
+    [TestCase(new byte[] { 34, 2, 65 }, false)]
+    [TestCase(new byte[] { 34, 2, 65, 66 }, true)]
+    [TestCase(new byte[] { 36 }, false)]
     public void IsWellFormed_ChecksHeaderAndLength(byte[] data, bool expected)
     {
         Assert.AreEqual(expected, PythonInterface.IsWellFormed(data));
+    }
+
+    [TestCase(33, 25)]
+    [TestCase(35, 253)]
+    public void IsWellFormed_ChecksFrameLength(int header, int length)
+    {
+        byte[] full = new byte[length];
+        full[0] = (byte)header;
+        byte[] short1 = new byte[length - 1];
+        short1[0] = (byte)header;
+        Assert.IsTrue(PythonInterface.IsWellFormed(full));
+        Assert.IsFalse(PythonInterface.IsWellFormed(short1));
     }
 
     [Test]
@@ -103,6 +122,30 @@ public class PythonInterfaceTests
             LogAssert.Expect(LogType.Error, new Regex("outdated, incompatible version of racecar_core"));
             byte[] reply = this.Request(python, new byte[] { headerConnect, 0 });
             CollectionAssert.AreEqual(new byte[] { headerError, 4 }, reply);
+        }
+    }
+
+    [Test]
+    public void Connect_AcceptsVersionOne()
+    {
+        this.pythonInterface = new PythonInterface();
+        using (UdpClient python = PythonInterfaceTests.CreatePython())
+        {
+            byte[] reply = this.Request(python, new byte[] { headerConnect, 1 });
+            CollectionAssert.AreEqual(new byte[] { headerConnect, 0 }, reply);
+        }
+    }
+
+    [Test]
+    public void Connect_ReportsOutdatedRacecarSim()
+    {
+        this.pythonInterface = new PythonInterface();
+        using (UdpClient python = PythonInterfaceTests.CreatePython())
+        {
+            LogAssert.Expect(LogType.Error, new Regex("newer, incompatible version of racecar_core"));
+            byte[] reply = this.Request(python, new byte[] { headerConnect, protocolVersion + 1 });
+            CollectionAssert.AreEqual(new byte[] { headerError, 5 }, reply);
+            Assert.IsEmpty(this.pythonInterface.ConnectedPrograms);
         }
     }
 

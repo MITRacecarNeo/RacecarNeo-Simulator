@@ -28,6 +28,13 @@ public static class RacecarPrefabSetup
     public const string CollidersName = "Colliders";
 
     /// <summary>
+    /// The LED band material: a light diffuser color, with emission for the LED texture that
+    /// LedStrip sets per car. Emission is black in the asset (the band shows no light outside
+    /// play mode) but enabled, so builds keep the emissive shader variant.
+    /// </summary>
+    public const string LedBandMaterialPath = "Assets/Models/RacecarNeoV2/LedBand.mat";
+
+    /// <summary>
     /// Wheel collider names in Drive.WheelColliders order, with the matching model wheels.
     /// </summary>
     public static readonly (string Collider, string Model)[] Wheels =
@@ -226,11 +233,22 @@ public static class RacecarPrefabSetup
         centerOfMass.FindProperty("Com").vector3Value = RacecarPrefabSetup.CenterOfMassPosition;
         centerOfMass.ApplyModifiedPropertiesWithoutUndo();
 
-        // Recolor targets
+        // Recolor target
         SerializedObject racecarObject = new SerializedObject(root.GetComponent<Racecar>());
-        racecarObject.FindProperty("chassisFront").objectReferenceValue = model.transform.Find("AccentStripe").gameObject;
-        racecarObject.FindProperty("chassisBack").objectReferenceValue = model.transform.Find("AccentLogo").gameObject;
+        racecarObject.FindProperty("shell").objectReferenceValue = model.transform.Find("Shell").gameObject;
         racecarObject.ApplyModifiedPropertiesWithoutUndo();
+
+        // LED strip in the light band
+        Renderer band = model.transform.Find("LedBar").GetComponent<Renderer>();
+        band.sharedMaterial = RacecarPrefabSetup.LedBandMaterial();
+        LedStrip strip = root.GetComponent<LedStrip>();
+        if (strip == null)
+        {
+            strip = root.AddComponent<LedStrip>();
+        }
+        SerializedObject stripObject = new SerializedObject(strip);
+        stripObject.FindProperty("band").objectReferenceValue = band;
+        stripObject.ApplyModifiedPropertiesWithoutUndo();
 
         // Sensors at the model anchors, at the heights measured on the physical car
         Vector3 cameraPosition = model.transform.Find("CameraAnchor").localPosition;
@@ -264,6 +282,29 @@ public static class RacecarPrefabSetup
     /// extension the spring holds under the car's weight.
     /// </summary>
     private const float RestExtension = RacecarPrefabSetup.SuspensionTravel * RacecarPrefabSetup.SuspensionTarget;
+
+    /// <summary>
+    /// Loads the LED band material, creating it on first use.
+    /// </summary>
+    private static Material LedBandMaterial()
+    {
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(RacecarPrefabSetup.LedBandMaterialPath);
+        if (material != null)
+        {
+            return material;
+        }
+        material = new Material(Shader.Find("Standard"))
+        {
+            name = "LedBand",
+            color = new Color(0.55f, 0.55f, 0.55f),
+            globalIlluminationFlags = MaterialGlobalIlluminationFlags.None
+        };
+        material.SetFloat("_Glossiness", 0.4f);
+        material.EnableKeyword("_EMISSION");
+        material.SetColor("_EmissionColor", Color.black);
+        AssetDatabase.CreateAsset(material, RacecarPrefabSetup.LedBandMaterialPath);
+        return material;
+    }
 
     private static void DestroyChild(Transform parent, string name)
     {

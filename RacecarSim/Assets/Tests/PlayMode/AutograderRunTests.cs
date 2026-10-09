@@ -139,4 +139,22 @@ public class AutograderRunTests
         Assert.AreEqual(3, result.Time - elapsedAtFinish, 1e-3f, "The penalty is not part of the recorded time.");
         Assert.GreaterOrEqual(result.Time, info.TimeLimit);
     }
+
+    /// <summary>
+    /// Lab 3c's parking task shows the car's angle and distance to the wall during an autograder
+    /// run, as in exploration mode.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator ParkingTask_ShowsAngleAndDistanceDuringTheRun()
+    {
+        LevelInfo lab = PlayModeLevels.Find("Lab 3c: Wall Parking");
+        yield return PlayModeLevels.Load(lab, LevelManagerMode.Autograder, lab.AutograderBuildIndex);
+        AutograderManager manager = Object.FindAnyObjectByType<AutograderManager>();
+        manager.HandleStart(Object.FindAnyObjectByType<Hud>());
+        yield return null;
+        yield return null;
+
+        bool shown = Object.FindObjectsByType<UnityEngine.UI.Text>().Any(text => text.text.Contains("Angle:") && text.text.Contains("Distance:"));
+        Assert.IsTrue(shown, "angle and distance message on screen");
+    }
 }

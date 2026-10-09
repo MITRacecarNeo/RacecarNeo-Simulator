@@ -14,6 +14,16 @@ public static class Settings
     public const bool DefaultIsRealism = true;
 
     /// <summary>
+    /// The default value of IsBatteryMode.
+    /// </summary>
+    public const bool DefaultIsBatteryMode = false;
+
+    /// <summary>
+    /// The default value of ShowDotMatrix.
+    /// </summary>
+    public const bool DefaultShowDotMatrix = false;
+
+    /// <summary>
     /// The default value of HideCarsInColorCamera.
     /// </summary>
     public const bool DefaultHideCarsInColorCamera = false;
@@ -56,9 +66,19 @@ public static class Settings
     public static bool IsRealism;
 
     /// <summary>
+    /// If true, a car with an empty battery cannot drive (outside autograder levels).
+    /// </summary>
+    public static bool IsBatteryMode;
+
+    /// <summary>
     /// If true, other cars do not show up in the color camera.
     /// </summary>
     public static bool HideCarsInColorCamera;
+
+    /// <summary>
+    /// If true, the HUD shows the car's 8x24 dot matrix.
+    /// </summary>
+    public static bool ShowDotMatrix;
 
     /// <summary>
     /// If true, controller input is still sent in evaluation mode but best times are not recorded.
@@ -92,7 +112,9 @@ public static class Settings
     public static void RestoreDefaults()
     {
         Settings.IsRealism = Settings.DefaultIsRealism;
+        Settings.IsBatteryMode = Settings.DefaultIsBatteryMode;
         Settings.HideCarsInColorCamera = Settings.DefaultHideCarsInColorCamera;
+        Settings.ShowDotMatrix = Settings.DefaultShowDotMatrix;
         Settings.DepthRes = Settings.DefaultDepthRes;
         Settings.Username = Settings.DefaultUsername;
     }
@@ -103,7 +125,9 @@ public static class Settings
     public static void SaveSettings()
     {
         PlayerPrefs.SetInt("IsRealism", System.Convert.ToInt32(Settings.IsRealism));
+        PlayerPrefs.SetInt("IsBatteryMode", System.Convert.ToInt32(Settings.IsBatteryMode));
         PlayerPrefs.SetInt("HideCarsInColorCamera", System.Convert.ToInt32(Settings.HideCarsInColorCamera));
+        PlayerPrefs.SetInt("ShowDotMatrix", System.Convert.ToInt32(Settings.ShowDotMatrix));
         PlayerPrefs.SetInt("DepthRes", (int)Settings.DepthRes);
         PlayerPrefs.SetString("Username", Settings.Username);
         PlayerPrefs.Save();
@@ -121,7 +145,9 @@ public static class Settings
     private static void LoadSettings()
     {
         Settings.IsRealism = System.Convert.ToBoolean(PlayerPrefs.GetInt("IsRealism", System.Convert.ToInt32(Settings.DefaultIsRealism)));
+        Settings.IsBatteryMode = System.Convert.ToBoolean(PlayerPrefs.GetInt("IsBatteryMode", System.Convert.ToInt32(Settings.DefaultIsBatteryMode)));
         Settings.HideCarsInColorCamera = System.Convert.ToBoolean(PlayerPrefs.GetInt("HideCarsInColorCamera", System.Convert.ToInt32(Settings.DefaultHideCarsInColorCamera)));
+        Settings.ShowDotMatrix = System.Convert.ToBoolean(PlayerPrefs.GetInt("ShowDotMatrix", System.Convert.ToInt32(Settings.DefaultShowDotMatrix)));
 
         // An out-of-range stored value (edited preferences, older build) falls back to the default
         int depthRes = PlayerPrefs.GetInt("DepthRes", (int)Settings.DefaultDepthRes);

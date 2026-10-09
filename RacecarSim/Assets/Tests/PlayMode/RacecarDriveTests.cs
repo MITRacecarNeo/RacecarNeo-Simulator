@@ -13,15 +13,22 @@ public class RacecarDriveTests
 
     private const float driveSeconds = 2;
 
+    private bool realism;
+
     [SetUp]
     public void RequireDataDirectory()
     {
         PlayModeLevels.RequireDataDirectory();
+
+        // The rest check reads the IMU, whose realism bias and noise would make it flaky
+        this.realism = Settings.IsRealism;
+        Settings.IsRealism = false;
     }
 
     [UnityTearDown]
     public IEnumerator Unload()
     {
+        Settings.IsRealism = this.realism;
         yield return PlayModeLevels.Unload();
     }
 
@@ -108,10 +115,10 @@ public class RacecarDriveTests
         Assert.Less(body.linearVelocity.magnitude, 0.01f, "car at rest");
         Assert.Less(Vector3.Angle(car.transform.up, Vector3.up), 0.2f, "car level");
 
-        // The IMU reads 1 g up at rest; the LIDAR turns at 7.4 Hz
+        // The IMU reads 1 g up (REP-103 z) at rest; the LIDAR turns at 7.4 Hz
         Vector3 acceleration = car.Physics.LinearAcceleration;
-        Assert.AreEqual(-9.81f, acceleration.y, 0.15f, "IMU vertical");
-        Assert.Less(new Vector2(acceleration.x, acceleration.z).magnitude, 0.15f, "IMU horizontal");
+        Assert.AreEqual(9.81f, acceleration.z, 0.15f, "IMU vertical");
+        Assert.Less(new Vector2(acceleration.x, acceleration.y).magnitude, 0.15f, "IMU horizontal");
         Assert.AreEqual(7.4f, scanRate, 0.6f, "LIDAR scans per second");
     }
 

@@ -15,15 +15,20 @@ public static class ModelPreview
     private const int Width = 1200;
     private const int Height = 800;
 
-    private static readonly (string Name, Vector3 Direction)[] Views =
+    /// <summary>
+    /// Viewpoints: direction from the model's center and distance scale (1 is the full view).
+    /// </summary>
+    private static readonly (string Name, Vector3 Direction, float Scale)[] Views =
     {
-        ("front-left", new Vector3(-1, 0.6f, 1.2f)),
-        ("rear-right", new Vector3(1, 0.6f, -1.2f)),
-        ("left", new Vector3(-1, 0.05f, 0)),
-        ("front", new Vector3(0, 0.1f, 1)),
-        ("top", new Vector3(0, 1, 0.001f)),
-        ("under", new Vector3(0.3f, -1, 0.2f)),
-        ("rear-low", new Vector3(0.25f, 0.3f, -1)),
+        ("front-left", new Vector3(-1, 0.6f, 1.2f), 1),
+        ("rear-right", new Vector3(1, 0.6f, -1.2f), 1),
+        ("left", new Vector3(-1, 0.05f, 0), 1),
+        ("front", new Vector3(0, 0.1f, 1), 1),
+        ("top", new Vector3(0, 1, 0.001f), 1),
+        ("under", new Vector3(0.3f, -1, 0.2f), 1),
+        ("rear-low", new Vector3(0.25f, 0.3f, -1), 1),
+        ("rear-close", new Vector3(0.15f, 0.25f, -1), 0.35f),
+        ("left-close", new Vector3(-1, 0.25f, -0.3f), 0.35f),
     };
 
     /// <summary>
@@ -71,10 +76,10 @@ public static class ModelPreview
         Texture2D image = new Texture2D(ModelPreview.Width, ModelPreview.Height, TextureFormat.RGB24, false);
         camera.targetTexture = target;
         Directory.CreateDirectory(outputFolder);
-        foreach ((string name, Vector3 direction) in ModelPreview.Views)
+        foreach ((string name, Vector3 direction, float scale) in ModelPreview.Views)
         {
             ground.SetActive(direction.y >= 0);
-            camera.transform.position = bounds.center + direction.normalized * distance;
+            camera.transform.position = bounds.center + direction.normalized * distance * scale;
             camera.transform.LookAt(bounds.center);
             camera.Render();
             RenderTexture.active = target;

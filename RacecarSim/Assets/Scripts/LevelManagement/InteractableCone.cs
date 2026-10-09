@@ -31,6 +31,20 @@ public class InteractableCone : DistanceCone
     private const float scrollSpeed = 0.1f;
     #endregion
 
+    private void OnEnable()
+    {
+        // The scroll wheel resizes the cone instead of zooming the player camera
+        if (this.Resizable)
+        {
+            PlayerCameraViews.ScrollCaptures.Add(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        PlayerCameraViews.ScrollCaptures.Remove(this);
+    }
+
     protected override void Update()
     {
         base.Update();

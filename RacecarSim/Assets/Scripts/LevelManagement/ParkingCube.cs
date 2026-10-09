@@ -39,6 +39,12 @@ public class ParkingCube : MonoBehaviour
     /// The threshold around goalDistance in cm we will consider an acceptable distance.
     /// </summary>
     private const float distanceThreshold = 2;
+
+    /// <summary>
+    /// Readout color while the car is outside the parking thresholds (green inside them); amber
+    /// to stand apart from the white HUD text.
+    /// </summary>
+    private static readonly Color readoutColor = new Color(1, 0.78f, 0.24f);
     #endregion
 
     /// <summary>
@@ -160,11 +166,9 @@ public class ParkingCube : MonoBehaviour
         this.angle = null;
         this.distance = null;
 
-        if (this.autograderTask == null)
-        {
-            LevelManager.ShowMessage($"Angle: {this.Angle:F1} degrees\nDistance: {this.Distance:F1} cm", this.IsSuccess ? Color.green : Color.white, -1);
-        }
-        else if (this.IsSuccess && LevelManager.GetCar().Physics.LinearVelocity.magnitude < Constants.MaxStopSpeed)
+        // Shown in both modes; an autograder task is active only while it is the current task
+        LevelManager.ShowMessage($"Angle: {this.Angle:F1} degrees\nDistance: {this.Distance:F1} cm", this.IsSuccess ? Color.green : ParkingCube.readoutColor, -1);
+        if (this.autograderTask != null && this.IsSuccess && LevelManager.GetCar().Physics.LinearVelocity.magnitude < Constants.MaxStopSpeed)
         {
             AutograderManager.CompleteTask(this.autograderTask);
         }

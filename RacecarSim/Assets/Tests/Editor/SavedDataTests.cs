@@ -62,8 +62,8 @@ public class SavedDataTests
         BestTimeInfo times = data.GetBestTimes(SavedDataTests.Level("grand-prix-2026", 2));
         times.OverallTime = 95.25f;
         times.CheckpointTimes[0] = 12.5f;
-        data.CarCustomizations[1].FrontColor = new SerializableColor(0.1f, 0.2f, 0.3f);
-        data.CarCustomizations[1].IsBackShiny = true;
+        data.CarCustomizations[1].ShellColor = new SerializableColor(0.1f, 0.2f, 0.3f);
+        data.CarCustomizations[1].IsShellShiny = true;
 
         SavedData loaded = SavedDataManager.FromJson(SavedDataManager.ToJson(data));
 
@@ -73,8 +73,26 @@ public class SavedDataTests
         Assert.AreEqual(95.25f, loadedTimes.OverallTime);
         Assert.AreEqual(12.5f, loadedTimes.CheckpointTimes[0]);
         Assert.AreEqual(float.MaxValue, loadedTimes.CheckpointTimes[2]);
-        Assert.AreEqual(new Color(0.1f, 0.2f, 0.3f), loaded.CarCustomizations[1].FrontColor.Color);
-        Assert.IsTrue(loaded.CarCustomizations[1].IsBackShiny);
+        Assert.AreEqual(new Color(0.1f, 0.2f, 0.3f), loaded.CarCustomizations[1].ShellColor.Color);
+        Assert.IsTrue(loaded.CarCustomizations[1].IsShellShiny);
+    }
+
+    [Test]
+    public void FromJson_Version2ColorsResetToShellDefaults()
+    {
+        SavedData loaded = SavedDataManager.FromJson(
+            "{\"Version\": 2, \"WasUsernameDialogShown\": true, \"CarCustomizations\": [" +
+            "{\"FrontColor\": {\"r\": 1, \"g\": 1, \"b\": 1}, \"IsFrontShiny\": true, \"BackColor\": {\"r\": 1, \"g\": 0, \"b\": 0}}," +
+            "{\"FrontColor\": {\"r\": 1, \"g\": 0, \"b\": 0}}, {\"FrontColor\": {\"r\": 0, \"g\": 0, \"b\": 1}}, {\"FrontColor\": {\"r\": 1, \"g\": 1, \"b\": 0}}]}");
+
+        Assert.AreEqual(SavedData.CurrentVersion, loaded.Version);
+        Assert.IsTrue(loaded.WasUsernameDialogShown);
+        for (int i = 0; i < loaded.CarCustomizations.Length; i++)
+        {
+            Assert.AreEqual(SavedData.Default.CarCustomizations[i].ShellColor.Color, loaded.CarCustomizations[i].ShellColor.Color, $"car {i}");
+            Assert.IsFalse(loaded.CarCustomizations[i].IsShellShiny);
+        }
+        Assert.AreEqual(CarCustomization.DefaultShellColor, loaded.CarCustomizations[0].ShellColor.Color);
     }
 
     [Test]
