@@ -9,6 +9,7 @@ public class SettingsDraft
 {
     public bool IsRealism;
     public bool IsRealCarResponse;
+    public bool IsAntennaColliderRemoved;
     public bool IsBatteryMode;
     public bool HideCarsInColorCamera;
     public bool ShowDotMatrix;
@@ -39,6 +40,7 @@ public class SettingsDraft
         {
             IsRealism = Settings.IsRealism,
             IsRealCarResponse = Settings.IsRealCarResponse,
+            IsAntennaColliderRemoved = Settings.IsAntennaColliderRemoved,
             IsBatteryMode = Settings.IsBatteryMode,
             HideCarsInColorCamera = Settings.HideCarsInColorCamera,
             ShowDotMatrix = Settings.ShowDotMatrix,
@@ -57,6 +59,7 @@ public class SettingsDraft
     {
         this.IsRealism = Settings.DefaultIsRealism;
         this.IsRealCarResponse = Settings.DefaultIsRealCarResponse;
+        this.IsAntennaColliderRemoved = Settings.DefaultIsAntennaColliderRemoved;
         this.IsBatteryMode = Settings.DefaultIsBatteryMode;
         this.HideCarsInColorCamera = Settings.DefaultHideCarsInColorCamera;
         this.ShowDotMatrix = Settings.DefaultShowDotMatrix;
@@ -73,6 +76,7 @@ public class SettingsDraft
     {
         Settings.IsRealism = this.IsRealism;
         Settings.IsRealCarResponse = this.IsRealCarResponse;
+        Settings.IsAntennaColliderRemoved = this.IsAntennaColliderRemoved;
         Settings.IsBatteryMode = this.IsBatteryMode;
         Settings.HideCarsInColorCamera = this.HideCarsInColorCamera;
         Settings.ShowDotMatrix = this.ShowDotMatrix;

@@ -13,12 +13,17 @@ public class MenuSettingsTests
     {
         SettingsDraft draft = SettingsDraft.From(SavedData.Default.CarCustomizations);
         draft.IsRealism = !Settings.DefaultIsRealism;
+        draft.IsRealCarResponse = !Settings.DefaultIsRealCarResponse;
+        draft.IsAntennaColliderRemoved = !Settings.DefaultIsAntennaColliderRemoved;
         draft.CarDetail = Settings.CarDetailLevel.High;
         draft.Username = "someone";
         draft.ShellColors[0] = Color.magenta;
         draft.RestoreDefaults();
 
         Assert.AreEqual(Settings.DefaultIsRealism, draft.IsRealism);
+        Assert.AreEqual(Settings.DefaultIsRealCarResponse, draft.IsRealCarResponse);
+        Assert.AreEqual(Settings.DefaultIsAntennaColliderRemoved, draft.IsAntennaColliderRemoved);
+        Assert.IsTrue(Settings.DefaultIsAntennaColliderRemoved, "antenna colliders off by default");
         Assert.AreEqual(Settings.DefaultIsBatteryMode, draft.IsBatteryMode);
         Assert.AreEqual(Settings.DefaultHideCarsInColorCamera, draft.HideCarsInColorCamera);
         Assert.AreEqual(Settings.DefaultShowDotMatrix, draft.ShowDotMatrix);

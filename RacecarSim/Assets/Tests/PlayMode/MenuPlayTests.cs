@@ -232,6 +232,123 @@ public class MenuPlayTests
         }
     }
 
+    /// <summary>
+    /// Every Settings row, for each shell picker mode and at 16:9, 4:3, 21:9, and 1280x720: no two
+    /// controls or labels come within 4 px of each other (the stacked shell sliders excepted), each row is at least 50 px tall, a row's label text ends at
+    /// least 16 px before its control, and every control stays inside the panel.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator Menu_SettingsRowsDoNotOverlap()
+    {
+        SceneManager.LoadScene(LevelCollection.MainMenuBuildIndex, LoadSceneMode.Single);
+        yield return PlayModeLevels.WaitFor(() => SceneManager.GetActiveScene().buildIndex == LevelCollection.MainMenuBuildIndex, "the main menu");
+        yield return null;
+        yield return null;
+        UIDocument document = Object.FindAnyObjectByType<MenuController>().GetComponent<UIDocument>();
+        VisualElement root = document.rootVisualElement;
+        MenuPlayTests.Submit(root.Q<Button>("settings"));
+        yield return new WaitForSecondsRealtime(0.3f);
+        VisualElement screen = root.Q("settings-screen");
+        Button[] pick = root.Q("shell-pick").Query<Button>().ToList().ToArray();
+
+        foreach ((int width, int height, string name) in new[] { (1920, 1080, "16x9"), (1440, 1080, "4x3"), (2520, 1080, "21x9"), (1280, 720, "720p") })
+        {
+            for (int mode = 0; mode < pick.Length; mode++)
+            {
+                MenuPlayTests.Submit(pick[mode]);
+                yield return null;
+                string at = $"{name}, shell mode {mode}";
+                yield return MenuPlayTests.Capture(document, $"ui-preview-settings-{name}-{mode}.png", width, height, () => MenuPlayTests.AssertSettingsLayout(screen, at));
+            }
+        }
+        MenuPlayTests.Submit(pick[0]);
+        MenuPlayTests.Submit(root.Q<Button>("settings-cancel"));
+        yield return null;
+    }
+
+    private static void AssertSettingsLayout(VisualElement screen, string at)
+    {
+        Rect panel = screen.Q(className: "mn-side-panel").worldBound;
+        VisualElement[] items = screen.Query<VisualElement>().Where(each => (each is Button || each is TextField || each is Slider || each.ClassListContains("mn-row-label") || each.ClassListContains("rcn-h2")) && MenuPlayTests.IsShown(each)).ToList()
+            .Where(each => !MenuPlayTests.HasAncestor(each, other => other is Button || other is TextField || other is Slider)).ToArray();
+        Assert.Greater(items.Length, 20, at);
+
+        // Rows in the scroll view are compared with each other unclipped and with the panel's
+        // other controls only where the viewport shows them
+        Rect viewport = screen.Q<ScrollView>("settings-rows").contentViewport.worldBound;
+        bool[] scrolled = items.Select(each => MenuPlayTests.HasAncestor(each, other => other.name == "settings-rows")).ToArray();
+        for (int i = 0; i < items.Length; i++)
+        {
+            Rect a = items[i].worldBound;
+            Assert.IsTrue(a.xMin >= panel.xMin - 0.5f && a.xMax <= panel.xMax + 0.5f, $"{at}: {MenuPlayTests.Name(items[i])} {a} outside panel {panel}");
+            for (int j = i + 1; j < items.Length; j++)
+            {
+                Rect b = items[j].worldBound;
+                if (scrolled[i] != scrolled[j])
+                {
+                    Rect shown = scrolled[i] ? a : b;
+                    shown = Rect.MinMaxRect(shown.xMin, Mathf.Max(shown.yMin, viewport.yMin), shown.xMax, Mathf.Min(shown.yMax, viewport.yMax));
+                    if (scrolled[i])
+                    {
+                        a = shown;
+                    }
+                    else
+                    {
+                        b = shown;
+                    }
+                }
+                float clearance = items[i] is Slider && items[j] is Slider ? 0 : 4;
+                Rect overlap = Rect.MinMaxRect(Mathf.Max(a.xMin, b.xMin), Mathf.Max(a.yMin, b.yMin), Mathf.Min(a.xMax, b.xMax) + clearance, Mathf.Min(a.yMax, b.yMax) + clearance);
+                Assert.IsFalse(overlap.width > 0.5f && overlap.height > 0.5f, $"{at}: {MenuPlayTests.Name(items[i])} {a} within {clearance} px of {MenuPlayTests.Name(items[j])} {b}");
+                a = items[i].worldBound;
+            }
+        }
+
+        foreach (VisualElement row in screen.Query(className: "mn-row").Where(MenuPlayTests.IsShown).ToList())
+        {
+            Assert.GreaterOrEqual(row.worldBound.height, 49.5f, $"{at}: row {MenuPlayTests.Name(row)} height");
+            Label label = row.Q<Label>(className: "mn-row-label");
+            VisualElement control = row.Children().FirstOrDefault(each => each != label);
+            if (label == null || control == null)
+            {
+                continue;
+            }
+            float textEnd = label.worldBound.xMin + label.MeasureTextSize(label.text, 0, VisualElement.MeasureMode.Undefined, 0, VisualElement.MeasureMode.Undefined).x;
+            float controlStart = control.Query<VisualElement>().Where(each => each is Button || each is TextField || each is Slider).ToList().Select(each => each.worldBound.xMin).DefaultIfEmpty(control.worldBound.xMin).Min();
+            Assert.GreaterOrEqual(controlStart - textEnd, 16, $"{at}: \"{label.text}\" ends {textEnd:F0}, control starts {controlStart:F0}");
+        }
+    }
+
+    private static bool IsShown(VisualElement element)
+    {
+        for (VisualElement each = element; each != null; each = each.parent)
+        {
+            if (each.resolvedStyle.display == DisplayStyle.None || each.resolvedStyle.visibility == Visibility.Hidden)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static bool HasAncestor(VisualElement element, System.Func<VisualElement, bool> match)
+    {
+        for (VisualElement each = element.parent; each != null; each = each.parent)
+        {
+            if (match(each))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static string Name(VisualElement element)
+    {
+        string text = element is TextElement textElement ? textElement.text : null;
+        return $"{element.GetType().Name}:{(string.IsNullOrEmpty(element.name) ? element.parent?.name : element.name)}{(string.IsNullOrEmpty(text) ? "" : " \"" + text + "\"")}";
+    }
+
     [UnityTest]
     public IEnumerator Menu_AutograderAsksForUsername()
     {

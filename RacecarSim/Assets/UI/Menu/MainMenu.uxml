@@ -92,6 +92,7 @@
                     </ui:VisualElement>
                     <ui:Label text="CAR" class="rcn-eyebrow rcn-muted mn-section" />
                     <ui:VisualElement name="car-response" class="mn-row" />
+                    <ui:VisualElement name="antenna" class="mn-row" />
                     <ui:VisualElement name="battery" class="mn-row" />
                     <ui:VisualElement name="dot-matrix" class="mn-row" />
                     <ui:VisualElement class="mn-row">

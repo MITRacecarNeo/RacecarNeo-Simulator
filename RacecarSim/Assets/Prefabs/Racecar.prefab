@@ -81,6 +81,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCameras: []
   shell: {fileID: 2272135062896775427}
+  antennaColliders:
+  - {fileID: 1378136337138436572}
+  - {fileID: 4360894113930372013}
 --- !u!114 &6847267400033205201
 MonoBehaviour:
   m_ObjectHideFlags: 0

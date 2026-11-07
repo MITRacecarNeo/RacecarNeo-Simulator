@@ -13,6 +13,8 @@ public class LidarObstacleTests
 {
     private bool realism;
 
+    private bool antennaColliderRemoved;
+
     [SetUp]
     public void RequireDataDirectory()
     {
@@ -21,18 +23,21 @@ public class LidarObstacleTests
         // Realism adds about 2 percent noise to each sample
         this.realism = Settings.IsRealism;
         Settings.IsRealism = false;
+        this.antennaColliderRemoved = Settings.IsAntennaColliderRemoved;
     }
 
     [UnityTearDown]
     public IEnumerator Unload()
     {
         Settings.IsRealism = this.realism;
+        Settings.IsAntennaColliderRemoved = this.antennaColliderRemoved;
         yield return PlayModeLevels.Unload();
     }
 
     [UnityTest]
     public IEnumerator Antennas_AppearBehindTheLidar()
     {
+        Settings.IsAntennaColliderRemoved = false;
         LevelInfo level = PlayModeLevels.Find("Demo World");
         yield return PlayModeLevels.Load(level, LevelManagerMode.Exploration, level.BuildIndex);
         Object.FindAnyObjectByType<LevelManager>().enabled = false;
@@ -56,6 +61,28 @@ public class LidarObstacleTests
                 }
             }
             Assert.AreEqual(26.6f, nearest, 1.5f, $"antenna at {bearing} deg (cm)");
+        }
+    }
+
+    [UnityTest]
+    public IEnumerator RemovedAntennaColliders_DoNotAppearBehindTheLidar()
+    {
+        Settings.IsAntennaColliderRemoved = true;
+        LevelInfo level = PlayModeLevels.Find("Demo World");
+        yield return PlayModeLevels.Load(level, LevelManagerMode.Exploration, level.BuildIndex);
+        Object.FindAnyObjectByType<LevelManager>().enabled = false;
+        Racecar car = LevelManager.GetCar();
+        PlayModeLevels.PlaceOnPad(car, new Vector3(0, 0.5f, 0));
+        yield return new WaitForSeconds(1);
+
+        foreach (float bearing in new[] { 170.5f, 189.5f })
+        {
+            int center = Mathf.RoundToInt(bearing / 360 * Lidar.NumSamples);
+            for (int i = center - 6; i <= center + 6; i++)
+            {
+                float sample = car.Lidar.Samples[i];
+                Assert.IsFalse(sample > 0 && sample < 40, $"sample {i}: {sample} cm");
+            }
         }
     }
 

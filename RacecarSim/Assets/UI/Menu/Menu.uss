@@ -465,6 +465,11 @@
     padding: 0;
 }
 
+/* Space between rows on the side panels, so tall segment rows do not touch their neighbors */
+.mn-settings-rows .mn-row {
+    padding: var(--rcn-space-1) 0;
+}
+
 /* Switch: a pill button with a knob, accent fill when on */
 
 .mn-switch {

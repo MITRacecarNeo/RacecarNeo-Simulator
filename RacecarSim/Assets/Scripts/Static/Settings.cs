@@ -24,6 +24,11 @@ public static class Settings
     public const bool DefaultIsRealCarResponse = false;
 
     /// <summary>
+    /// The default value of IsAntennaColliderRemoved.
+    /// </summary>
+    public const bool DefaultIsAntennaColliderRemoved = true;
+
+    /// <summary>
     /// The default value of IsBatteryMode.
     /// </summary>
     public const bool DefaultIsBatteryMode = false;
@@ -92,6 +97,12 @@ public static class Settings
     public static bool IsRealCarResponse;
 
     /// <summary>
+    /// If true, the two antenna masts have no collider: nothing touches them and the LIDAR does
+    /// not see them behind the car.
+    /// </summary>
+    public static bool IsAntennaColliderRemoved;
+
+    /// <summary>
     /// If true, a car with an empty battery cannot drive (outside autograder levels).
     /// </summary>
     public static bool IsBatteryMode;
@@ -145,6 +156,7 @@ public static class Settings
     {
         Settings.IsRealism = Settings.DefaultIsRealism;
         Settings.IsRealCarResponse = Settings.DefaultIsRealCarResponse;
+        Settings.IsAntennaColliderRemoved = Settings.DefaultIsAntennaColliderRemoved;
         Settings.IsBatteryMode = Settings.DefaultIsBatteryMode;
         Settings.HideCarsInColorCamera = Settings.DefaultHideCarsInColorCamera;
         Settings.ShowDotMatrix = Settings.DefaultShowDotMatrix;
@@ -160,6 +172,7 @@ public static class Settings
     {
         PlayerPrefs.SetInt("IsRealism", System.Convert.ToInt32(Settings.IsRealism));
         PlayerPrefs.SetInt("IsRealCarResponse", System.Convert.ToInt32(Settings.IsRealCarResponse));
+        PlayerPrefs.SetInt("IsAntennaColliderRemoved", System.Convert.ToInt32(Settings.IsAntennaColliderRemoved));
         PlayerPrefs.SetInt("IsBatteryMode", System.Convert.ToInt32(Settings.IsBatteryMode));
         PlayerPrefs.SetInt("HideCarsInColorCamera", System.Convert.ToInt32(Settings.HideCarsInColorCamera));
         PlayerPrefs.SetInt("ShowDotMatrix", System.Convert.ToInt32(Settings.ShowDotMatrix));
@@ -182,6 +195,7 @@ public static class Settings
     {
         Settings.IsRealism = System.Convert.ToBoolean(PlayerPrefs.GetInt("IsRealism", System.Convert.ToInt32(Settings.DefaultIsRealism)));
         Settings.IsRealCarResponse = System.Convert.ToBoolean(PlayerPrefs.GetInt("IsRealCarResponse", System.Convert.ToInt32(Settings.DefaultIsRealCarResponse)));
+        Settings.IsAntennaColliderRemoved = System.Convert.ToBoolean(PlayerPrefs.GetInt("IsAntennaColliderRemoved", System.Convert.ToInt32(Settings.DefaultIsAntennaColliderRemoved)));
         Settings.IsBatteryMode = System.Convert.ToBoolean(PlayerPrefs.GetInt("IsBatteryMode", System.Convert.ToInt32(Settings.DefaultIsBatteryMode)));
         Settings.HideCarsInColorCamera = System.Convert.ToBoolean(PlayerPrefs.GetInt("HideCarsInColorCamera", System.Convert.ToInt32(Settings.DefaultHideCarsInColorCamera)));
         Settings.ShowDotMatrix = System.Convert.ToBoolean(PlayerPrefs.GetInt("ShowDotMatrix", System.Convert.ToInt32(Settings.DefaultShowDotMatrix)));

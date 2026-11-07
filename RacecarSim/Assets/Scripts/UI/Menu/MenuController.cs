@@ -858,6 +858,7 @@ public class MenuController : MonoBehaviour
         MenuController.SwitchRow(this.root.Q("realism"), "Sensor noise", () => this.draft.IsRealism, value => this.draft.IsRealism = value);
         MenuController.SwitchRow(this.root.Q("hide-cars"), "Hide other cars in camera", () => this.draft.HideCarsInColorCamera, value => this.draft.HideCarsInColorCamera = value);
         MenuController.SwitchRow(this.root.Q("car-response"), "Real car response", () => this.draft.IsRealCarResponse, value => this.draft.IsRealCarResponse = value);
+        MenuController.SwitchRow(this.root.Q("antenna"), "Remove antenna collider", () => this.draft.IsAntennaColliderRemoved, value => this.draft.IsAntennaColliderRemoved = value);
         MenuController.SwitchRow(this.root.Q("battery"), "Car stops when battery runs out", () => this.draft.IsBatteryMode, value => this.draft.IsBatteryMode = value);
         MenuController.SwitchRow(this.root.Q("dot-matrix"), "Dot matrix on HUD", () => this.draft.ShowDotMatrix, value => this.draft.ShowDotMatrix = value);
         MenuController.SwitchRow(this.root.Q("shiny"), "Shiny shell", () => this.draft.IsShellShiny[this.editedCar], value =>
@@ -995,7 +996,7 @@ public class MenuController : MonoBehaviour
     private void RefreshSettings()
     {
         this.isLoadingDraft = true;
-        foreach (string row in new[] { "realism", "hide-cars", "car-response", "battery", "dot-matrix", "shiny" })
+        foreach (string row in new[] { "realism", "hide-cars", "car-response", "antenna", "battery", "dot-matrix", "shiny" })
         {
             Button toggle = this.root.Q(row).Q<Button>();
             toggle.EnableInClassList("mn-switch--on", ((Func<bool>)toggle.userData)());

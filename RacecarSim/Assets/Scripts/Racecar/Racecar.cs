@@ -17,6 +17,12 @@ public class Racecar : MonoBehaviour
     /// </summary>
     [SerializeField]
     private GameObject shell;
+
+    /// <summary>
+    /// The antenna mast colliders, turned off when Settings.IsAntennaColliderRemoved.
+    /// </summary>
+    [SerializeField]
+    private Collider[] antennaColliders;
     #endregion
 
     #region Constants
@@ -227,6 +233,11 @@ public class Racecar : MonoBehaviour
         this.Drive = this.GetComponent<Drive>();
         this.Lidar = this.GetComponentInChildren<Lidar>();
         this.Physics = this.GetComponent<PhysicsModule>();
+
+        foreach (Collider antenna in this.antennaColliders)
+        {
+            antenna.enabled = !Settings.IsAntennaColliderRemoved;
+        }
 
         // The first camera shows every view; the others stay off
         if (this.playerCameras.Length > 0)

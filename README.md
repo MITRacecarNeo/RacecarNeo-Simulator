@@ -51,6 +51,10 @@ You can learn more about RacecarSim and download the current version [here](http
   speed as before.
 - The car brakes a little harder when the speed is set to 0, as measured on
   the physical car: about 0.29 m to stop from 1 m/s (was 0.32 m).
+- Remove antenna collider (Settings, on by default): the two antennas
+  have no collider, so they do not touch anything and the LIDAR does not
+  see them behind the car. Turn it off to see them in the LIDAR scan, as
+  on the physical car.
 - Tires look solid and stay on the ground in full-lock turns.
 - Car detail (Settings): Low, Medium, or High car models, for slower
   computers. Driving and sensors are the same at every level.

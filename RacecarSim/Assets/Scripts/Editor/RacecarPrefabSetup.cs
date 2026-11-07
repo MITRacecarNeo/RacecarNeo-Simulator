@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -50,7 +51,8 @@ public static class RacecarPrefabSetup
     /// across the wheels up to the payload floor and out to the front impact rail, rear bumper,
     /// mudflaps, and full-width rail, payload shell (rear
     /// section, front sensor deck), LIDAR stack, LIDAR head, and the two antenna masts (the LIDAR
-    /// sees them behind it, as on the physical car).
+    /// sees them behind it, as on the physical car; Racecar turns them off when
+    /// Settings.IsAntennaColliderRemoved).
     /// </summary>
     public static readonly (string Name, Vector3 Center, Vector3 Size)[] BodyBoxes =
     {
@@ -195,11 +197,16 @@ public static class RacecarPrefabSetup
         GameObject colliders = new GameObject(RacecarPrefabSetup.CollidersName);
         colliders.transform.SetParent(body, false);
         colliders.transform.SetSiblingIndex(1);
-        foreach ((string _, Vector3 center, Vector3 size) in RacecarPrefabSetup.BodyBoxes)
+        List<BoxCollider> antennas = new List<BoxCollider>();
+        foreach ((string name, Vector3 center, Vector3 size) in RacecarPrefabSetup.BodyBoxes)
         {
             BoxCollider box = colliders.AddComponent<BoxCollider>();
             box.center = center;
             box.size = size;
+            if (name.StartsWith("Antenna"))
+            {
+                antennas.Add(box);
+            }
         }
 
         // Wheel colliders at the model wheel centers, raised so the wheels rest there; rest
@@ -256,6 +263,12 @@ public static class RacecarPrefabSetup
         // Recolor target
         SerializedObject racecarObject = new SerializedObject(root.GetComponent<Racecar>());
         racecarObject.FindProperty("shell").objectReferenceValue = model.transform.Find("Shell").gameObject;
+        SerializedProperty antennaColliders = racecarObject.FindProperty("antennaColliders");
+        antennaColliders.arraySize = antennas.Count;
+        for (int i = 0; i < antennas.Count; i++)
+        {
+            antennaColliders.GetArrayElementAtIndex(i).objectReferenceValue = antennas[i];
+        }
         racecarObject.ApplyModifiedPropertiesWithoutUndo();
 
         // LED strip in the light band
