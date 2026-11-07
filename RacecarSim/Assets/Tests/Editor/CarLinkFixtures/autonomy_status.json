@@ -1,0 +1,1 @@
+{"op":"publish","topic":"\/autonomy\/status","msg":{"level":0,"name":"autonomy","message":"ok","hardware_id":"","values":[{"key":"mode","value":"mapping"},{"key":"map","value":"lab"},{"key":"localized","value":"true"}]}}

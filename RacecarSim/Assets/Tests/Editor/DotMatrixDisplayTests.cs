@@ -13,6 +13,15 @@ public class DotMatrixDisplayTests
     private const float afterSplash = 100;
 
     [Test]
+    public void NoSplash_ShowsModeFromTheStart()
+    {
+        ActuatorCommands commands = new ActuatorCommands();
+        Assert.AreEqual(
+            DotMatrixDisplayTests.Render(new DotMatrixDisplay(0).Frame(commands, DotMatrixDisplay.DriveMode.Manual, DotMatrixDisplayTests.afterSplash)),
+            DotMatrixDisplayTests.Render(new DotMatrixDisplay(float.NegativeInfinity).Frame(commands, DotMatrixDisplay.DriveMode.Manual, 0)));
+    }
+
+    [Test]
     public void Manual_GlyphAndLabel()
     {
         DotMatrixDisplayTests.AssertFrame(new[]
@@ -157,15 +166,23 @@ public class DotMatrixDisplayTests
 
     private static void AssertFrame(string[] expected, bool[,] frame)
     {
-        StringBuilder actual = new StringBuilder();
+        Assert.AreEqual(string.Join("\n", expected) + "\n", DotMatrixDisplayTests.Render(frame));
+    }
+
+    /// <summary>
+    /// A frame as rows of X (lit) and . (dark), one line per row.
+    /// </summary>
+    private static string Render(bool[,] frame)
+    {
+        StringBuilder text = new StringBuilder();
         for (int row = 0; row < frame.GetLength(0); row++)
         {
             for (int column = 0; column < frame.GetLength(1); column++)
             {
-                actual.Append(frame[row, column] ? 'X' : '.');
+                text.Append(frame[row, column] ? 'X' : '.');
             }
-            actual.Append('\n');
+            text.Append('\n');
         }
-        Assert.AreEqual(string.Join("\n", expected) + "\n", actual.ToString());
+        return text.ToString();
     }
 }

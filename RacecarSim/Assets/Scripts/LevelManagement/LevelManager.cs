@@ -330,6 +330,32 @@ public class LevelManager : MonoBehaviour
     }
 
     /// <summary>
+    /// World positions of the level's key points in race order (start, checkpoints, finish), for
+    /// the HUD map; empty without a level.
+    /// </summary>
+    public static Vector3[] KeyPointPositions
+    {
+        get
+        {
+            KeyPoint[] points = LevelManager.instance?.keyPoints;
+            return points == null ? new Vector3[0] : points.Select(point => point.transform.position).ToArray();
+        }
+    }
+
+    /// <summary>
+    /// Index in KeyPointPositions of the key point a car is heading for, or -1 after the finish.
+    /// </summary>
+    public static int NextKeyPoint(int carIndex = 0)
+    {
+        LevelManager current = LevelManager.instance;
+        if (current?.curKeyPoints == null || carIndex < 0 || carIndex >= current.curKeyPoints.Length)
+        {
+            return -1;
+        }
+        int next = current.curKeyPoints[carIndex] + 1;
+        return next < current.keyPoints.Length ? next : -1;
+    }
+    /// <summary>
     /// Restarts the current level, as START + BACK does.
     /// </summary>
     public static void RestartLevel()
@@ -351,7 +377,11 @@ public class LevelManager : MonoBehaviour
         LevelManager.cachedPythonInterface = LevelManager.instance.pythonInterface;
         LevelManager.instance.isPythonInterfaceHandedOff = true;
         LevelManager.autograderBuildIndex++;
-        SceneManager.LoadScene(LevelManager.autograderBuildIndex, LoadSceneMode.Single);
+
+        // The Python program stays connected; it waits for the next update while the level is frozen
+        float timeScale = Time.timeScale;
+        int buildIndex = LevelManager.autograderBuildIndex;
+        LevelManager.instance.LeaveLevel(beforeLoad => SceneFlow.Load(buildIndex, SceneTransition.Wipe, beforeLoad, AutograderManager.TrialResultSeconds), timeScale);
 
     }
 
@@ -363,7 +393,7 @@ public class LevelManager : MonoBehaviour
         LevelManager.instance.SetTimeScale(1.0f);
         LevelManager.instance.pythonInterface.HandleExit();
         LevelManager.cachedPythonInterface = null;
-        SceneManager.LoadScene(AutograderManager.AutograderSummaryScene, LoadSceneMode.Single);
+        LevelManager.instance.LeaveLevel(beforeLoad => SceneFlow.Load(AutograderManager.AutograderSummaryScene, SceneTransition.Wipe, beforeLoad, AutograderManager.TrialResultSeconds), 1);
     }
     #endregion
 
@@ -508,7 +538,7 @@ public class LevelManager : MonoBehaviour
         // Thus, we should return directly to the main menu
         if (LevelManager.LevelInfo.BuildIndex < 0)
         {
-            SceneManager.LoadScene(LevelCollection.MainMenuBuildIndex, LoadSceneMode.Single);
+            SceneFlow.Load(LevelCollection.MainMenuBuildIndex, SceneTransition.Cut);
             return;
         }
 
@@ -617,17 +647,17 @@ public class LevelManager : MonoBehaviour
         }
 
         // Handle timeScale change on alt keys
-        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        if (Input.GetKeyDown(Hotkeys.SlowDown))
         {
             this.ScaleTimeScale(0.5f);
         }
-        else if (Input.GetKeyDown(KeyCode.RightAlt) || Input.GetKeyDown(KeyCode.AltGr))
+        else if (Input.GetKeyDown(Hotkeys.SpeedUp) || Input.GetKeyDown(Hotkeys.SpeedUpAlternate))
         {
             this.ScaleTimeScale(2);
         }
 
         // Handle exit on escape key
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(Hotkeys.Exit))
         {
             this.HandleExit();
         }
@@ -653,7 +683,7 @@ public class LevelManager : MonoBehaviour
         }
 
         // In exploration mode, skip between checkpoints on tab key
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(Hotkeys.SkipCheckpoint))
         {
             if (LevelManager.LevelManagerMode == LevelManagerMode.Exploration)
             {
@@ -667,7 +697,7 @@ public class LevelManager : MonoBehaviour
         }
 
         // In exploration mode, reset to current checkpoint on Caps Lock key
-        if (Input.GetKeyDown(KeyCode.CapsLock))
+        if (Input.GetKeyDown(Hotkeys.ResetToCheckpoint))
         {
             if (LevelManager.LevelManagerMode == LevelManagerMode.Exploration)
             {
@@ -767,7 +797,7 @@ public class LevelManager : MonoBehaviour
     private void ManageRaceInputs()
     {
         // R + number resets that car
-        if (Input.GetKey(KeyCode.R))
+        if (Input.GetKey(Hotkeys.ResetCar))
         {
             for (int i = 0; i < LevelManager.NumPlayers && i < 9; i++)
             {
@@ -960,7 +990,7 @@ public class LevelManager : MonoBehaviour
             AutograderManager.ResetAutograder();
             ReloadBuffer.BuildIndexToReload = LevelManager.LevelInfo.AutograderBuildIndex;
         }
-        SceneManager.LoadScene(ReloadBuffer.BuildIndex, LoadSceneMode.Single);
+        this.LeaveLevel(beforeLoad => SceneFlow.Load(ReloadBuffer.BuildIndex, SceneTransition.Wipe, beforeLoad), 1);
     }
 
     /// <summary>
@@ -973,7 +1003,27 @@ public class LevelManager : MonoBehaviour
         this.pythonInterface.HandleExit();
         LevelManager.cachedPythonInterface = null;
         AutograderManager.ResetAutograder();
-        SceneManager.LoadScene(LevelCollection.MainMenuBuildIndex, LoadSceneMode.Single);
+        this.LeaveLevel(beforeLoad => SceneFlow.Load(LevelCollection.MainMenuBuildIndex, SceneTransition.Wipe, beforeLoad), 1);
+    }
+
+    /// <summary>
+    /// Leaves the level (restart, Esc, next autograder trial, autograder summary): this manager
+    /// stops updating, so no Python update is sent, and time stops while the cover slides in over
+    /// the frozen scene. Time resumes at nextTimeScale right before the load. A refused request
+    /// restores both.
+    /// </summary>
+    /// <param name="load">Starts the SceneFlow load with the given beforeLoad callback; returns false when refused.</param>
+    /// <param name="nextTimeScale">Time scale for the next scene.</param>
+    private void LeaveLevel(Func<Action, bool> load, float nextTimeScale)
+    {
+        float previousTimeScale = Time.timeScale;
+        this.enabled = false;
+        Time.timeScale = 0;
+        if (!load(() => Time.timeScale = nextTimeScale))
+        {
+            this.enabled = true;
+            Time.timeScale = previousTimeScale;
+        }
     }
 
     /// <summary>

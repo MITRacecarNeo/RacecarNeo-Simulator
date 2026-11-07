@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine;
 
 /// <summary>
-/// The base class from which all in-simulation HUDs and screen managers inherit.
+/// The base class from which all in-simulation HUDs and screen managers inherit: the calls
+/// LevelManager, AutograderManager, and the car modules make, and how long messages stay up.
 /// </summary>
 public abstract class ScreenManager : MonoBehaviour
 {
@@ -30,7 +30,7 @@ public abstract class ScreenManager : MonoBehaviour
     /// <summary>
     /// The color of text used in a warning message.
     /// </summary>
-    private static readonly Color warningColor = Color.yellow;
+    protected static readonly Color warningColor = Color.yellow;
     #endregion
 
     #region Public Interface
@@ -38,19 +38,10 @@ public abstract class ScreenManager : MonoBehaviour
     /// Show a text message to the user.
     /// </summary>
     /// <param name="message">The text to show.</param>
-    /// <param name="color">The color of the text.</param>
-    /// <param name="persistTime">The time in seconds the text is shown.</param>
+    /// <param name="color">The color of the text; errorColor and warningColor mark errors and warnings.</param>
+    /// <param name="persistTime">The time in seconds the text is shown; -1 keeps it until replaced.</param>
     /// <param name="fadeTime">In the time in seconds it takes for the text to fade out after persistTime has passed.</param>
-    public void ShowMessage(string message, Color color, float persistTime = -1, float fadeTime = 1.0f)
-    {
-        this.messageText.text = message;
-        this.messageText.color = color;
-
-        this.messageColor = color;
-        this.messageCounter = 0;
-        this.messagePersistTime = persistTime;
-        this.messageFadeTime = fadeTime;
-    }
+    public abstract void ShowMessage(string message, Color color, float persistTime = -1, float fadeTime = 1.0f);
 
     public void ShowError(string errorText)
     {
@@ -69,23 +60,14 @@ public abstract class ScreenManager : MonoBehaviour
     /// </summary>
     /// <param name="mainTime">The total time in seconds that the current level has been running.</param>
     /// <param name="keyPointDurations">The time which the 0th car spent on each key point, indexed by key point.</param>
-    public virtual void UpdateTime(float mainTime, float[] keyPointDurations)
-    {
-        this.mainTimeText.text = mainTime.ToString("F3");
-
-        // The children of this class can override this method if they wish to display key point times
-    }
+    public abstract void UpdateTime(float mainTime, float[] keyPointDurations);
 
     /// <summary>
     /// Updates the elements showing when the simulation is paused.
     /// </summary>
     /// <param name="isPaused">True if the simulation is currently paused.</param>
-    public void SetPause(bool isPaused)
-    {
-        this.pauseScreen.gameObject.SetActive(isPaused);
-    }
+    public abstract void SetPause(bool isPaused);
 
-    #region Abstract
     /// <summary>
     /// Update the element(s) indicating that the race is won.
     /// </summary>
@@ -118,73 +100,20 @@ public abstract class ScreenManager : MonoBehaviour
     /// <param name="timeScale">The current rate at which time progresses. 1 is full speed, 0.5 is half speed, and 0 is paused.</param>
     public abstract void UpdateTimeScale(float timeScale);
     #endregion
-    #endregion
-
-    #region Set in Unity Editor
-    /// <summary>
-    /// The text showing messages, warnings, and errors.
-    /// </summary>
-    [SerializeField]
-    protected Text messageText;
 
     /// <summary>
-    /// The text showing the main timer.
+    /// True for the error message color.
     /// </summary>
-    [SerializeField]
-    protected Text mainTimeText;
-
-    /// <summary>
-    /// The overlay shown while the simulation is paused.
-    /// </summary>
-    [SerializeField]
-    protected RawImage pauseScreen;
-    #endregion
-
-    protected virtual void Awake()
+    protected static bool IsError(Color color)
     {
-        this.messagePersistTime = -1;
-        this.messageText.text = string.Empty;
-        this.mainTimeText.text = string.Empty;
-
-        this.SetPause(false);
-    }
-
-    protected virtual void Update()
-    {
-        // Handle message persistence and fadeout
-        if (this.messagePersistTime > 0)
-        {
-            this.messageCounter += Time.deltaTime;
-            if (this.messageCounter > this.messagePersistTime)
-            {
-                this.messagePersistTime = 0;
-                this.messageCounter = 0;
-            }
-        }
-        else if (this.messagePersistTime == 0 && this.messageCounter < this.messageFadeTime)
-        {
-            this.messageCounter += Time.deltaTime;
-            this.messageText.color = Color.Lerp(this.messageColor, Color.clear, this.messageCounter / this.messageFadeTime);
-        }
+        return color == ScreenManager.errorColor;
     }
 
     /// <summary>
-    /// A counter used to track message persistence and fade out.
+    /// True for the warning message color.
     /// </summary>
-    private float messageCounter;
-
-    /// <summary>
-    /// The time is seconds that the current message will persist.  If -1, the current message will persist indefinitely.
-    /// </summary>
-    private float messagePersistTime;
-
-    /// <summary>
-    /// The time in seconds that the current message will take to fade out.
-    /// </summary>
-    private float messageFadeTime;
-
-    /// <summary>
-    /// The color of the current message.
-    /// </summary>
-    private Color messageColor;
+    protected static bool IsWarning(Color color)
+    {
+        return color == ScreenManager.warningColor;
+    }
 }

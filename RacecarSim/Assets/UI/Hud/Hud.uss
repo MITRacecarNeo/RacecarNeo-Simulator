@@ -1,0 +1,535 @@
+/* Race HUD: frames the screen edges and keeps the bottom center clear for the car. */
+
+.hud-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Left column: map at the top, sensor feeds at the bottom */
+
+.hud-left-column {
+    position: absolute;
+    left: var(--rcn-space-8);
+    top: var(--rcn-space-8);
+    bottom: var(--rcn-space-6);
+    align-items: flex-start;
+}
+
+.hud-nav--hidden {
+    display: none;
+}
+
+.hud-map {
+    width: 320px;
+    height: 320px;
+    border-width: 3px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-lg);
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: var(--rcn-radius-lg);
+    border-bottom-right-radius: var(--rcn-radius-lg);
+    overflow: hidden;
+}
+
+.hud-map-image {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.hud-spacer {
+    flex-grow: 1;
+}
+
+/* Gauge under the body frame; padding keeps its label inside the tray */
+.hud-gauge-box {
+    align-items: center;
+    margin-top: var(--rcn-space-2);
+    padding-bottom: 22px;
+}
+
+.hud-gauge {
+    width: 170px;
+    height: 170px;
+}
+
+.hud-gauge-readout {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 14px;
+    -unity-font-definition: url("../../Fonts/JetBrainsMono/JetBrainsMono-SemiBold.ttf");
+    font-size: var(--rcn-text-lg);
+    color: var(--rcn-text);
+    -unity-text-align: middle-center;
+    padding: 0;
+}
+
+/* Under the dial without moving it off center */
+.hud-gauge-label {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: var(--rcn-space-1);
+    -unity-text-align: middle-center;
+}
+
+/* Mode chip and messages, top center */
+
+.hud-top-center {
+    position: absolute;
+    left: 25%;
+    right: 25%;
+    top: var(--rcn-space-8);
+    align-items: center;
+}
+
+.hud-chip {
+    flex-direction: row;
+    align-items: center;
+    background-color: var(--rcn-overlay);
+    color: var(--rcn-text);
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    padding: var(--rcn-space-2) var(--rcn-space-6);
+}
+
+.hud-chip-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.hud-chip-label {
+    padding: 0;
+    margin: 0 var(--rcn-space-4) 0 var(--rcn-space-3);
+}
+
+.hud-connection {
+    width: 16px;
+    height: 16px;
+    border-top-left-radius: var(--rcn-radius-pill);
+    border-top-right-radius: var(--rcn-radius-pill);
+    border-bottom-left-radius: var(--rcn-radius-pill);
+    border-bottom-right-radius: var(--rcn-radius-pill);
+    background-color: var(--rcn-steel);
+}
+
+.hud-connection--on {
+    background-color: var(--rcn-success);
+}
+
+.hud-time-scale {
+    color: var(--rcn-highlight);
+    padding: 0;
+    margin-left: var(--rcn-space-4);
+}
+
+.hud-toast {
+    margin-top: var(--rcn-space-4);
+    max-width: 100%;
+    background-color: var(--rcn-overlay);
+    color: var(--rcn-text);
+    border-left-width: 6px;
+    border-color: var(--rcn-steel);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    padding: var(--rcn-space-2) var(--rcn-space-4);
+    display: none;
+}
+
+.hud-toast--warning {
+    border-color: var(--rcn-gold);
+}
+
+.hud-toast--error {
+    border-color: var(--rcn-crimson);
+}
+
+.hud-toast--success {
+    border-color: var(--rcn-success);
+}
+
+.hud-toast-text {
+    white-space: normal;
+    padding: 0;
+}
+
+/* Timer, checkpoint pips, autograder, top right */
+
+.hud-top-right {
+    position: absolute;
+    right: var(--rcn-space-8);
+    top: var(--rcn-space-8);
+    align-items: flex-end;
+}
+
+.hud-timer {
+    align-self: flex-end;
+}
+
+.hud-timer--warning {
+    --fill: var(--rcn-gold);
+    color: var(--rcn-ink);
+}
+
+.hud-timer--over {
+    --fill: var(--rcn-crimson);
+    color: var(--rcn-paper);
+}
+
+.hud-pips {
+    flex-direction: row;
+    margin-top: var(--rcn-space-3);
+}
+
+.hud-pip {
+    width: 22px;
+    height: 10px;
+    margin-left: var(--rcn-space-1);
+    background-color: var(--rcn-steel);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+}
+
+.hud-pip--done {
+    background-color: var(--rcn-accent);
+}
+
+.hud-autograder {
+    width: 500px;
+    margin-top: var(--rcn-space-4);
+    padding: var(--rcn-space-4) var(--rcn-space-6);
+    display: none;
+}
+
+.hud-ag-title {
+    white-space: normal;
+}
+
+.hud-ag-text {
+    white-space: normal;
+    margin-bottom: var(--rcn-space-2);
+}
+
+.hud-ag-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Time limit ring: elapsed arc, bonus bracket ticks, limit in the middle */
+.hud-ag-ring {
+    width: 96px;
+    height: 96px;
+    align-items: center;
+    justify-content: center;
+    --fill: var(--rcn-orange);
+    --track: var(--rcn-steel);
+    --tick: var(--rcn-paper);
+}
+
+.hud-ag-ring--warning {
+    --fill: var(--rcn-gold);
+}
+
+.hud-ag-ring--over {
+    --fill: var(--rcn-crimson);
+}
+
+.hud-ag-ring-text {
+    font-size: var(--rcn-text-xs);
+    color: var(--rcn-text);
+    padding: 0;
+}
+
+.hud-ag-limit {
+    color: var(--rcn-text-muted);
+}
+
+.hud-ag-progress {
+    margin-top: var(--rcn-space-2);
+}
+
+/* Sensor tray, bottom corners (H toggles) */
+
+.hud-tray {
+    background-color: var(--rcn-overlay);
+    color: var(--rcn-text);
+    border-top-left-radius: var(--rcn-radius-lg);
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: var(--rcn-radius-lg);
+    border-bottom-right-radius: var(--rcn-radius-lg);
+    padding: var(--rcn-space-3);
+}
+
+.hud-tray--hidden {
+    display: none;
+}
+
+/* L-shaped window: LIDAR over the camera, depth beside the camera. Two panels meet at the
+   inner edge, so the tray itself draws nothing. */
+.hud-tray-left {
+    flex-direction: row;
+    align-items: flex-end;
+    background-color: rgba(0, 0, 0, 0);
+    padding: 0;
+}
+
+.hud-l-panel {
+    background-color: var(--rcn-overlay);
+    padding: var(--rcn-space-3);
+}
+
+.hud-l-tall {
+    border-top-left-radius: var(--rcn-radius-lg);
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: var(--rcn-radius-lg);
+    border-bottom-right-radius: 0;
+}
+
+.hud-l-short {
+    padding-left: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: var(--rcn-radius-lg);
+}
+
+.hud-tray-right {
+    position: absolute;
+    bottom: var(--rcn-space-6);
+    right: var(--rcn-space-8);
+    width: 500px;
+}
+
+.hud-tray-row {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.hud-feed-box--below {
+    margin-top: var(--rcn-space-3);
+}
+
+/* Name over the feed's top-left corner */
+.hud-feed-label {
+    position: absolute;
+    left: var(--rcn-space-1);
+    top: var(--rcn-space-1);
+    padding: 0 var(--rcn-space-2);
+    background-color: var(--rcn-overlay);
+    color: var(--rcn-text);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+}
+
+.hud-feed {
+    width: 240px;
+    height: 180px;
+    background-color: var(--rcn-code-bg);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.hud-side {
+    align-items: center;
+    margin: 0 var(--rcn-space-2);
+}
+
+.hud-body-frame {
+    width: 170px;
+    height: 150px;
+    margin-top: var(--rcn-space-1);
+}
+
+.hud-axis-label {
+    position: absolute;
+    -unity-font-definition: url("../../Fonts/JetBrainsMono/JetBrainsMono-SemiBold.ttf");
+    font-size: var(--rcn-text-xs);
+    color: var(--rcn-text);
+    padding: 0;
+    margin: 0;
+}
+
+.hud-readouts {
+    margin-right: var(--rcn-space-3);
+    flex-grow: 1;
+}
+
+.hud-readout {
+    font-size: var(--rcn-text-xs);
+    padding: 0;
+}
+
+.hud-readout-gap {
+    margin-top: var(--rcn-space-2);
+}
+
+.hud-battery--empty .hud-readout {
+    color: var(--rcn-gold);
+}
+
+.hud-meter {
+    flex-direction: row;
+    align-items: center;
+    margin-top: var(--rcn-space-1);
+}
+
+.hud-meter-track {
+    flex-grow: 1;
+    height: 10px;
+    margin-right: var(--rcn-space-3);
+    background-color: var(--rcn-code-bg);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+    overflow: hidden;
+}
+
+.hud-meter-fill {
+    height: 100%;
+    width: 0;
+}
+
+/* Voltage in the LED strip's battery red; current in orange */
+.hud-meter-fill--volts {
+    background-color: var(--rcn-led-red);
+}
+
+.hud-meter-fill--amps {
+    background-color: var(--rcn-orange);
+}
+
+.hud-meter-value {
+    min-width: 76px;
+    -unity-text-align: middle-right;
+}
+
+.hud-dot-matrix {
+    align-self: center;
+    width: 360px;
+    height: 120px;
+    margin-bottom: var(--rcn-space-2);
+    -unity-background-scale-mode: scale-to-fit;
+    display: none;
+}
+
+/* Controller input: pills that light while pressed */
+
+.hud-pad {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: var(--rcn-space-3);
+    width: 250px;
+}
+
+.hud-pad-key {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-SemiBold.ttf");
+    font-size: 15px;
+    color: var(--rcn-text);
+    background-color: var(--rcn-surface);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+    padding: 1px 6px;
+    margin: 0 4px 4px 0;
+}
+
+.hud-pad-key--down {
+    background-color: var(--rcn-accent);
+    color: var(--rcn-on-accent);
+}
+
+/* Pause and result */
+
+.hud-pause {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--rcn-overlay);
+    color: var(--rcn-text);
+    align-items: center;
+    justify-content: center;
+    display: none;
+}
+
+.hud-result-backdrop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    display: none;
+}
+
+.hud-result {
+    width: 640px;
+    align-items: center;
+}
+
+.hud-result-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--rcn-space-2);
+}
+
+/* Failure: icon and title in LED red (large text, 3:1 on the card) */
+.hud-result--failed .hud-result-icon {
+    color: var(--rcn-led-red);
+}
+
+.hud-result--failed .hud-result-title {
+    color: var(--rcn-led-red);
+}
+
+.hud-result-best {
+    align-self: center;
+}
+
+.hud-result-detail {
+    white-space: normal;
+    -unity-text-align: middle-center;
+    margin: var(--rcn-space-2) 0 var(--rcn-space-4) 0;
+}
+
+.hud-hints {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: var(--rcn-space-4);
+}
+
+.hud-hint {
+    flex-direction: row;
+    align-items: center;
+    margin: 0 var(--rcn-space-4);
+}
+
+.hud-hint-label {
+    color: var(--rcn-text-muted);
+    padding: 0;
+    margin-left: var(--rcn-space-2);
+}

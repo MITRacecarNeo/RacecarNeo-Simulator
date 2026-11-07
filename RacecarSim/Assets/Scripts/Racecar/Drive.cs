@@ -62,10 +62,10 @@ public class Drive : RacecarModule
 
     /// <summary>
     /// The ESC's drag brake at Speed 0: total brake torque over all wheels, which with the wheel
-    /// damping slows the car at about 1.4 m/s^2, as measured on the physical car (0.37 m to stop
-    /// from 1.07 m/s).
+    /// damping slows the car at about 1.6 to 1.8 m/s^2, as measured on the physical car
+    /// (firmware v0.9.2: 0.12 m to stop from 0.63 m/s, 0.32 m from 1.05 m/s).
     /// </summary>
-    private const float dragBrakeTorque = 8.0f;
+    private const float dragBrakeTorque = 9.5f;
 
     /// <summary>
     /// The steering angle at full lock (Angle = 1) of a single front wheel on the car's center
@@ -204,6 +204,11 @@ public class Drive : RacecarModule
     private readonly HallEncoder encoder = new HallEncoder();
 
     /// <summary>
+    /// Shapes the target speed like the physical car's response while Real car response is on.
+    /// </summary>
+    private readonly CarResponse response = new CarResponse();
+
+    /// <summary>
     /// True once the battery-empty warning has been shown.
     /// </summary>
     private bool wasCutoffShown;
@@ -295,20 +300,27 @@ public class Drive : RacecarModule
     {
         using SimProfiler.Scope profile = SimProfiler.Measure(SimProfiler.Section.Drive);
         // Speed 0 is neutral, as on the physical car: no drive torque, the ESC's drag brake, and a
-        // cleared integrator. Otherwise feedforward plus PI control holds the target speed. An
-        // empty battery in battery mode leaves the drive neutral.
+        // cleared integrator. Otherwise feedforward plus PI control holds the target speed, which
+        // Real car response shapes like the physical car's. An empty battery in battery mode
+        // leaves the drive neutral.
         float speed = this.IsBatteryCutoff ? 0 : this.Speed;
         float target = speed * this.MaxSpeed * Drive.FullCommandSpeed;
+        float forwardSpeed = Vector3.Dot(this.rBody.linearVelocity, this.transform.forward);
         float torque = 0;
         float brakeTorque = 0;
         if (speed == 0)
         {
             brakeTorque = Drive.dragBrakeTorque / this.WheelColliders.Length;
             this.speedErrorIntegral = 0;
+            this.response.Reset(forwardSpeed);
         }
         else
         {
-            float error = target - Vector3.Dot(this.rBody.linearVelocity, this.transform.forward);
+            if (Settings.IsRealCarResponse)
+            {
+                target = this.response.Step(target, Time.fixedDeltaTime);
+            }
+            float error = target - forwardSpeed;
             float unclamped = Drive.feedforwardTorque * target + Drive.proportionalGain * error + Drive.integralGain * this.speedErrorIntegral;
             torque = Mathf.Clamp(unclamped, -Drive.maxTorque, Drive.maxTorque);
 
@@ -361,13 +373,15 @@ public class Drive : RacecarModule
         foreach (WheelPosition wheelPosition in Drive.wheelPositions)
         {
             // The contact offset changes at a limited rate: a wheel that touches the ground only
-            // on some physics steps in a hard turn would otherwise jump between the two heights
+            // on some physics steps in a hard turn would otherwise jump between the two heights.
+            // A lifted wheel keeps its offset, so it lands near its contact point
             int index = (int)wheelPosition;
             WheelCollider wheelCollider = this.WheelColliders[index];
             wheelCollider.GetWorldPose(out Vector3 position, out Quaternion rotation);
+            float targetOffset = wheelCollider.isGrounded ? Drive.ContactOffset(wheelCollider, position) : this.wheelContactOffsets[index];
             this.wheelContactOffsets[index] = Mathf.MoveTowards(
                 this.wheelContactOffsets[index],
-                Drive.ContactOffset(wheelCollider, position),
+                targetOffset,
                 Drive.maxContactOffsetRate * Time.fixedDeltaTime);
             this.Wheels[index].transform.SetPositionAndRotation(position + wheelCollider.transform.up * this.wheelContactOffsets[index], rotation);
         }

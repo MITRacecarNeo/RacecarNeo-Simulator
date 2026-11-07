@@ -395,4 +395,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GrandPrixFiles/GrandPrix2026.unity
     guid: 8e5f3f2e5cf4d0b45b3ab543d90db97c
+  - enabled: 1
+    path: Assets/Scenes/CarWorld.unity
+    guid: 5e29feb028f3b5c4aadfdba603388a65
   m_configObjects: {}

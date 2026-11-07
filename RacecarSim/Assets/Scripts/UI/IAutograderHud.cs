@@ -38,4 +38,19 @@ public interface IAutograderHud
     /// <param name="bonus">The maximum time in seconds which the user can spend and still receive the current bonus.</param>
     /// <param name="isLastBracket">True if this is the last time bracket.</param>
     void SetTimeBonus(float maxTime, float bonus, bool isLastBracket);
+
+    /// <summary>
+    /// Shows where the time-bonus brackets end on the time limit.
+    /// </summary>
+    /// <param name="timeLimit">The level's time limit in seconds.</param>
+    /// <param name="bracketTimes">The end of each bonus bracket in seconds; empty when the level has none.</param>
+    void SetTimeBrackets(float timeLimit, float[] bracketTimes);
+
+    /// <summary>
+    /// Shows the result of the level that just finished, before the next level loads.
+    /// </summary>
+    /// <param name="levelIndex">The 0-based index of the finished autograder level.</param>
+    /// <param name="score">The points earned, including any time bonus.</param>
+    /// <param name="maxScore">The level's maximum points.</param>
+    void ShowTrialResult(int levelIndex, float score, float maxScore);
 }

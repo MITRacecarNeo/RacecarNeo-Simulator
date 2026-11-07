@@ -139,6 +139,26 @@ public static class RacecarPrefabSetup
     private const int PlayerLayer = 9;
 
     /// <summary>
+    /// Adds CarModelDetail to the car prefab, pointed at the detail models, and saves the prefab.
+    /// Apply also does this; this step leaves the rest of the prefab as it is. Batch use:
+    /// <c>Unity.exe -batchmode -quit -projectPath . -executeMethod RacecarPrefabSetup.ApplyModelDetail</c>
+    /// </summary>
+    public static void ApplyModelDetail()
+    {
+        GameObject root = PrefabUtility.LoadPrefabContents(RacecarPrefabSetup.PrefabPath);
+        try
+        {
+            RacecarPrefabSetup.ApplyModelDetailTo(root);
+            PrefabUtility.SaveAsPrefabAsset(root, RacecarPrefabSetup.PrefabPath);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+        Debug.Log($"RacecarPrefabSetup: CarModelDetail on {RacecarPrefabSetup.PrefabPath}");
+    }
+
+    /// <summary>
     /// Rebuilds the car prefab geometry from the model and saves the prefab.
     /// </summary>
     public static void Apply()
@@ -275,6 +295,26 @@ public static class RacecarPrefabSetup
         {
             part.gameObject.layer = RacecarPrefabSetup.PlayerLayer;
         }
+
+        RacecarPrefabSetup.ApplyModelDetailTo(root);
+    }
+
+    private static void ApplyModelDetailTo(GameObject root)
+    {
+        CarModelDetail detail = root.GetComponent<CarModelDetail>();
+        if (detail == null)
+        {
+            detail = root.AddComponent<CarModelDetail>();
+        }
+        SerializedObject detailObject = new SerializedObject(detail);
+        detailObject.FindProperty("model").objectReferenceValue = root.transform.Find("TransformShift/" + RacecarPrefabSetup.ModelName);
+        SerializedProperty models = detailObject.FindProperty("models");
+        models.arraySize = RacecarModelImport.DetailModelPaths.Length;
+        for (int i = 0; i < models.arraySize; i++)
+        {
+            models.GetArrayElementAtIndex(i).objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>(RacecarModelImport.DetailModelPaths[i]);
+        }
+        detailObject.ApplyModifiedPropertiesWithoutUndo();
     }
 
     /// <summary>

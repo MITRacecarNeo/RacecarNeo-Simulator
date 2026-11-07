@@ -16,7 +16,7 @@ using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 /// </summary>
 /// <remarks>
 /// Batch mode:
-/// <code>Unity -batchmode -quit -projectPath . -executeMethod PlayerBuilds.BuildAllBatch [-racecarsim-build-output DIR]</code>
+/// <code>Unity -batchmode -quit -projectPath . -executeMethod PlayerBuilds.BuildAllBatch [-racecarsim-build-output DIR] [-racecarsim-build-version VERSION] [-racecarsim-build-platforms Windows,Mac,Linux]</code>
 /// <code>Unity -batchmode -quit -projectPath . -executeMethod PlayerBuilds.CompileAllBatch</code>
 /// </remarks>
 public static class PlayerBuilds
@@ -35,6 +35,17 @@ public static class PlayerBuilds
     /// Command-line option overriding the build output root (default: Builds/ in the project).
     /// </summary>
     private const string outputOption = "-racecarsim-build-output";
+
+    /// <summary>
+    /// Command-line option giving the version for this build only (default: PlayerSettings.bundleVersion).
+    /// The setting is restored after the build, so the project file does not change.
+    /// </summary>
+    private const string versionOption = "-racecarsim-build-version";
+
+    /// <summary>
+    /// Command-line option limiting the build to a comma-separated list of Platforms folder names.
+    /// </summary>
+    private const string platformsOption = "-racecarsim-build-platforms";
 
     /// <summary>
     /// The game-code assembly (Assets/Scripts/RacecarSim.asmdef); its presence marks a successful script compile.
@@ -58,7 +69,23 @@ public static class PlayerBuilds
     /// </summary>
     public static void BuildAllBatch()
     {
-        EditorApplication.Exit(PlayerBuilds.Build(PlayerBuilds.OutputRoot()) ? 0 : 1);
+        string projectVersion = PlayerSettings.bundleVersion;
+        string version = PlayerBuilds.Option(PlayerBuilds.versionOption);
+        string platforms = PlayerBuilds.Option(PlayerBuilds.platformsOption);
+        bool succeeded;
+        try
+        {
+            if (version != null)
+            {
+                PlayerSettings.bundleVersion = version;
+            }
+            succeeded = PlayerBuilds.Build(PlayerBuilds.OutputRoot(), platforms?.Split(','));
+        }
+        finally
+        {
+            PlayerSettings.bundleVersion = projectVersion;
+        }
+        EditorApplication.Exit(succeeded ? 0 : 1);
     }
 
     /// <summary>
@@ -73,8 +100,9 @@ public static class PlayerBuilds
     /// Builds every platform into root/v{version}/{platform}. Logs one result line per platform.
     /// </summary>
     /// <param name="root">The output root folder.</param>
+    /// <param name="folders">Platforms folder names to build; all platforms if null.</param>
     /// <returns>True if every build succeeded.</returns>
-    public static bool Build(string root)
+    public static bool Build(string root, string[] folders = null)
     {
         string[] scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(scene => scene.path).ToArray();
         string versionFolder = Path.Combine(root, $"v{PlayerSettings.bundleVersion}");
@@ -90,6 +118,11 @@ public static class PlayerBuilds
 
         foreach ((BuildTarget target, string folder, string executable) in PlayerBuilds.Platforms)
         {
+            if (folders != null && !folders.Contains(folder, StringComparer.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
             BuildPlayerOptions options = new BuildPlayerOptions()
             {
                 scenes = scenes,
@@ -194,10 +227,16 @@ public static class PlayerBuilds
 
     private static string OutputRoot()
     {
+        return PlayerBuilds.Option(PlayerBuilds.outputOption) ?? Path.Combine(Directory.GetCurrentDirectory(), "Builds");
+    }
+
+    /// <summary>
+    /// The value after a command-line option, or null if the option is absent.
+    /// </summary>
+    private static string Option(string name)
+    {
         string[] args = Environment.GetCommandLineArgs();
-        int index = Array.IndexOf(args, PlayerBuilds.outputOption);
-        return index >= 0 && index + 1 < args.Length
-            ? args[index + 1]
-            : Path.Combine(Directory.GetCurrentDirectory(), "Builds");
+        int index = Array.IndexOf(args, name);
+        return index >= 0 && index + 1 < args.Length ? args[index + 1] : null;
     }
 }

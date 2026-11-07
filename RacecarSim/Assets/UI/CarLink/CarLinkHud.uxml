@@ -1,0 +1,54 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="CarLinkHud.uss" />
+    <ui:VisualElement name="car-link" class="cl-root" picking-mode="Ignore">
+        <ui:VisualElement class="rcn-overlay cl-panel">
+            <ui:VisualElement class="cl-title">
+                <ui:VisualElement name="cl-dot" class="cl-dot" />
+                <ui:Label name="cl-status" class="rcn-label" />
+            </ui:VisualElement>
+            <ui:Label name="cl-car" class="rcn-caption rcn-muted cl-car" />
+            <ui:VisualElement class="cl-row">
+                <ui:Label text="Mode" class="rcn-caption rcn-muted cl-key" />
+                <ui:Label name="cl-mode" class="rcn-body cl-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="cl-row">
+                <ui:Label text="Pose" class="rcn-caption rcn-muted cl-key" />
+                <ui:Label name="cl-pose" class="rcn-body cl-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="cl-row">
+                <ui:Label text="World" class="rcn-caption rcn-muted cl-key" />
+                <ui:Label name="cl-world" class="rcn-body rcn-numeric cl-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="cl-row">
+                <ui:Label text="Scan" class="rcn-caption rcn-muted cl-key" />
+                <ui:Label name="cl-scan" class="rcn-body rcn-numeric cl-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="cl-row">
+                <ui:Label text="Battery" class="rcn-caption rcn-muted cl-key" />
+                <ui:Label name="cl-battery" class="rcn-body rcn-numeric cl-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="cl-row">
+                <ui:Label text="Link" class="rcn-caption rcn-muted cl-key" />
+                <ui:Label name="cl-latency" class="rcn-body rcn-numeric cl-value" />
+            </ui:VisualElement>
+            <ui:Label text="MAPPING" class="rcn-eyebrow rcn-muted cl-section" />
+            <ui:Label name="cl-run" class="rcn-body cl-run" />
+            <ui:TextField name="cl-map-name" max-length="48" class="cl-text" />
+            <ui:VisualElement class="cl-map-actions">
+                <ui:Button name="cl-start" text="Start mapping" class="rcn-button" />
+                <ui:Button name="cl-save" text="Save" class="rcn-button rcn-button--secondary cl-map-action" />
+                <ui:Button name="cl-stop" text="Stop" class="rcn-button rcn-button--secondary cl-map-action" />
+            </ui:VisualElement>
+            <ui:VisualElement class="cl-map-actions cl-world-actions">
+                <ui:Button name="cl-save-world" text="Save world" class="rcn-button rcn-button--secondary" />
+                <ui:Button name="cl-clear" text="Clear" class="rcn-button rcn-button--secondary cl-map-action" />
+            </ui:VisualElement>
+            <ui:Label name="cl-world-saved" class="rcn-caption rcn-muted cl-run" />
+            <ui:VisualElement class="cl-actions">
+                <ui:Button name="cl-disconnect" text="Disconnect" class="rcn-button rcn-button--secondary" />
+                <ui:Label text="Esc" class="rcn-key cl-key-hint" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <CarMinimap name="cl-minimap" class="cl-minimap" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -76,9 +76,20 @@ public class LevelInfo
     public string CollectionName;
 
     /// <summary>
+    /// The display name of the level collection to which the level belongs.
+    /// </summary>
+    public string CollectionDisplayName;
+
+    /// <summary>
     /// The message shown at the beginning of the level describing any special features or requirements.
     /// </summary>
     public string HelpMessage;
+
+    /// <summary>
+    /// Stable key for data kept outside LevelCollection (LevelPresentationCatalog): Id when set,
+    /// otherwise the display name as a slug, the same fallback -racecarsim-level accepts.
+    /// </summary>
+    public string Key => string.IsNullOrEmpty(this.Id) ? LaunchOptions.Slug(this.DisplayName) : this.Id;
 
     /// <summary>
     /// The full name of the level, including the level collection to which it belongs.

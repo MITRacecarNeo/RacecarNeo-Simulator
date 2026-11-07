@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -24,6 +25,17 @@ public class AutograderManager : MonoBehaviour
     /// Autograder information about the current level.
     /// </summary>
     public static AutograderLevelInfo LevelInfo { get { return LevelManager.LevelInfo.AutograderLevels[AutograderManager.levelIndex]; } }
+
+    /// <summary>
+    /// How long the HUD shows a finished level's result over the frozen level before the next
+    /// level or the summary loads (interactive runs only; see SceneFlow.Load).
+    /// </summary>
+    public const float TrialResultSeconds = 1.5f;
+
+    /// <summary>
+    /// True during the first level of an autograder run.
+    /// </summary>
+    public static bool IsFirstLevel { get { return AutograderManager.levelIndex == 0; } }
 
     /// <summary>
     /// Reset the autograder for a new lab.
@@ -82,6 +94,8 @@ public class AutograderManager : MonoBehaviour
         this.hud.UpdateScore(this.levelScore, AutograderManager.LevelInfo.MaxPoints);
         this.hud.UpdateTime(0, AutograderManager.LevelInfo.TimeLimit);
 
+        Vector2[] brackets = AutograderManager.LevelInfo.TimeBonuses ?? new Vector2[0];
+        this.hud.SetTimeBrackets(AutograderManager.LevelInfo.TimeLimit, brackets.Select(bracket => bracket.x).ToArray());
         if (AutograderManager.LevelInfo.TimeBonuses != null)
         {
             Vector2 timeBonus = AutograderManager.LevelInfo.TimeBonuses[this.timeBonusIndex];
@@ -254,6 +268,7 @@ public class AutograderManager : MonoBehaviour
                 Score = this.levelScore,
                 Time = this.ElapsedTime
             });
+            this.hud?.ShowTrialResult(AutograderManager.levelIndex, this.levelScore, AutograderManager.LevelInfo.MaxPoints);
 
             if (AutograderManager.levelIndex == LevelManager.LevelInfo.AutograderLevels.Length - 1)
             {

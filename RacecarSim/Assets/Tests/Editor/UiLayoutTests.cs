@@ -9,8 +9,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Guards the serialized references of the UI scripts (for example Hud.modeText,
-/// SettingsUI.colorSliders). The test records the object each reference points to and fails when
+/// Guards the serialized references of the UI scripts (for example RaceScreen.tileTemplate,
+/// MenuShowcase.band). The test records the object each reference points to and fails when
 /// a reference is missing or moves, so a hierarchy edit cannot silently rewire the UI.
 /// </summary>
 public class UiLayoutTests
@@ -23,16 +23,14 @@ public class UiLayoutTests
 
     private static readonly string[] prefabs =
     {
-        "Assets/Prefabs/UI/Hud.prefab", "Assets/Prefabs/UI/RaceScreen.prefab",
-        "Assets/Prefabs/UI/AutograderLevelEntry.prefab", "Assets/Prefabs/UI/BestTimeEntry.prefab"
+        "Assets/Prefabs/UI/Hud.prefab", "Assets/Prefabs/UI/RaceScreen.prefab"
     };
 
     private static readonly string[] scenes = { "Assets/Scenes/Main.unity", "Assets/Scenes/AutograderSummary.unity" };
 
     private static readonly Type[] scriptTypes =
     {
-        typeof(ScreenManager), typeof(SettingsUI), typeof(BestTimesUI), typeof(MainMenu), typeof(AutograderSummary),
-        typeof(NoUsernameUI), typeof(ControlsUI), typeof(AutograderUIEntry), typeof(BestTimeUIEntry)
+        typeof(ScreenManager), typeof(MenuController), typeof(MenuShowcase), typeof(AutograderSummary)
     };
 
     private SceneSetup[] savedSetup;

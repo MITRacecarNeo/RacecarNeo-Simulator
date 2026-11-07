@@ -1,0 +1,204 @@
+/* Autograder results: one card centered on the charcoal stage */
+
+.ags-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    padding: var(--rcn-space-8);
+}
+
+.ags-panel {
+    width: 1200px;
+    max-height: 100%;
+    padding: var(--rcn-space-8);
+}
+
+.ags-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.ags-heading {
+    flex-shrink: 1;
+    margin-right: var(--rcn-space-8);
+}
+
+.ags-title {
+    white-space: normal;
+}
+
+.ags-total {
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.ags-total-time {
+    padding: 0;
+}
+
+.ags-progress {
+    margin: var(--rcn-space-4) 0 var(--rcn-space-6) 0;
+    flex-shrink: 0;
+}
+
+/* Cut-short notice: crimson edge, shown when a required trial failed or the program errored */
+.ags-alert {
+    background-color: var(--rcn-surface);
+    border-left-width: 6px;
+    border-color: var(--rcn-crimson);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    padding: var(--rcn-space-3) var(--rcn-space-4);
+    margin-bottom: var(--rcn-space-4);
+    flex-shrink: 0;
+    display: none;
+}
+
+.ags-alert-text {
+    white-space: normal;
+    color: var(--rcn-text);
+    background-color: var(--rcn-surface);
+    padding: 0;
+}
+
+/* Trial rows: number, title, score bar, score, time */
+
+.ags-trials {
+    flex-shrink: 1;
+}
+
+.ags-row {
+    flex-direction: row;
+    align-items: center;
+    padding: var(--rcn-space-1) 0;
+    border-bottom-width: 1px;
+    border-color: var(--rcn-border);
+}
+
+.ags-row-index {
+    width: 48px;
+    padding: 0;
+}
+
+.ags-row-title {
+    flex-grow: 1;
+    flex-basis: 0;
+    padding: 0;
+}
+
+.ags-row-bar {
+    width: 220px;
+    margin: 0 var(--rcn-space-6);
+}
+
+.ags-row-score {
+    width: 170px;
+    -unity-text-align: middle-right;
+    padding: 0;
+}
+
+.ags-row-time {
+    width: 130px;
+    -unity-text-align: middle-right;
+    padding: 0;
+}
+
+/* Score colors: full credit stays the text color */
+.ags-row-score--partial {
+    color: var(--rcn-gold);
+}
+
+.ags-row-score--none {
+    color: var(--rcn-coral);
+}
+
+.ags-row-score--extra {
+    color: var(--rcn-orange);
+}
+
+.ags-note {
+    margin-top: var(--rcn-space-2);
+    flex-shrink: 0;
+}
+
+/* Course ID and score code: the code field takes the space left and scrolls its text */
+
+.ags-footer {
+    flex-direction: row;
+    align-items: flex-end;
+    margin-top: var(--rcn-space-6);
+    flex-shrink: 0;
+}
+
+.ags-field--username {
+    width: 240px;
+    margin-right: var(--rcn-space-6);
+}
+
+.ags-field--code {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-width: 0;
+}
+
+.ags-username {
+    padding: var(--rcn-space-2) 0;
+}
+
+.ags-code-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.ags-code {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-width: 0;
+    overflow: hidden;
+    margin: 0 var(--rcn-space-3) 0 0;
+}
+
+.ags-code > .unity-text-field__input {
+    -unity-font-definition: url("../../Fonts/JetBrainsMono/JetBrainsMono-Regular.ttf");
+    font-size: var(--rcn-text-sm);
+    background-color: var(--rcn-code-bg);
+    color: var(--rcn-code-text);
+    border-width: 0;
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    padding: var(--rcn-space-2) var(--rcn-space-3);
+}
+
+.ags-copy {
+    min-width: 130px;
+    flex-shrink: 0;
+}
+
+.ags-menu {
+    flex-direction: row;
+    align-items: center;
+    margin-left: var(--rcn-space-6);
+    flex-shrink: 0;
+}
+
+.ags-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.ags-button-label {
+    margin-left: var(--rcn-space-3);
+    padding: 0;
+}

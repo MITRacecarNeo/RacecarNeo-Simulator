@@ -4,10 +4,12 @@ _The MIT Beaver Works RACECAR simulation environment_
 
 You can learn more about RacecarSim and download the current version [here](https://sites.mit.edu/mit-racecar/resources/).
 
-> **Note**: As of update v2.9.3, the Racecar Neo Simulator is built using Unity `v6000.4.5f1`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
+> **Note**: As of update v2.9.5, the Racecar Neo Simulator is built using Unity `v6000.4.5f1`. Any older (or newer) versions of Unity are not supported. Migration to a newer version of Unity or opening the project in an older version of Unity may be risky and cause unexpected results.
 
 ## Table of Contents
 - [Changelog](#changelog)
+    - [v2.9.5](#v295-update---mapped-worlds-1172026)
+    - [v2.9.4](#v294-update---new-look-10102026)
     - [v2.9.3](#v293-update---sensors-and-actuators-1092026)
     - [v2.9.2](#v292-update---model-update-1052026)
     - [v2.9.1](#v291-update---unity-6-and-stability-9272026)
@@ -23,6 +25,90 @@ You can learn more about RacecarSim and download the current version [here](http
 - [Modeling Error](#modeling-error)
 
 ## Changelog
+
+### v2.9.5 Update - Mapped Worlds [11/7/2026]
+**Requirements**
+- No change: use racecar_core `v2.9.3-sim`. Score codes keep their format.
+- BWSI course on Edly: enter the course ID shown on the lab's autograder
+  problem in Settings > Course ID (formerly Username).
+
+**Mapped Worlds**
+- Import a map made by a ROS 2 robot: Map select > Mapped Worlds > Import
+  map, then the path to the map's `.yaml` file (its `.pgm` image in the
+  same folder). The map becomes a level with walls, driven with the keyboard
+  or a Python program like any Exploration level.
+- Each mapped world has its own settings in Map select: wall height (0.3 to
+  2.0 m), how many small specks to remove, and whether to close the map's
+  open edges. Worlds can be deleted.
+- Connecting to a physical RACECAR Neo is not available yet: Connect on the
+  Home screen is grayed out.
+
+**Car**
+- Real car response (Settings, off by default): the car's speed follows the
+  physical car's measured response on firmware v0.9.2. Forward speed
+  overshoots the target by up to about 20% before it settles; reverse
+  settles about 30% above the target. Off, the car holds the commanded
+  speed as before.
+- The car brakes a little harder when the speed is set to 0, as measured on
+  the physical car: about 0.29 m to stop from 1 m/s (was 0.32 m).
+- Tires look solid and stay on the ground in full-lock turns.
+- Car detail (Settings): Low, Medium, or High car models, for slower
+  computers. Driving and sensors are the same at every level.
+
+**Settings**
+- Shell colors per car from numbered swatches, with Sliders, Presets, or a
+  shell Code to copy and paste.
+- "Empty battery stops the car" is now "Car stops when battery runs out".
+
+**Races**
+- Races with 2 to 4 cars show a tile per car with its number, shell color,
+  connection, and speed. Click a car's view to give it Space, C, and the
+  scroll wheel; the loading card shows "Race | N cars".
+
+**Fixes**
+- The score code no longer slides under the Main menu button on the results
+  screen.
+- Selecting an AR marker in levels whose markers have no highlight no longer
+  logs an error.
+
+### v2.9.4 Update - New look [10/10/2026]
+**Requirements**
+- No change: use racecar_core `v2.9.3-sim`. Sensors, physics, grading, and
+  score codes are the same as v2.9.3.
+
+**Menus**
+- New main menu with the RACECAR Neo V2 on a turntable, in its saved shell
+  color.
+- Map select: level cards with pictures, grouped as Sandbox, Labs, Grand
+  Prix, Community, and Legacy, with mode tiles (Exploration, Autograder,
+  Race) and the number of cars.
+- Settings, Best times (with checkpoint splits), and Controls (keyboard and
+  controller, from the current key bindings) screens.
+- A short splash on launch (any key skips it) and a loading card between
+  scenes.
+- Before an autograder run, a reminder to set your username while it is
+  still "Default".
+
+**HUD**
+- Map in the top left (M hides it), lap timer and checkpoint marks in the
+  top right, and the drive mode in the top center.
+- LIDAR, color camera, and depth windows in the bottom left; dot matrix,
+  IMU, battery voltage and current, controller input, the car's body axes,
+  and the speedometer in the bottom right. H hides the sensor windows.
+- The dot matrix window is on by default for new settings, and the battery
+  readout always shows. "Empty battery stops the car" (Settings) only
+  affects driving.
+- A result card when you finish or fail, with the keys to restart or
+  return to the menu.
+
+**Autograder**
+- A ring shows the trial's time limit, with marks where each time bonus
+  ends. Each trial's score shows briefly before the next trial starts.
+- New results screen with a Copy button for the score code.
+
+**Levels**
+- Levels on the standard terrain get stands, mountains, and a sky around
+  them. The car's camera, depth, and LIDAR readings do not change.
 
 ### v2.9.3 Update - Sensors and actuators [10/9/2026]
 **Requirements**

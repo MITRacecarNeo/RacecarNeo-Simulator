@@ -1,0 +1,60 @@
+/* Generated from the RACECAR Neo design tokens. Do not edit by hand. */
+
+:root {
+    --rcn-crimson-deep: #850028;
+    --rcn-crimson: #A01936;
+    --rcn-red: #BC3345;
+    --rcn-coral: #DF7A46;
+    --rcn-orange: #F49A4B;
+    --rcn-gold: #FFB84A;
+    --rcn-ink: #231F20;
+    --rcn-charcoal: #2F2D38;
+    --rcn-slate: #423F52;
+    --rcn-steel: #505166;
+    --rcn-mist: #E3E3EB;
+    --rcn-paper: #FFFFFF;
+    --rcn-hud-blue: #3355AA;
+    --rcn-led-red: #F63C47;
+    --rcn-success: #19686C;
+
+    /* Dark semantic roles (the simulator uses the dark theme only) */
+    --rcn-bg: #2F2D38;
+    --rcn-surface: #423F52;
+    --rcn-text: #FFFFFF;
+    --rcn-text-muted: #E3E3EB;
+    --rcn-accent: #F49A4B;
+    --rcn-on-accent: #231F20;
+    --rcn-accent-hover: #FFB84A;
+    --rcn-link: #F49A4B;
+    --rcn-highlight: #FFB84A;
+    --rcn-on-highlight: #231F20;
+    --rcn-border: #505166;
+    --rcn-focus: #FFB84A;
+    --rcn-code-bg: #232228;
+    --rcn-code-text: #E3E3EB;
+    /* Panel over the 3D view: charcoal at 88% */
+    --rcn-overlay: rgba(47, 45, 56, 0.88);
+
+    --rcn-text-xs: 18px;
+    --rcn-text-sm: 21px;
+    --rcn-text-base: 24px;
+    --rcn-text-lg: 30px;
+    --rcn-text-xl: 38px;
+    --rcn-text-2xl: 46px;
+    --rcn-text-3xl: 58px;
+    --rcn-text-4xl: 74px;
+    --rcn-text-5xl: 92px;
+    --rcn-space-1: 6px;
+    --rcn-space-2: 12px;
+    --rcn-space-3: 18px;
+    --rcn-space-4: 24px;
+    --rcn-space-6: 36px;
+    --rcn-space-8: 48px;
+    --rcn-space-12: 72px;
+    --rcn-space-16: 96px;
+    --rcn-space-24: 144px;
+    --rcn-radius-sm: 6px;
+    --rcn-radius-md: 12px;
+    --rcn-radius-lg: 24px;
+    --rcn-radius-pill: 9999px;
+}

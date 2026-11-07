@@ -185,6 +185,30 @@ public static class Controller
     }
 
     /// <summary>
+    /// The keyboard key that stands in for a controller button.
+    /// </summary>
+    public static KeyCode KeyFor(Button button)
+    {
+        return Controller.keyboardButtonMap[(int)button];
+    }
+
+    /// <summary>
+    /// The keyboard key that stands in for a controller trigger.
+    /// </summary>
+    public static KeyCode KeyFor(Trigger trigger)
+    {
+        return Controller.keyboardTriggerMap[(int)trigger];
+    }
+
+    /// <summary>
+    /// The keyboard keys that stand in for a joystick, ordered left, right, down, up.
+    /// </summary>
+    public static KeyCode[] KeysFor(Joystick joystick)
+    {
+        return (KeyCode[])Controller.keyboardJoystickMap[(int)joystick].Clone();
+    }
+
+    /// <summary>
     /// Returns true if the provided button is pressed.
     /// </summary>
     /// <param name="button">A button on an Xbox controller.</param>

@@ -2,7 +2,7 @@ using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// The HUD dot matrix panel: hidden unless Show dot matrix is on; a frame sent to the car lights
@@ -36,13 +36,13 @@ public class DotMatrixPanelTests
     [UnityTest]
     public IEnumerator HiddenUnlessEnabled()
     {
-        RawImage image = Object.FindAnyObjectByType<DotMatrixPanel>().GetComponentInChildren<RawImage>();
+        VisualElement panel = Object.FindAnyObjectByType<Hud>().GetComponent<UIDocument>().rootVisualElement.Q("dot-matrix");
         Settings.ShowDotMatrix = false;
         yield return null;
-        Assert.IsFalse(image.enabled);
+        Assert.AreEqual(DisplayStyle.None, panel.style.display.value);
         Settings.ShowDotMatrix = true;
         yield return null;
-        Assert.IsTrue(image.enabled);
+        Assert.AreEqual(DisplayStyle.Flex, panel.style.display.value);
     }
 
     [UnityTest]
@@ -56,7 +56,7 @@ public class DotMatrixPanelTests
         yield return null;
         yield return null;
 
-        Texture2D texture = (Texture2D)Object.FindAnyObjectByType<DotMatrixPanel>().GetComponentInChildren<RawImage>().texture;
+        Texture2D texture = Object.FindAnyObjectByType<Hud>().DotMatrix.Texture;
         int cell = texture.width / ActuatorCommands.MatrixColumns;
         Color32 LedCenter(int row, int column) => texture.GetPixel(column * cell + cell / 2, (ActuatorCommands.MatrixRows - 1 - row) * cell + cell / 2);
 

@@ -1,0 +1,1 @@
+{"op":"publish","topic":"\/tf_static","msg":{"transforms":[{"header":{"stamp":{"sec":1792492836,"nanosec":190982079},"frame_id":"base_link"},"child_frame_id":"laser","transform":{"translation":{"x":0.2383,"y":0.0,"z":0.195},"rotation":{"x":0.0,"y":0.0,"z":0.9999944726839327,"w":0.0033248460992105085}}}]}}

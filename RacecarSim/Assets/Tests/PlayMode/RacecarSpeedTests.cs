@@ -49,10 +49,10 @@ public class RacecarSpeedTests
     private const float straightDefaultMaxRise = 0.38f;
     private const float straightFullRise = 1.06f;
     private const float straightHalfRise = 0.62f;
-    private const float straightHalfStopDistance = 9.90f;
-    private const float straightHalfStopTime = 1.16f;
-    private const float straightDefaultMaxStopDistance = 3.24f;
-    private const float straightDefaultMaxStopTime = 0.72f;
+    private const float straightHalfStopDistance = 9.12f;
+    private const float straightHalfStopTime = 1.06f;
+    private const float straightDefaultMaxStopDistance = 2.92f;
+    private const float straightDefaultMaxStopTime = 0.64f;
     private const float circleHalfSpeed = 19.98f;
 
     private Racecar car;
@@ -133,6 +133,32 @@ public class RacecarSpeedTests
         yield return this.DriveRun(1, 0.5f, -1, run);
         RacecarSpeedTests.AssertNear(RacecarSpeedTests.circleHalfSpeed, run.SteadySpeed, "steady speed", run);
     }
+
+    /// <summary>
+    /// Stops from the physical car's speeds at command off (2026-11-07 runs, m/s) within 10 % of
+    /// its measured stopping distances (m).
+    /// </summary>
+    [UnityTest]
+    public IEnumerator Stop_MatchesMeasuredDistances(
+        [ValueSource(nameof(RacecarSpeedTests.measuredStops))] float[] stop)
+    {
+        Run run = new Run();
+        yield return this.DriveRun(1, stop[0] * 10 / Drive.FullCommandSpeed, 0, run);
+        yield return this.Stop(run);
+        float distance = run.StopDistance / 10;
+        Debug.Log($"Measured stop from {stop[0]:F3} m/s: sim {distance:F3} m in {run.StopTime:F2} s, car {stop[1]:F3} m ({distance / stop[1] - 1:P1})");
+        Assert.IsTrue(run.Stopped, "car stopped");
+        Assert.AreEqual(stop[1], distance, 0.10f * stop[1], "stop distance");
+    }
+
+    private static readonly float[][] measuredStops =
+    {
+        new[] { 0.625f, 0.122f },
+        new[] { 0.756f, 0.172f },
+        new[] { 0.906f, 0.266f },
+        new[] { 1.053f, 0.319f },
+        new[] { -1.194f, 0.431f },
+    };
 
     /// <summary>
     /// Places the car at rest on the pad, then drives with the given inputs and records the steady

@@ -1,0 +1,202 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="Menu.uss" />
+    <ui:VisualElement name="menu" class="mn-root">
+        <ui:VisualElement name="home" class="mn-screen mn-home">
+            <ui:VisualElement class="mn-home-column">
+                <ui:VisualElement name="logo" class="mn-logo" />
+                <GradientBar class="rcn-divider mn-divider" />
+                <ui:Button name="play" class="rcn-button mn-play">
+                    <MenuIcon icon="Play" class="mn-icon" />
+                    <ui:Label text="Play" class="mn-button-label" />
+                </ui:Button>
+                <ui:VisualElement class="mn-tiles">
+                    <ui:Button name="best-times" class="mn-tile">
+                        <MenuIcon icon="BestTimes" class="mn-tile-icon" />
+                        <ui:Label text="Best times" class="rcn-label" />
+                    </ui:Button>
+                    <ui:Button name="settings" class="mn-tile">
+                        <MenuIcon icon="Settings" class="mn-tile-icon" />
+                        <ui:Label text="Settings" class="rcn-label" />
+                    </ui:Button>
+                    <ui:Button name="controls" class="mn-tile">
+                        <MenuIcon icon="Controls" class="mn-tile-icon" />
+                        <ui:Label text="Controls" class="rcn-label" />
+                    </ui:Button>
+                    <ui:Button name="connect" class="mn-tile">
+                        <MenuIcon icon="Link" class="mn-tile-icon" />
+                        <ui:Label text="Connect" class="rcn-label" />
+                    </ui:Button>
+                    <ui:Button name="exit" class="mn-tile">
+                        <MenuIcon icon="Exit" class="mn-tile-icon" />
+                        <ui:Label text="Exit" class="rcn-label" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="version" class="mn-version rcn-caption rcn-muted" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="map-select" class="mn-screen mn-map">
+            <ui:VisualElement class="mn-map-top">
+                <ui:Button name="back" class="mn-back">
+                    <MenuIcon icon="Back" class="mn-icon" />
+                </ui:Button>
+                <ui:VisualElement name="tabs" class="mn-tabs" />
+            </ui:VisualElement>
+            <ui:VisualElement class="mn-map-body">
+                <ui:ScrollView name="cards" class="mn-cards" />
+                <ui:VisualElement name="detail" class="rcn-card mn-detail">
+                    <ui:VisualElement name="detail-thumbnail" class="mn-detail-thumbnail" />
+                    <ui:Label name="detail-collection" class="rcn-eyebrow rcn-muted" />
+                    <ui:Label name="detail-title" class="rcn-h2 rcn-motion mn-detail-title" />
+                    <ui:VisualElement name="modes" class="mn-modes" />
+                    <ui:VisualElement name="cars" class="mn-cars">
+                        <ui:Button name="cars-less" text="-" class="mn-step" />
+                        <ui:Label name="cars-count" class="rcn-h3 rcn-numeric mn-cars-count" />
+                        <ui:Button name="cars-more" text="+" class="mn-step" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="world-options" class="mn-world-options">
+                        <ui:VisualElement class="mn-row">
+                            <ui:Label text="Wall height" class="rcn-body mn-row-label" />
+                            <ui:VisualElement name="world-walls" class="mn-segments" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="mn-row">
+                            <ui:Label text="Remove specks" class="rcn-body mn-row-label" />
+                            <ui:VisualElement name="world-specks" class="mn-segments" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="world-close" class="mn-row" />
+                        <ui:Button name="world-delete" text="Delete world" class="rcn-button rcn-button--secondary mn-world-delete" />
+                    </ui:VisualElement>
+                    <ui:Button name="start" class="rcn-button mn-start">
+                        <MenuIcon icon="Play" class="mn-icon" />
+                        <ui:Label text="Start" class="mn-button-label" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-screen" class="mn-screen">
+            <ui:VisualElement class="rcn-overlay mn-side-panel">
+                <ui:VisualElement class="mn-panel-top">
+                    <ui:Button name="settings-back" class="mn-back">
+                        <MenuIcon icon="Back" class="mn-icon" />
+                    </ui:Button>
+                    <ui:Label text="Settings" class="rcn-h2" />
+                </ui:VisualElement>
+                <ui:ScrollView name="settings-rows" class="mn-settings-rows">
+                    <ui:Label text="SENSORS" class="rcn-eyebrow rcn-muted mn-section" />
+                    <ui:VisualElement name="realism" class="mn-row" />
+                    <ui:VisualElement name="hide-cars" class="mn-row" />
+                    <ui:VisualElement class="mn-row">
+                        <ui:Label text="Depth resolution" class="rcn-body mn-row-label" />
+                        <ui:VisualElement name="depth" class="mn-segments" />
+                    </ui:VisualElement>
+                    <ui:Label text="CAR" class="rcn-eyebrow rcn-muted mn-section" />
+                    <ui:VisualElement name="car-response" class="mn-row" />
+                    <ui:VisualElement name="battery" class="mn-row" />
+                    <ui:VisualElement name="dot-matrix" class="mn-row" />
+                    <ui:VisualElement class="mn-row">
+                        <ui:Label text="Car detail" class="rcn-body mn-row-label" />
+                        <ui:VisualElement name="car-detail" class="mn-segments" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="mn-row">
+                        <ui:Label text="Shell/Team Color" class="rcn-body mn-row-label" />
+                        <ui:VisualElement name="cars-swatches" class="mn-swatches" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="shell-pick" class="mn-segments mn-shell-pick" />
+                    <ui:VisualElement name="shell-sliders">
+                        <ui:Slider name="shell-r" low-value="0" high-value="1" class="mn-slider mn-slider--r" />
+                        <ui:Slider name="shell-g" low-value="0" high-value="1" class="mn-slider mn-slider--g" />
+                        <ui:Slider name="shell-b" low-value="0" high-value="1" class="mn-slider mn-slider--b" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="shell-presets" class="mn-presets" />
+                    <ui:TextField name="shell-code" max-length="7" class="mn-text mn-code-text" />
+                    <ui:VisualElement name="shiny" class="mn-row" />
+                    <ui:VisualElement class="mn-row">
+                        <ui:Label text="Course ID" class="rcn-body mn-row-label" />
+                        <ui:TextField name="username" max-length="32" class="mn-text mn-row-text" />
+                    </ui:VisualElement>
+                </ui:ScrollView>
+                <ui:VisualElement class="mn-panel-actions">
+                    <ui:Button name="settings-save" text="Save" class="rcn-button" />
+                    <ui:Button name="settings-cancel" text="Cancel" class="rcn-button rcn-button--secondary mn-action" />
+                    <ui:Button name="settings-defaults" text="Defaults" class="rcn-button rcn-button--secondary mn-action" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="connect-screen" class="mn-screen">
+            <ui:VisualElement class="rcn-overlay mn-side-panel">
+                <ui:VisualElement class="mn-panel-top">
+                    <ui:Button name="connect-back" class="mn-back">
+                        <MenuIcon icon="Back" class="mn-icon" />
+                    </ui:Button>
+                    <ui:Label text="Connect car" class="rcn-h2" />
+                </ui:VisualElement>
+                <ui:ScrollView name="connect-rows" class="mn-settings-rows">
+                    <ui:VisualElement class="mn-row">
+                        <ui:Label text="Address" class="rcn-body mn-row-label" />
+                        <ui:TextField name="connect-host" max-length="64" class="mn-text mn-row-text" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="mn-row">
+                        <ui:Label text="Ports" class="rcn-body mn-row-label" />
+                        <ui:TextField name="connect-bridge-port" max-length="5" class="mn-text mn-port-text" />
+                        <ui:TextField name="connect-api-port" max-length="5" class="mn-text mn-port-text" />
+                    </ui:VisualElement>
+                    <ui:Label name="connect-recent-title" text="RECENT" class="rcn-eyebrow rcn-muted mn-section" />
+                    <ui:VisualElement name="connect-recent" class="mn-recent" />
+                    <ui:Label name="connect-status" class="rcn-body rcn-muted mn-connect-status" />
+                </ui:ScrollView>
+                <ui:VisualElement class="mn-panel-actions">
+                    <ui:Button name="connect-go" text="Connect" class="rcn-button" />
+                    <ui:Button name="connect-cancel" text="Cancel" class="rcn-button rcn-button--secondary mn-action" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="best-times-screen" class="mn-screen mn-map">
+            <ui:VisualElement class="mn-map-top">
+                <ui:Button name="best-times-back" class="mn-back">
+                    <MenuIcon icon="Back" class="mn-icon" />
+                </ui:Button>
+                <MenuIcon icon="BestTimes" class="mn-title-icon" />
+                <ui:Label text="Best times" class="rcn-h2" />
+                <ui:VisualElement class="mn-spacer" />
+                <ui:Button name="best-times-clear" text="Clear" class="rcn-button rcn-button--secondary" />
+            </ui:VisualElement>
+            <ui:ScrollView name="best-times-cards" class="mn-cards" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="controls-screen" class="mn-screen mn-map">
+            <ui:VisualElement class="mn-map-top">
+                <ui:Button name="controls-back" class="mn-back">
+                    <MenuIcon icon="Back" class="mn-icon" />
+                </ui:Button>
+                <MenuIcon icon="Controls" class="mn-title-icon" />
+                <ui:Label text="Controls" class="rcn-h2" />
+            </ui:VisualElement>
+            <ui:ScrollView name="controls-scroll" class="mn-controls">
+                <ui:VisualElement name="controls-columns" class="mn-controls-columns" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="dialog" class="mn-dialog-backdrop">
+            <ui:VisualElement class="rcn-card mn-dialog">
+                <ui:Label name="dialog-title" class="rcn-h3" />
+                <ui:Label name="dialog-text" class="rcn-body rcn-muted mn-dialog-text" />
+                <ui:TextField name="dialog-input" max-length="32" class="mn-text" />
+                <ui:VisualElement class="mn-panel-actions">
+                    <ui:Button name="dialog-ok" text="OK" class="rcn-button" />
+                    <ui:Button name="dialog-other" class="rcn-button rcn-button--secondary mn-action" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="splash" class="mn-splash">
+            <TransitionWipe name="splash-cover" class="mn-splash-cover" />
+            <ui:VisualElement class="mn-splash-content">
+                <ui:VisualElement name="splash-logo" class="mn-splash-logo" />
+                <GradientBar name="splash-bar" class="mn-splash-bar" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

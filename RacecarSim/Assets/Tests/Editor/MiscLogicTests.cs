@@ -11,29 +11,29 @@ public class MiscLogicTests
     public void NextKonamiIndex_FullCodeMatches()
     {
         int matched = 0;
-        foreach (KeyCode key in MainMenu.KonamiCodes)
+        foreach (KeyCode key in KonamiCode.Keys)
         {
-            matched = MainMenu.NextKonamiIndex(matched, key);
+            matched = KonamiCode.NextIndex(matched, key);
         }
-        Assert.AreEqual(MainMenu.KonamiCodes.Length, matched);
+        Assert.AreEqual(KonamiCode.Keys.Length, matched);
     }
 
     [Test]
     public void NextKonamiIndex_ExtraLeadingKeyStillMatches()
     {
-        KeyCode[] typed = new[] { MainMenu.KonamiCodes[0] }.Concat(MainMenu.KonamiCodes).ToArray();
+        KeyCode[] typed = new[] { KonamiCode.Keys[0] }.Concat(KonamiCode.Keys).ToArray();
         int matched = 0;
         foreach (KeyCode key in typed)
         {
-            matched = MainMenu.NextKonamiIndex(matched, key);
+            matched = KonamiCode.NextIndex(matched, key);
         }
-        Assert.AreEqual(MainMenu.KonamiCodes.Length, matched);
+        Assert.AreEqual(KonamiCode.Keys.Length, matched);
     }
 
     [Test]
     public void NextKonamiIndex_UnrelatedKeyResets()
     {
-        Assert.AreEqual(0, MainMenu.NextKonamiIndex(3, KeyCode.Z));
+        Assert.AreEqual(0, KonamiCode.NextIndex(3, KeyCode.Z));
     }
 
     [Test]

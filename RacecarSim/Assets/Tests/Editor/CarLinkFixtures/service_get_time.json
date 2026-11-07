@@ -1,0 +1,1 @@
+{"op":"service_response","service":"\/rosapi\/get_time","values":{"time":{"sec":1792492836,"nanosec":922330009}},"result":true,"id":"t1"}

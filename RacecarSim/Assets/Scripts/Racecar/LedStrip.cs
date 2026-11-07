@@ -5,9 +5,7 @@ using UnityEngine;
 /// when it sets them, otherwise the drive board firmware's battery display.
 /// </summary>
 /// <remarks>
-/// The band mesh's UV x runs from LED 0 at the front-left end, around the rear, to LED 83 at the
-/// front-right end. Each LED lights its own segment of an emission texture; unlit segments show
-/// the band's diffuser color.
+/// LedBandRenderer draws the colors on the band; unlit segments show the band's diffuser color.
 /// </remarks>
 public class LedStrip : RacecarModule
 {
@@ -21,23 +19,9 @@ public class LedStrip : RacecarModule
 
     #region Constants
     /// <summary>
-    /// Texture pixels per LED along the band; the outer pixel of each LED is dimmed so neighboring
-    /// LEDs read as separate dots.
-    /// </summary>
-    private const int pixelsPerLed = 4;
-
-    /// <summary>
     /// The firmware's idle battery display: a red bar filling each end toward the middle.
     /// </summary>
     private static readonly Color32 batteryColor = new Color32(255, 0, 0, 255);
-
-    /// <summary>
-    /// Emission strength of a fully lit LED, so lit segments stand out in daylight scenes.
-    /// </summary>
-    private static readonly Color emissionColor = new Color(1.6f, 1.6f, 1.6f);
-
-    private static readonly int emissionMapId = Shader.PropertyToID("_EmissionMap");
-    private static readonly int emissionColorId = Shader.PropertyToID("_EmissionColor");
     #endregion
 
     #region Public Interface
@@ -59,70 +43,40 @@ public class LedStrip : RacecarModule
     }
 
     /// <summary>
+    /// A rainbow along the index order, LED 0 at the given hue (0 to 1) and the hue rising toward
+    /// LED 83, as in the rainbow reference renders of the car.
+    /// </summary>
+    public static Color32[] RainbowFrame(float startHue)
+    {
+        Color32[] colors = new Color32[ActuatorCommands.LedCount];
+        for (int i = 0; i < colors.Length; i++)
+        {
+            colors[i] = Color.HSVToRGB(Mathf.Repeat(startHue + (float)i / colors.Length, 1), 1, 1);
+        }
+        return colors;
+    }
+
+    /// <summary>
     /// The colors currently shown, LED 0 first.
     /// </summary>
-    public Color32[] Shown { get; private set; }
+    public Color32[] Shown => this.bandRenderer?.Shown;
     #endregion
 
-    private Texture2D texture;
-
-    private Color32[] texturePixels;
-
-    private Material material;
+    private LedBandRenderer bandRenderer;
 
     private void Start()
     {
-        this.texture = new Texture2D(ActuatorCommands.LedCount * LedStrip.pixelsPerLed, 1, TextureFormat.RGBA32, false)
-        {
-            filterMode = FilterMode.Bilinear,
-            wrapMode = TextureWrapMode.Clamp
-        };
-        this.texturePixels = new Color32[this.texture.width];
-
-        // Renderer.material creates a per-car copy, destroyed in OnDestroy
-        this.material = this.band.material;
-        this.material.SetTexture(LedStrip.emissionMapId, this.texture);
-        this.material.SetColor(LedStrip.emissionColorId, LedStrip.emissionColor);
+        this.bandRenderer = new LedBandRenderer(this.band);
     }
 
     private void Update()
     {
-        Color32[] colors = this.racecar.Actuators.GetLeds()
-            ?? LedStrip.BatteryFrame(BatteryModel.ChargeFromVoltage(this.racecar.Readings.BatteryVoltage));
-        if (this.Shown != null && LedStrip.Same(colors, this.Shown))
-        {
-            return;
-        }
-
-        this.Shown = colors;
-        for (int i = 0; i < colors.Length; i++)
-        {
-            Color32 dim = Color32.Lerp(new Color32(0, 0, 0, 255), colors[i], 0.35f);
-            int x = i * LedStrip.pixelsPerLed;
-            this.texturePixels[x] = dim;
-            this.texturePixels[x + 1] = colors[i];
-            this.texturePixels[x + 2] = colors[i];
-            this.texturePixels[x + 3] = dim;
-        }
-        this.texture.SetPixels32(this.texturePixels);
-        this.texture.Apply(false);
+        this.bandRenderer.Show(this.racecar.Actuators.GetLeds()
+            ?? LedStrip.BatteryFrame(BatteryModel.ChargeFromVoltage(this.racecar.Readings.BatteryVoltage)));
     }
 
     private void OnDestroy()
     {
-        Destroy(this.texture);
-        Destroy(this.material);
-    }
-
-    private static bool Same(Color32[] a, Color32[] b)
-    {
-        for (int i = 0; i < a.Length; i++)
-        {
-            if (!a[i].Equals(b[i]))
-            {
-                return false;
-            }
-        }
-        return true;
+        this.bandRenderer?.Dispose();
     }
 }

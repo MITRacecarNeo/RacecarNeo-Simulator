@@ -1,0 +1,875 @@
+/* Main menu: Home over the car turntable, and Map select. Layout at the 1920 x 1080 reference. */
+
+.mn-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.mn-screen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+}
+
+.mn-screen--open {
+    display: flex;
+}
+
+/* Icons */
+
+.mn-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.mn-button-label {
+    margin-left: var(--rcn-space-3);
+    padding: 0;
+}
+
+/* Home */
+
+.mn-home-column {
+    position: absolute;
+    left: var(--rcn-space-16);
+    top: var(--rcn-space-16);
+    bottom: var(--rcn-space-16);
+    width: 760px;
+}
+
+.mn-logo {
+    width: 480px;
+    height: 126px;
+    background-image: url("../Brand/lockup-horizontal-reversed.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.mn-divider {
+    margin-top: var(--rcn-space-8);
+    margin-bottom: var(--rcn-space-12);
+}
+
+.mn-play {
+    flex-direction: row;
+    align-self: flex-start;
+    align-items: center;
+    font-size: var(--rcn-text-xl);
+    padding: 24px 48px;
+}
+
+.mn-tiles {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: var(--rcn-space-8);
+}
+
+.mn-tile {
+    width: 120px;
+    height: 120px;
+    margin: 0 var(--rcn-space-4) var(--rcn-space-4) 0;
+    padding: var(--rcn-space-3);
+    align-items: center;
+    justify-content: center;
+    background-color: var(--rcn-overlay);
+    color: var(--rcn-text);
+    border-width: 2px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-lg);
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: var(--rcn-radius-lg);
+    border-bottom-right-radius: var(--rcn-radius-lg);
+    transition-property: border-color, scale;
+    transition-duration: 0.12s;
+}
+
+.mn-tile:hover {
+    border-color: var(--rcn-accent);
+}
+
+.mn-tile:focus {
+    border-color: var(--rcn-focus);
+    scale: 1.05 1.05;
+}
+
+.mn-tile:disabled,
+.mn-tile:disabled:hover {
+    border-color: var(--rcn-border);
+    opacity: 0.3;
+}
+
+/* Unity's label box keeps text a little left of the box center; zero it inside tiles */
+.mn-tile > .rcn-label {
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+}
+
+.mn-tile-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--rcn-space-2);
+}
+
+.mn-version {
+    position: absolute;
+    left: var(--rcn-space-16);
+    bottom: var(--rcn-space-8);
+}
+
+/* Map select */
+
+.mn-map {
+    background-color: var(--rcn-overlay);
+    padding: var(--rcn-space-12) var(--rcn-space-16);
+}
+
+.mn-map-top {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: var(--rcn-space-8);
+}
+
+.mn-back {
+    width: 72px;
+    height: 72px;
+    margin: 0 var(--rcn-space-8) 0 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--rcn-text);
+    border-width: 2px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-pill);
+    border-top-right-radius: var(--rcn-radius-pill);
+    border-bottom-left-radius: var(--rcn-radius-pill);
+    border-bottom-right-radius: var(--rcn-radius-pill);
+}
+
+.mn-back:focus {
+    border-color: var(--rcn-focus);
+}
+
+.mn-tabs {
+    flex-direction: row;
+}
+
+.mn-tab {
+    -unity-font-definition: url("../../Fonts/BarlowSemiCondensed/BarlowSemiCondensed-Bold.ttf");
+    font-size: var(--rcn-text-xl);
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--rcn-text-muted);
+    border-width: 0 0 4px 0;
+    border-color: rgba(0, 0, 0, 0);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin: 0 var(--rcn-space-6) 0 0;
+    padding: var(--rcn-space-2) 0;
+}
+
+.mn-tab:hover {
+    color: var(--rcn-text);
+}
+
+.mn-tab--selected {
+    color: var(--rcn-text);
+    border-color: var(--rcn-accent);
+}
+
+.mn-tab:focus {
+    color: var(--rcn-focus);
+}
+
+.mn-map-body {
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.mn-cards {
+    flex-grow: 1;
+    margin-right: var(--rcn-space-8);
+}
+
+.mn-card {
+    width: 336px;
+    margin: 0 var(--rcn-space-4) var(--rcn-space-4) 0;
+    padding: 0;
+    background-color: var(--rcn-bg);
+    color: var(--rcn-text);
+    border-width: 3px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-lg);
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: var(--rcn-radius-lg);
+    border-bottom-right-radius: var(--rcn-radius-lg);
+    overflow: hidden;
+    transition-property: border-color, scale;
+    transition-duration: 0.12s;
+}
+
+.mn-card:hover {
+    border-color: var(--rcn-accent);
+}
+
+.mn-card--selected {
+    border-color: var(--rcn-accent);
+}
+
+.mn-card:focus {
+    border-color: var(--rcn-focus);
+    scale: 1.03 1.03;
+}
+
+.mn-card-thumbnail {
+    height: 186px;
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.mn-card-footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--rcn-space-2) var(--rcn-space-3);
+    min-height: 60px;
+}
+
+.mn-card-name {
+    flex-shrink: 1;
+    white-space: normal;
+    padding: 0;
+}
+
+.mn-card-best {
+    flex-direction: row;
+    align-items: center;
+    color: var(--rcn-highlight);
+    margin-left: var(--rcn-space-2);
+}
+
+.mn-card-best-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: var(--rcn-space-1);
+}
+
+.mn-card-best-time {
+    font-size: var(--rcn-text-xs);
+    padding: 0;
+}
+
+.mn-detail {
+    width: 600px;
+    flex-shrink: 0;
+}
+
+.mn-detail-thumbnail {
+    height: 300px;
+    min-height: 140px;
+    flex-shrink: 1;
+    margin-bottom: var(--rcn-space-6);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.mn-detail-title {
+    white-space: normal;
+    flex-shrink: 0;
+    margin-bottom: var(--rcn-space-6);
+}
+
+/* Mapped world settings in the map select detail */
+
+.mn-world-options {
+    flex-shrink: 0;
+    margin-bottom: var(--rcn-space-4);
+}
+
+.mn-world-options .mn-row {
+    min-height: 44px;
+}
+
+.mn-world-options .mn-row-label {
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-right: var(--rcn-space-3);
+}
+
+.mn-world-options .mn-segments {
+    flex-grow: 1;
+    flex-shrink: 1;
+    justify-content: flex-end;
+}
+
+.mn-world-options .mn-segment {
+    padding: var(--rcn-space-1) var(--rcn-space-2);
+}
+
+.mn-world-delete {
+    align-self: flex-start;
+    margin-top: var(--rcn-space-2);
+}
+
+.mn-card-import {
+    align-items: center;
+    justify-content: center;
+}
+
+.mn-card-import-icon {
+    width: 72px;
+    height: 72px;
+    color: var(--rcn-text-muted);
+}
+
+.mn-modes {
+    flex-direction: row;
+    flex-shrink: 0;
+    margin-bottom: var(--rcn-space-6);
+}
+
+.mn-mode {
+    flex-grow: 1;
+    flex-basis: 0;
+    height: 108px;
+    margin: 0 var(--rcn-space-3) 0 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--rcn-text);
+    border-width: 2px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+}
+
+.mn-mode:hover {
+    border-color: var(--rcn-accent-hover);
+}
+
+.mn-mode--selected {
+    color: var(--rcn-accent);
+    border-color: var(--rcn-accent);
+}
+
+.mn-mode:focus {
+    border-color: var(--rcn-focus);
+}
+
+.mn-mode:disabled {
+    opacity: 0.3;
+}
+
+.mn-mode-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--rcn-space-2);
+}
+
+.mn-cars {
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: center;
+    margin-bottom: var(--rcn-space-6);
+}
+
+.mn-step {
+    width: 56px;
+    height: 56px;
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-Bold.ttf");
+    font-size: var(--rcn-text-xl);
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--rcn-text);
+    border-width: 2px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-pill);
+    border-top-right-radius: var(--rcn-radius-pill);
+    border-bottom-left-radius: var(--rcn-radius-pill);
+    border-bottom-right-radius: var(--rcn-radius-pill);
+    margin: 0;
+    padding: 0;
+}
+
+.mn-step:focus {
+    border-color: var(--rcn-focus);
+}
+
+.mn-cars-count {
+    width: 72px;
+    -unity-text-align: middle-center;
+}
+
+.mn-start {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--rcn-text-lg);
+    margin-top: auto;
+}
+
+/* Side panel screens (Settings) leave the car visible on the right for the shell preview */
+
+.mn-side-panel {
+    position: absolute;
+    left: var(--rcn-space-12);
+    top: var(--rcn-space-8);
+    bottom: var(--rcn-space-8);
+    width: 760px;
+    padding: var(--rcn-space-6) var(--rcn-space-8);
+}
+
+.mn-panel-top {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: var(--rcn-space-4);
+}
+
+.mn-title-icon {
+    width: 44px;
+    height: 44px;
+    margin-right: var(--rcn-space-4);
+}
+
+.mn-spacer {
+    flex-grow: 1;
+}
+
+.mn-settings-rows {
+    flex-grow: 1;
+}
+
+.mn-section {
+    margin-top: var(--rcn-space-4);
+    margin-bottom: var(--rcn-space-1);
+}
+
+.mn-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 50px;
+}
+
+.mn-row-label {
+    flex-grow: 1;
+    padding: 0;
+}
+
+/* Switch: a pill button with a knob, accent fill when on */
+
+.mn-switch {
+    width: 84px;
+    height: 44px;
+    margin: 0;
+    padding: 4px;
+    background-color: var(--rcn-surface);
+    border-width: 2px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    justify-content: center;
+}
+
+.mn-switch:focus {
+    border-color: var(--rcn-focus);
+}
+
+.mn-switch--on {
+    background-color: var(--rcn-accent);
+    border-color: var(--rcn-accent);
+}
+
+.mn-knob {
+    width: 32px;
+    height: 32px;
+    background-color: var(--rcn-text);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+    translate: 0 0;
+    transition-property: translate;
+    transition-duration: 0.12s;
+}
+
+.mn-switch--on .mn-knob {
+    translate: 36px 0;
+}
+
+/* Segmented picker */
+
+.mn-segments {
+    flex-direction: row;
+}
+
+.mn-segment {
+    margin: 0 0 0 var(--rcn-space-2);
+    padding: var(--rcn-space-2) var(--rcn-space-4);
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--rcn-text);
+    border-width: 2px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+}
+
+.mn-segment:focus {
+    border-color: var(--rcn-focus);
+}
+
+.mn-segment--selected {
+    background-color: var(--rcn-accent);
+    color: var(--rcn-on-accent);
+    border-color: var(--rcn-accent);
+}
+
+/* Shell swatches, one per car */
+
+.mn-swatches {
+    flex-direction: row;
+}
+
+.mn-swatch {
+    width: 52px;
+    height: 52px;
+    margin: 0 0 0 var(--rcn-space-3);
+    border-width: 3px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-pill);
+    border-top-right-radius: var(--rcn-radius-pill);
+    border-bottom-left-radius: var(--rcn-radius-pill);
+    border-bottom-right-radius: var(--rcn-radius-pill);
+}
+
+.mn-swatch--selected {
+    border-color: var(--rcn-accent);
+}
+
+.mn-swatch:focus {
+    border-color: var(--rcn-focus);
+}
+
+/* Car number on each swatch, on its own chip so it reads on any shell color */
+.mn-swatch {
+    align-items: center;
+    justify-content: center;
+}
+
+.mn-swatch-number {
+    width: 26px;
+    height: 26px;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-SemiBold.ttf");
+    font-size: var(--rcn-text-xs);
+    color: var(--rcn-text);
+    background-color: var(--rcn-bg);
+    border-top-left-radius: var(--rcn-radius-pill);
+    border-top-right-radius: var(--rcn-radius-pill);
+    border-bottom-left-radius: var(--rcn-radius-pill);
+    border-bottom-right-radius: var(--rcn-radius-pill);
+    padding: 0;
+    margin: 0;
+}
+
+.mn-shell-pick {
+    margin: var(--rcn-space-2) 0 var(--rcn-space-2) 0;
+    justify-content: flex-end;
+}
+
+/* Preset shell colors for the selected car */
+
+.mn-presets {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin: var(--rcn-space-2) 0;
+}
+
+.mn-preset {
+    width: 40px;
+    height: 40px;
+    margin: 0 0 var(--rcn-space-2) var(--rcn-space-2);
+    border-width: 3px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+}
+
+.mn-preset--selected {
+    border-color: var(--rcn-accent);
+}
+
+.mn-preset:focus {
+    border-color: var(--rcn-focus);
+}
+
+.mn-code-text {
+    align-self: flex-end;
+    width: 200px;
+}
+
+/* Sliders */
+
+.mn-slider {
+    margin: 0;
+    height: 40px;
+}
+
+.mn-slider .unity-base-slider__tracker {
+    height: 10px;
+    margin-top: -5px;
+    background-color: var(--rcn-surface);
+    border-width: 0;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.mn-slider .unity-base-slider__dragger {
+    width: 28px;
+    height: 28px;
+    margin-top: -14px;
+    background-color: var(--rcn-text);
+    border-width: 3px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+}
+
+.mn-slider:focus .unity-base-slider__dragger {
+    border-color: var(--rcn-focus);
+}
+
+/* Channel thumbs in the full red, green, and blue they set on the shell, outside the palette */
+.mn-slider--r .unity-base-slider__dragger {
+    background-color: rgb(255, 0, 0);
+}
+
+.mn-slider--g .unity-base-slider__dragger {
+    background-color: rgb(0, 255, 0);
+}
+
+.mn-slider--b .unity-base-slider__dragger {
+    background-color: rgb(0, 0, 255);
+}
+
+/* Text input */
+
+.mn-text {
+    margin: var(--rcn-space-2) 0;
+}
+
+.mn-text .unity-text-field__input {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-Medium.ttf");
+    font-size: var(--rcn-text-base);
+    background-color: var(--rcn-surface);
+    color: var(--rcn-text);
+    border-width: 2px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    padding: var(--rcn-space-2) var(--rcn-space-3);
+}
+
+.mn-row-text {
+    width: 380px;
+}
+
+.mn-text:focus .unity-text-field__input {
+    border-color: var(--rcn-focus);
+}
+
+.mn-panel-actions {
+    flex-direction: row;
+    margin-top: var(--rcn-space-4);
+}
+
+.mn-action {
+    margin-left: var(--rcn-space-4);
+}
+
+/* Best times cards add a split bar */
+
+.mn-splits {
+    flex-direction: row;
+    height: 8px;
+    margin: 0 var(--rcn-space-3) var(--rcn-space-3) var(--rcn-space-3);
+}
+
+.mn-split {
+    height: 8px;
+    margin-right: 2px;
+    background-color: var(--rcn-steel);
+}
+
+.mn-split--alternate {
+    background-color: var(--rcn-mist);
+}
+
+.mn-card-time {
+    color: var(--rcn-text-muted);
+}
+
+/* Controls */
+
+/* One to three columns, chosen from the width (MenuController.LayoutControls); the columns share
+   the width so nothing runs off the side, and a short window scrolls */
+.mn-controls {
+    flex-grow: 1;
+}
+
+.mn-controls-columns {
+    flex-direction: row;
+}
+
+.mn-controls-column {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: var(--rcn-space-8);
+}
+
+.mn-controls-column:last-child {
+    margin-right: 0;
+}
+
+.mn-controls-section {
+    margin-bottom: var(--rcn-space-4);
+}
+
+.mn-binding {
+    flex-direction: row;
+    align-items: center;
+    min-height: 50px;
+    border-bottom-width: 1px;
+    border-color: var(--rcn-border);
+}
+
+.mn-binding-action {
+    width: 36%;
+    padding: 0;
+}
+
+.mn-binding-keys {
+    flex-direction: row;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.mn-pad {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-SemiBold.ttf");
+    font-size: var(--rcn-text-xs);
+    color: var(--rcn-highlight);
+    width: 22%;
+    -unity-text-align: middle-right;
+    padding: 0;
+}
+
+/* Dialog */
+
+.mn-dialog-backdrop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--rcn-overlay);
+    align-items: center;
+    justify-content: center;
+    display: none;
+}
+
+.mn-dialog-backdrop--open {
+    display: flex;
+}
+
+.mn-dialog {
+    width: 760px;
+}
+
+.mn-dialog-text {
+    white-space: normal;
+    margin: var(--rcn-space-3) 0;
+}
+
+/* Splash (MenuSplash): logo and gradient bar on the charcoal cover */
+
+.mn-splash {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+}
+
+.mn-splash-cover {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.mn-splash-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.mn-splash-logo {
+    width: 760px;
+    height: 200px;
+    background-image: url("../Brand/lockup-horizontal-reversed.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.mn-splash-bar {
+    width: 760px;
+    height: 8px;
+    margin-top: var(--rcn-space-8);
+}
+
+.mn-port-text {
+    width: 120px;
+    margin-right: var(--rcn-space-2);
+}
+
+.mn-recent {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.mn-recent-car {
+    margin-bottom: var(--rcn-space-2);
+}
+
+.mn-connect-status {
+    margin-top: var(--rcn-space-4);
+    white-space: normal;
+}

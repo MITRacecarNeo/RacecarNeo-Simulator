@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="tile" class="race-tile" picking-mode="Ignore">
+        <ui:VisualElement name="view" class="race-view">
+            <ui:VisualElement name="badge" class="race-badge">
+                <ui:VisualElement name="swatch" class="race-swatch" />
+                <ui:Label name="car-label" class="rcn-label race-car-label" />
+                <ui:VisualElement name="connection" class="hud-connection" />
+            </ui:VisualElement>
+            <ui:VisualElement name="readouts" class="race-readouts">
+                <SpeedGauge name="gauge" class="race-gauge" />
+            </ui:VisualElement>
+            <ui:Label name="waiting" text="Awaiting connection from a Python program..." class="rcn-body race-waiting" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

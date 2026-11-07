@@ -37,11 +37,11 @@ public static class PlayModeLevels
     /// <summary>
     /// Loads a level scene as the main menu would, then waits for its LevelManager to start.
     /// </summary>
-    public static IEnumerator Load(LevelInfo level, LevelManagerMode mode, int buildIndex)
+    public static IEnumerator Load(LevelInfo level, LevelManagerMode mode, int buildIndex, int cars = 1)
     {
         LevelManager.LevelInfo = level;
         LevelManager.LevelManagerMode = mode;
-        LevelManager.NumPlayers = 1;
+        LevelManager.NumPlayers = cars;
         SceneManager.LoadScene(buildIndex, LoadSceneMode.Single);
         yield return PlayModeLevels.WaitFor(() => SceneManager.GetActiveScene().buildIndex == buildIndex, $"scene {buildIndex} to load");
 

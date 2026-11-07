@@ -1,0 +1,236 @@
+/* RACECAR Neo simulator components. Colors come only from Tokens.uss variables.
+   Text weights map to font files: USS selects a file, not a numeric weight. */
+
+:root {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-Regular.ttf");
+    font-size: var(--rcn-text-base);
+    color: var(--rcn-text);
+}
+
+/* Surfaces */
+
+.rcn-screen {
+    flex-grow: 1;
+    background-color: var(--rcn-bg);
+    color: var(--rcn-text);
+}
+
+.rcn-overlay {
+    background-color: var(--rcn-overlay);
+    color: var(--rcn-text);
+    border-top-left-radius: var(--rcn-radius-lg);
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: var(--rcn-radius-lg);
+    border-bottom-right-radius: var(--rcn-radius-lg);
+    padding: var(--rcn-space-8);
+}
+
+.rcn-surface {
+    background-color: var(--rcn-surface);
+    color: var(--rcn-text);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    padding: var(--rcn-space-4);
+}
+
+.rcn-card {
+    background-color: var(--rcn-bg);
+    color: var(--rcn-text);
+    border-width: 1px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-lg);
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: var(--rcn-radius-lg);
+    border-bottom-right-radius: var(--rcn-radius-lg);
+    padding: var(--rcn-space-6);
+    overflow: hidden;
+}
+
+/* Text */
+
+.rcn-display {
+    -unity-font-definition: url("../../Fonts/BarlowSemiCondensed/BarlowSemiCondensed-ExtraBold.ttf");
+    font-size: var(--rcn-text-5xl);
+}
+
+.rcn-h1 {
+    -unity-font-definition: url("../../Fonts/BarlowSemiCondensed/BarlowSemiCondensed-Bold.ttf");
+    font-size: var(--rcn-text-4xl);
+}
+
+.rcn-h2 {
+    -unity-font-definition: url("../../Fonts/BarlowSemiCondensed/BarlowSemiCondensed-Bold.ttf");
+    font-size: var(--rcn-text-3xl);
+}
+
+.rcn-h3 {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-SemiBold.ttf");
+    font-size: var(--rcn-text-xl);
+}
+
+.rcn-h4 {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-SemiBold.ttf");
+    font-size: var(--rcn-text-lg);
+}
+
+/* Italic Semi Condensed is the motion voice for headlines and badges */
+.rcn-motion {
+    -unity-font-definition: url("../../Fonts/BarlowSemiCondensed/BarlowSemiCondensed-ExtraBoldItalic.ttf");
+}
+
+.rcn-body {
+    font-size: var(--rcn-text-base);
+}
+
+.rcn-label {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-Medium.ttf");
+    font-size: var(--rcn-text-sm);
+}
+
+.rcn-caption {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-Medium.ttf");
+    font-size: var(--rcn-text-xs);
+}
+
+/* USS has no text-transform: eyebrow text is written in uppercase */
+.rcn-eyebrow {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-SemiBold.ttf");
+    font-size: var(--rcn-text-xs);
+    letter-spacing: 1.5px;
+}
+
+.rcn-muted {
+    color: var(--rcn-text-muted);
+}
+
+.rcn-code {
+    -unity-font-definition: url("../../Fonts/JetBrainsMono/JetBrainsMono-Regular.ttf");
+    font-size: var(--rcn-text-sm);
+    background-color: var(--rcn-code-bg);
+    color: var(--rcn-code-text);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    padding: var(--rcn-space-2) var(--rcn-space-3);
+}
+
+/* Numbers that change in place (speeds, sensor values): monospaced digits */
+.rcn-numeric {
+    -unity-font-definition: url("../../Fonts/JetBrainsMono/JetBrainsMono-SemiBold.ttf");
+}
+
+/* Buttons */
+
+.rcn-button {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-SemiBold.ttf");
+    font-size: var(--rcn-text-base);
+    background-color: var(--rcn-accent);
+    color: var(--rcn-on-accent);
+    border-width: 2px;
+    border-color: var(--rcn-accent);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    padding: 18px 30px;
+    margin: 0;
+    transition-property: background-color, border-color, scale;
+    transition-duration: 0.12s;
+}
+
+.rcn-button:hover {
+    background-color: var(--rcn-accent-hover);
+    border-color: var(--rcn-accent-hover);
+    color: var(--rcn-on-accent);
+}
+
+.rcn-button:focus {
+    border-color: var(--rcn-focus);
+    scale: 1.04 1.04;
+}
+
+.rcn-button:active {
+    scale: 0.98 0.98;
+}
+
+.rcn-button:disabled {
+    opacity: 0.4;
+}
+
+.rcn-button--secondary {
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--rcn-accent);
+    border-color: var(--rcn-accent);
+}
+
+.rcn-button--secondary:hover {
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--rcn-accent-hover);
+    border-color: var(--rcn-accent-hover);
+}
+
+/* Badges (ParallelogramElement draws the leaning fill from --fill) */
+
+.rcn-badge {
+    -unity-font-definition: url("../../Fonts/Barlow/Barlow-Bold.ttf");
+    font-size: var(--rcn-text-xs);
+    --fill: var(--rcn-highlight);
+    color: var(--rcn-on-highlight);
+    padding: var(--rcn-space-1) var(--rcn-space-4);
+    -unity-text-align: middle-center;
+    align-self: flex-start;
+}
+
+/* Lap timer: card fill, monospace digits so the width holds while counting */
+.rcn-timer-badge {
+    -unity-font-definition: url("../../Fonts/JetBrainsMono/JetBrainsMono-SemiBold.ttf");
+    font-size: var(--rcn-text-2xl);
+    --fill: var(--rcn-bg);
+    color: var(--rcn-text);
+    padding: var(--rcn-space-2) var(--rcn-space-8);
+    -unity-text-align: middle-center;
+    align-self: flex-start;
+}
+
+/* Gradient bar (GradientBar draws gradient.mark) */
+
+.rcn-divider {
+    height: 6px;
+    width: 144px;
+}
+
+.rcn-progress {
+    height: var(--rcn-space-2);
+}
+
+/* Focus outline for focusable elements other than buttons */
+.rcn-focusable:focus {
+    border-width: 2px;
+    border-color: var(--rcn-focus);
+}
+
+/* Key caps (Controls screen, HUD hints) */
+
+.rcn-key {
+    -unity-font-definition: url("../../Fonts/JetBrainsMono/JetBrainsMono-SemiBold.ttf");
+    font-size: var(--rcn-text-xs);
+    background-color: var(--rcn-surface);
+    color: var(--rcn-text);
+    border-width: 0 0 3px 0;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-sm);
+    border-top-right-radius: var(--rcn-radius-sm);
+    border-bottom-left-radius: var(--rcn-radius-sm);
+    border-bottom-right-radius: var(--rcn-radius-sm);
+    padding: var(--rcn-space-1) var(--rcn-space-2);
+    margin: var(--rcn-space-1) var(--rcn-space-2) var(--rcn-space-1) 0;
+}
+
+.rcn-key-join {
+    color: var(--rcn-text-muted);
+    margin: 0 var(--rcn-space-2) 0 0;
+    padding: 0;
+}

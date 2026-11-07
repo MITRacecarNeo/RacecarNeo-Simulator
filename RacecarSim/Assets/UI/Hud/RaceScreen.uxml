@@ -1,0 +1,35 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="Hud.uss" />
+    <ui:Style src="RaceScreen.uss" />
+    <ui:VisualElement name="race" class="race-root" picking-mode="Ignore">
+        <ui:VisualElement name="header" class="race-header" picking-mode="Ignore">
+            <ui:VisualElement name="chip" class="hud-chip">
+                <MenuIcon name="mode-icon" class="hud-chip-icon" />
+                <ui:Label name="mode-label" class="rcn-label hud-chip-label" />
+                <ui:Label name="time-scale" class="rcn-label hud-time-scale" />
+            </ui:VisualElement>
+            <ParallelogramElement name="timer" text="00:00.00" class="rcn-timer-badge race-timer" />        </ui:VisualElement>
+
+        <ui:VisualElement name="tiles" class="race-tiles" picking-mode="Ignore" />
+
+        <ui:VisualElement name="toast-row" class="race-toast-row" picking-mode="Ignore">
+            <ui:VisualElement name="toast" class="hud-toast">
+                <ui:Label name="toast-text" class="rcn-body hud-toast-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="pause" class="hud-pause">
+            <ui:Label text="Paused" class="rcn-h1 rcn-motion" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="result" class="hud-result-backdrop">
+            <ui:VisualElement name="result-card" class="rcn-card hud-result">
+                <MenuIcon name="result-icon" class="hud-result-icon" />
+                <ui:Label name="result-title" class="rcn-h2 rcn-motion hud-result-title" />
+                <ui:Label name="result-detail" class="rcn-body rcn-muted hud-result-detail" />
+                <ParallelogramElement name="result-best" text="NEW BEST" class="rcn-badge hud-result-best" />
+                <ui:VisualElement name="result-hints" class="hud-hints" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

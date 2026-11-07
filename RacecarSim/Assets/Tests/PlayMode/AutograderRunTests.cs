@@ -5,6 +5,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// Autograder runs through the real level scenes: task order, scoring, time bonuses, time limits,
@@ -154,7 +155,9 @@ public class AutograderRunTests
         yield return null;
         yield return null;
 
-        bool shown = Object.FindObjectsByType<UnityEngine.UI.Text>().Any(text => text.text.Contains("Angle:") && text.text.Contains("Distance:"));
-        Assert.IsTrue(shown, "angle and distance message on screen");
+        VisualElement root = Object.FindAnyObjectByType<Hud>().GetComponent<UIDocument>().rootVisualElement;
+        string toast = root.Q<Label>("toast-text").text;
+        Assert.IsTrue(toast.Contains("Angle:") && toast.Contains("Distance:"), "angle and distance message on screen");
+        Assert.AreEqual(DisplayStyle.Flex, root.Q("toast").resolvedStyle.display);
     }
 }

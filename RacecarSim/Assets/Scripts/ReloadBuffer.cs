@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Manages an intermediate scene used to avoid errors when reloading a level.
@@ -46,7 +45,7 @@ public class ReloadBuffer : MonoBehaviour
         if (this.counter <= 0 && !this.isLoading)
         {
             this.isLoading = true;
-            SceneManager.LoadScene(ReloadBuffer.BuildIndexToReload, LoadSceneMode.Single);
+            SceneFlow.Load(ReloadBuffer.BuildIndexToReload, SceneTransition.Cut);
         }
     }
 }

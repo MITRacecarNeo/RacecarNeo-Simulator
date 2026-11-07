@@ -1,0 +1,609 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97f157f4e18e3fc42bb60434e07f9956, type: 3}
+  m_Name: LevelPresentation
+  m_EditorClassIdentifier: RacecarSim::LevelPresentationCatalog
+  Entries:
+  - Key: demo-world
+    Thumbnail: {fileID: 2800000, guid: 2ee03461667836743800ac0d85cff4dd, type: 3}
+    TopView: {fileID: 2800000, guid: fa6811059491d0645b1426b8eb91c4ff, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -45.22155
+      y: -37.15005
+      width: 126.9191
+      height: 126.9191
+    Route: []
+    IsLoop: 0
+  - Key: color-camera-sandbox
+    Thumbnail: {fileID: 2800000, guid: 6ba78e2c3a6a8294c87248594646872d, type: 3}
+    TopView: {fileID: 2800000, guid: 909bf455fb72a814988ca034aa21f2b0, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -7.387501
+      y: 7.7625003
+      width: 15.125001
+      height: 15.125001
+    Route: []
+    IsLoop: 0
+  - Key: depth-camera-sandbox
+    Thumbnail: {fileID: 2800000, guid: 99a1a9ef1ce6f6342a424c1128b5e2ee, type: 3}
+    TopView: {fileID: 2800000, guid: 276f6655e0a82a346984043618a8616f, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -20.65
+      y: -21.388
+      width: 36.3
+      height: 36.3
+    Route:
+    - {x: 0.95454544, y: 0.20352618}
+    IsLoop: 0
+  - Key: lidar-sandbox
+    Thumbnail: {fileID: 2800000, guid: f2c4bd434cf51f84598bb97df7e325c8, type: 3}
+    TopView: {fileID: 2800000, guid: b3f419caadfeed448bf5347fd7bb9faf, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -27.149162
+      y: -10.162561
+      width: 38.325123
+      height: 38.325123
+    Route: []
+    IsLoop: 0
+  - Key: ar-marker-sandbox
+    Thumbnail: {fileID: 2800000, guid: 70c2f001ffbf34f4ab9d1e3e6ab2c7ba, type: 3}
+    TopView: {fileID: 2800000, guid: 0a00c7b0137c84f4093534c3487bc791, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -5.6000004
+      y: 4.3999996
+      width: 13.200001
+      height: 13.200001
+    Route: []
+    IsLoop: 0
+  - Key: long-hallway-sandbox
+    Thumbnail: {fileID: 2800000, guid: aaa8b0aa5cbc38c4e8190e52a69516c6, type: 3}
+    TopView: {fileID: 2800000, guid: 03b4dfdd07b076848ae7fb1dcece14eb, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -243.10391
+      y: -230.30609
+      width: 440
+      height: 440
+    Route:
+    - {x: 0.50505435, y: 0.9362411}
+    IsLoop: 0
+  - Key: lab-d-driving-in-mazes
+    Thumbnail: {fileID: 2800000, guid: dd857ef3ea0f5454ca552cfd5436a13e, type: 3}
+    TopView: {fileID: 2800000, guid: 91b5b0d6341faf248b5d7fd4d933e3f1, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -125.57586
+      y: -104.343994
+      width: 277.69852
+      height: 277.69852
+    Route:
+    - {x: 0.4522021, y: 0.3757456}
+    - {x: 0.5780395, y: 0.35917905}
+    - {x: 0.7583069, y: 0.35917905}
+    - {x: 0.33180124, y: 0.35917905}
+    - {x: 0.24555662, y: 0.35917905}
+    - {x: 0.065595806, y: 0.3407796}
+    IsLoop: 0
+  - Key: lab-e-stoplight-challenge
+    Thumbnail: {fileID: 2800000, guid: ca261c2f161524449af7c963e85ad5f5, type: 3}
+    TopView: {fileID: 2800000, guid: cba30632d2467524f82bf1cb67241e1f, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -72
+      y: -37.000004
+      width: 143
+      height: 143
+    Route:
+    - {x: 0.5034965, y: 0.2587413}
+    IsLoop: 0
+  - Key: lab-f-line-follower
+    Thumbnail: {fileID: 2800000, guid: 94a03aea28f022c4d9b0186731d92e78, type: 3}
+    TopView: {fileID: 2800000, guid: 292eaad5769cbf1488f78ee0a5c465b7, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -82.91027
+      y: -44.786682
+      width: 165.82387
+      height: 165.82387
+    Route:
+    - {x: 0.49998996, y: 0.27008587}
+    - {x: 0.49998996, y: 0.3047612}
+    - {x: 0.49998996, y: 0.6127989}
+    - {x: 0.32444227, y: 0.69819075}
+    - {x: 0.70315737, y: 0.20610231}
+    - {x: 0.4993869, y: 0.24264711}
+    IsLoop: 0
+  - Key: lab-g-autonomous-parking
+    Thumbnail: {fileID: 2800000, guid: 4b97eaa9a084a474eb6ca94d6d96bf69, type: 3}
+    TopView: {fileID: 2800000, guid: 07007f6bd76679c48999b279b4edcfc3, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -9.6
+      y: 7.3999996
+      width: 13.200001
+      height: 13.200001
+    Route: []
+    IsLoop: 0
+  - Key: lab-h-cone-slalom
+    Thumbnail: {fileID: 2800000, guid: 435cf5e34fd3bfc41a7790b7bd4aac2d, type: 3}
+    TopView: {fileID: 2800000, guid: e873eb59cc618da4a849cb33f1f4bc7e, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -99.82153
+      y: -16.54287
+      width: 143.94307
+      height: 143.94307
+    Route:
+    - {x: 0.69347924, y: 0.11492647}
+    - {x: 0.20717588, y: 0.6151242}
+    IsLoop: 0
+  - Key: lab-i-wall-follower
+    Thumbnail: {fileID: 2800000, guid: caf5a73f6badefe42a728192596f41f6, type: 3}
+    TopView: {fileID: 2800000, guid: 8a5344cdfce0a0642864deb58882c1cd, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -65.673355
+      y: -120.0305
+      width: 207.81671
+      height: 207.81671
+    Route:
+    - {x: 0.32563964, y: 0.57757866}
+    - {x: 0.32563964, y: 0.6052473}
+    - {x: 0.48828295, y: 0.91845596}
+    - {x: 0.6973133, y: 0.71187973}
+    - {x: 0.6973133, y: 0.24555534}
+    - {x: 0.32742003, y: 0.53282773}
+    IsLoop: 0
+  - Key: lab-1-driving-in-shapes
+    Thumbnail: {fileID: 2800000, guid: 319f9e81514b5a440a2e65b6ea3d6e92, type: 3}
+    TopView: {fileID: 2800000, guid: 4744caa75b4db9146b3361ba8a357545, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -52.269997
+      y: 22.230003
+      width: 67.53999
+      height: 67.53999
+    Route: []
+    IsLoop: 0
+  - Key: lab-2a-line-following
+    Thumbnail: {fileID: 2800000, guid: 273e79e5f1743d848af24b0bd9b3f782, type: 3}
+    TopView: {fileID: 2800000, guid: 458ba4e00ffe0cf4b9e4b6020b1cd889, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -42.96
+      y: -17.5
+      width: 99
+      height: 99
+    Route: []
+    IsLoop: 0
+  - Key: lab-2b-cone-parking
+    Thumbnail: {fileID: 2800000, guid: f1acaaa59ff9dd1438f6f9bca6d06196, type: 3}
+    TopView: {fileID: 2800000, guid: b8344061705ce584bb1517cef28dcc49, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -9.6
+      y: 7.3999996
+      width: 13.200001
+      height: 13.200001
+    Route: []
+    IsLoop: 0
+  - Key: lab-3a-safety-stop
+    Thumbnail: {fileID: 2800000, guid: 85de3eaf2dbf6f94fb1edff294beb672, type: 3}
+    TopView: {fileID: 2800000, guid: 532c07fc510a9804d90b61cd8c1ef96b, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -67.25155
+      y: -26.730843
+      width: 137.07848
+      height: 137.07848
+    Route: []
+    IsLoop: 0
+  - Key: lab-3b-cone-parking-revisited
+    Thumbnail: {fileID: 2800000, guid: a5b0c8fdbc10a224f9996882ae83ffb7, type: 3}
+    TopView: {fileID: 2800000, guid: c76a5b59f1c6c984aa97263f77f324b7, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -9.6
+      y: 7.3999996
+      width: 13.200001
+      height: 13.200001
+    Route: []
+    IsLoop: 0
+  - Key: lab-3c-wall-parking
+    Thumbnail: {fileID: 2800000, guid: e16eacbc7684c884c95f53cc1a3b8f4f, type: 3}
+    TopView: {fileID: 2800000, guid: b1117bb613c7cb245b97919516972c64, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -33
+      y: -18
+      width: 66
+      height: 66
+    Route: []
+    IsLoop: 0
+  - Key: lab-4a-safety-stop-revisited
+    Thumbnail: {fileID: 2800000, guid: 647f5286a9834294cac0ebb8619d7f8e, type: 3}
+    TopView: {fileID: 2800000, guid: 4acd909bb5a1ec241880a69fdb65ac17, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -67.25155
+      y: -26.730843
+      width: 137.07848
+      height: 137.07848
+    Route: []
+    IsLoop: 0
+  - Key: lab-4b-wall-following
+    Thumbnail: {fileID: 2800000, guid: 4031dace888de074cba42039c5147561, type: 3}
+    TopView: {fileID: 2800000, guid: 3b8f58f0819c7ee48a30a088931db489, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -56.16687
+      y: 11.376881
+      width: 119.033745
+      height: 119.033745
+    Route:
+    - {x: 0.5894704, y: 0.22366028}
+    - {x: 0.45505473, y: 0.61010534}
+    - {x: 0.5390645, y: 0.95454544}
+    IsLoop: 0
+  - Key: lab-5-ar-tag-decisions
+    Thumbnail: {fileID: 2800000, guid: 847d3024542f4d847a9c860c5fced4ff, type: 3}
+    TopView: {fileID: 2800000, guid: 6c9f2099fd4e128428cf4cbec4e4858d, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -105.600006
+      y: -9.600006
+      width: 211.20001
+      height: 211.20001
+    Route:
+    - {x: 0.5, y: 0.045454573}
+    - {x: 0.5, y: 0.30113637}
+    - {x: 0.5, y: 0.63257575}
+    - {x: 0.5, y: 0.95454544}
+    IsLoop: 0
+  - Key: lab-6a-roll-prevention
+    Thumbnail: {fileID: 2800000, guid: 48f0bfbc39083df4eb14e3df756e4289, type: 3}
+    TopView: {fileID: 2800000, guid: fab6a37e3bc4c0d4bae6ec999a6fb534, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -33
+      y: -33
+      width: 66
+      height: 66
+    Route: []
+    IsLoop: 0
+  - Key: lab-6b-driving-in-shapes-revisited
+    Thumbnail: {fileID: 2800000, guid: 71aa70c2de1158644b4aa8fd3877c70b, type: 3}
+    TopView: {fileID: 2800000, guid: 5c48a4461130934488aca48d1dd5b7d1, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -52.269997
+      y: 22.230003
+      width: 67.53999
+      height: 67.53999
+    Route: []
+    IsLoop: 0
+  - Key: lab-6c-speed-limit
+    Thumbnail: {fileID: 2800000, guid: debc61bec1db8364cb394dc34821e8e9, type: 3}
+    TopView: {fileID: 2800000, guid: fb40182523ec8a74d9585f39c80312d4, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -132
+      y: -70
+      width: 264
+      height: 264
+    Route:
+    - {x: 0.5, y: 0.07575758}
+    - {x: 0.5, y: 0.9469697}
+    IsLoop: 0
+  - Key: cone-slalom-regular
+    Thumbnail: {fileID: 2800000, guid: 64672350279d7154ab01bf07a7a82309, type: 3}
+    TopView: {fileID: 2800000, guid: d6f79a2c15a7cd74683ba12dac058bb6, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -99.82153
+      y: -16.54287
+      width: 143.94307
+      height: 143.94307
+    Route:
+    - {x: 0.69347924, y: 0.11492647}
+    - {x: 0.20717588, y: 0.6151242}
+    IsLoop: 0
+  - Key: cone-slalom-hard
+    Thumbnail: {fileID: 2800000, guid: 3016ec0ce3c502a438045379c2776252, type: 3}
+    TopView: {fileID: 2800000, guid: 0483542fa4884e046ba6f22319651bb2, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -187.11093
+      y: -164.83281
+      width: 288.92184
+      height: 288.92184
+    Route:
+    - {x: 0.6476178, y: 0.57051}
+    - {x: 0.40533775, y: 0.81971234}
+    - {x: 0.40533775, y: 0.50820947}
+    - {x: 0.40533775, y: 0.04787734}
+    IsLoop: 0
+  - Key: grand-prix-2026
+    Thumbnail: {fileID: 2800000, guid: e58c330606e37704eb1b3c3d3700fcde, type: 3}
+    TopView: {fileID: 2800000, guid: a7cef72b71a22f14b996a20e6a109d46, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -263.90387
+      y: -271.55038
+      width: 540.84784
+      height: 540.84784
+    Route:
+    - {x: 0.9545455, y: 0.4522536}
+    - {x: 0.7766581, y: 0.5990601}
+    - {x: 0.48091877, y: 0.51178974}
+    - {x: 0.21124958, y: 0.49598125}
+    - {x: 0.18628876, y: 0.62864333}
+    - {x: 0.9495285, y: 0.48451775}
+    IsLoop: 0
+  - Key: micro-grand-prix-2026
+    Thumbnail: {fileID: 2800000, guid: 08399334240f6c34f857fa3837526cf6, type: 3}
+    TopView: {fileID: 2800000, guid: f3c8daed53885b34cbb3014984f3992c, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: 121.02246
+      y: 136.91217
+      width: 222.42358
+      height: 222.42358
+    Route:
+    - {x: 0.25081664, y: 0.49963778}
+    - {x: 0.08869349, y: 0.455287}
+    IsLoop: 0
+  - Key: mini-grand-prix-fall-2025
+    Thumbnail: {fileID: 2800000, guid: a7afbffdc3d02db488d36a7eb07797d7, type: 3}
+    TopView: {fileID: 2800000, guid: 2eabce27e1d14084e80d8bd5747d8abf, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: 127.47734
+      y: 131.49889
+      width: 230.22748
+      height: 230.22748
+    Route:
+    - {x: 0.45587435, y: 0.09145088}
+    - {x: 0.48428798, y: 0.11295134}
+    IsLoop: 0
+  - Key: grand-prix-2025
+    Thumbnail: {fileID: 2800000, guid: e86718eb0589f8840bf4ed25f43a2b32, type: 3}
+    TopView: {fileID: 2800000, guid: 8e25f0e833666b64da43643c89d93f42, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -291.34064
+      y: -291.33682
+      width: 582.52277
+      height: 582.52277
+    Route:
+    - {x: 0.93335515, y: 0.45386523}
+    - {x: 0.82630354, y: 0.35592914}
+    - {x: 0.5234828, y: 0.52016306}
+    - {x: 0.067775264, y: 0.5952331}
+    - {x: 0.4999644, y: 0.42998633}
+    - {x: 0.93314916, y: 0.46888608}
+    IsLoop: 0
+  - Key: mini-grand-prix-spring-2025
+    Thumbnail: {fileID: 2800000, guid: 7eb75a612e98bd04b8308dffebf79aac, type: 3}
+    TopView: {fileID: 2800000, guid: 4f976f811a14bb4479402d958340ae26, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: 66.29239
+      y: 68.40964
+      width: 367.7058
+      height: 367.7058
+    Route:
+    - {x: 0.2444339, y: 0.7734274}
+    - {x: 0.3257761, y: 0.36189353}
+    - {x: 0.5450818, y: 0.19802175}
+    - {x: 0.4864752, y: 0.087281056}
+    - {x: 0.4864208, y: 0.52994466}
+    - {x: 0.27035135, y: 0.8068781}
+    IsLoop: 0
+  - Key: micro-grand-prix-2025
+    Thumbnail: {fileID: 2800000, guid: 189feb09209caef4eab95c350bfb3ebb, type: 3}
+    TopView: {fileID: 2800000, guid: f1738d01de1dd3b4393679cb5dbadd39, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: 142.28485
+      y: 139.22871
+      width: 196.1348
+      height: 196.1348
+    Route:
+    - {x: 0.09745921, y: 0.51354825}
+    - {x: 0.15099382, y: 0.5591088}
+    IsLoop: 0
+  - Key: mini-grand-prix-fall-2024
+    Thumbnail: {fileID: 2800000, guid: 770744f16634f7448a1a640fe5b929ce, type: 3}
+    TopView: {fileID: 2800000, guid: f22d923d57d4f644db7c9ccd7bd9f0c1, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: 132.05986
+      y: 118.95732
+      width: 241.92642
+      height: 241.92642
+    Route:
+    - {x: 0.7351503, y: 0.31189677}
+    - {x: 0.047751263, y: 0.3556704}
+    - {x: 0.82331765, y: 0.27105787}
+    IsLoop: 0
+  - Key: grand-prix-2024
+    Thumbnail: {fileID: 2800000, guid: 3c167fe7b6600c646a414cf5a2db6edd, type: 3}
+    TopView: {fileID: 2800000, guid: 88b9809892f06d549962835e650faa7f, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -297.30673
+      y: -287.6095
+      width: 576.5478
+      height: 576.5478
+    Route:
+    - {x: 0.22826684, y: 0.360056}
+    - {x: 0.23902048, y: 0.36026415}
+    - {x: 0.811202, y: 0.36026415}
+    - {x: 0.7418756, y: 0.5331206}
+    - {x: 0.27547887, y: 0.4836364}
+    - {x: 0.178297, y: 0.5968621}
+    - {x: 0.15453485, y: 0.35905004}
+    IsLoop: 0
+  - Key: mini-grand-prix-spring-2024
+    Thumbnail: {fileID: 2800000, guid: dd541fb0aae229542bd6803568b1110b, type: 3}
+    TopView: {fileID: 2800000, guid: c50b29f1adebaec48bb3217ec1977fe5, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: 141.84993
+      y: 131.51987
+      width: 199.10345
+      height: 199.10345
+    Route:
+    - {x: 0.096694514, y: 0.3886599}
+    - {x: 0.18664777, y: 0.25099277}
+    IsLoop: 0
+  - Key: mini-grand-prix-fall-2023
+    Thumbnail: {fileID: 2800000, guid: a70e4e788c22e0e4fbf3b7911c49648f, type: 3}
+    TopView: {fileID: 2800000, guid: dbe3de7daf53ab0449eecc6609599b90, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -122.87313
+      y: -113.15733
+      width: 232.44983
+      height: 232.44983
+    Route:
+    - {x: 0.39606512, y: 0.07589049}
+    - {x: 0.6431722, y: 0.1322897}
+    IsLoop: 0
+  - Key: grand-prix-2022
+    Thumbnail: {fileID: 2800000, guid: 3132f3a9114fc9e46a990a84959df2e1, type: 3}
+    TopView: {fileID: 2800000, guid: 15a82e209e44dd14bb18db730f25d040, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: 13.348389
+      y: 49.893433
+      width: 464.86682
+      height: 464.86682
+    Route:
+    - {x: 0.7353614, y: 0.5341968}
+    - {x: 0.8210634, y: 0.25411654}
+    - {x: 0.2725192, y: 0.04545461}
+    - {x: 0.24117687, y: 0.47758055}
+    - {x: 0.23822981, y: 0.8779296}
+    - {x: 0.31274578, y: 0.41803446}
+    - {x: 0.47627646, y: 0.75019836}
+    - {x: 0.5343576, y: 0.751033}
+    - {x: 0.69399476, y: 0.46262783}
+    IsLoop: 0
+  - Key: grand-prix-2021
+    Thumbnail: {fileID: 2800000, guid: 0c8d1996fcb47ff4ead35a9084348ad5, type: 3}
+    TopView: {fileID: 2800000, guid: be071fcf52381974bb669dbf65b0bb3b, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -210.1
+      y: -205.20125
+      width: 420.2
+      height: 420.2
+    Route:
+    - {x: 0.5, y: 0.48834184}
+    - {x: 0.5, y: 0.7310834}
+    - {x: 0.6475488, y: 0.7929587}
+    - {x: 0.7165635, y: 0.3598316}
+    - {x: 0.5690147, y: 0.08139278}
+    - {x: 0.43336508, y: 0.08139278}
+    - {x: 0.32151356, y: 0.5145199}
+    - {x: 0.045454558, y: 0.7334632}
+    - {x: 0.95454544, y: 0.552597}
+    - {x: 0.5, y: 0.38838944}
+    IsLoop: 0
+  - Key: grand-prix-2020
+    Thumbnail: {fileID: 2800000, guid: 2bd8ee8bd62b013478b37447b097092b, type: 3}
+    TopView: {fileID: 2800000, guid: f58e1bf59231cd343a7c8b316dfd4f11, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -126.36004
+      y: -165.98152
+      width: 344.9933
+      height: 344.9933
+    Route:
+    - {x: 0.67352045, y: 0.48401383}
+    - {x: 0.6880135, y: 0.059367884}
+    - {x: 0.78366756, y: 0.61445117}
+    - {x: 0.5314887, y: 0.9130077}
+    - {x: 0.21574345, y: 0.93466026}
+    - {x: 0.36771742, y: 0.4231431}
+    IsLoop: 0
+  - Key: time-trial-2020
+    Thumbnail: {fileID: 2800000, guid: f3038316e66a0984fbf30f6cc6bd2f42, type: 3}
+    TopView: {fileID: 2800000, guid: 87ce72ffa78b4e5429da996ef30b6f0b, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -204.6901
+      y: -115.15001
+      width: 333.30002
+      height: 333.30002
+    Route:
+    - {x: 0.31410167, y: 0.04545457}
+    - {x: 0.5091212, y: 0.18646866}
+    - {x: 0.79414964, y: 0.26747677}
+    - {x: 0.28709897, y: 0.5375037}
+    - {x: 0.6411344, y: 0.95454544}
+    IsLoop: 0
+  - Key: greece-time-trial-2026
+    Thumbnail: {fileID: 2800000, guid: 77858af327f632244846fe1c710c02c4, type: 3}
+    TopView: {fileID: 2800000, guid: 626bef447bedaf140b96506af2cc691b, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -187.72716
+      y: -162.30516
+      width: 315.62372
+      height: 315.62372
+    Route:
+    - {x: 0.3377983, y: 0.12421488}
+    - {x: 0.55606455, y: 0.3633604}
+    - {x: 0.5586309, y: 0.69052213}
+    - {x: 0.81197053, y: 0.8441544}
+    - {x: 0.045454577, y: 0.8930885}
+    IsLoop: 0
+  - Key: greece-time-trial-2025
+    Thumbnail: {fileID: 2800000, guid: bbf3c23ade838b841aebf4729f599860, type: 3}
+    TopView: {fileID: 2800000, guid: d24fb412278adce42865e6b1da58fd5b, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -187.72716
+      y: -163.72073
+      width: 315.62372
+      height: 315.62372
+    Route:
+    - {x: 0.3377983, y: 0.12869988}
+    - {x: 0.55606455, y: 0.36784542}
+    - {x: 0.5586309, y: 0.69500715}
+    - {x: 0.81197053, y: 0.8486394}
+    - {x: 0.045454577, y: 0.89757353}
+    IsLoop: 0
+  - Key: greece-grand-prix-2025
+    Thumbnail: {fileID: 2800000, guid: 2bbf9f597a762394daef0b2d7ae1d5a1, type: 3}
+    TopView: {fileID: 2800000, guid: e7fd477916aef514db9f4274cdc01a22, type: 3}
+    TopViewArea:
+      serializedVersion: 2
+      x: -224.2822
+      y: -164.38805
+      width: 383.54437
+      height: 383.54437
+    Route:
+    - {x: 0.45012313, y: 0.064003155}
+    - {x: 0.17688225, y: 0.58047533}
+    - {x: 0.54450595, y: 0.7226753}
+    - {x: 0.65518415, y: 0.9204882}
+    - {x: 0.7812452, y: 0.2279998}
+    IsLoop: 0

@@ -50,7 +50,7 @@ public class LevelCollection
         
         new LevelCollection()
         {
-            DisplayName = "Sandbox Environments",
+            DisplayName = "Sandbox",
             ShortName = "Sandbox",
             Levels = new LevelInfo[]
             {
@@ -91,7 +91,7 @@ public class LevelCollection
 
         new LevelCollection()
         {
-            DisplayName = "Neo Labs",
+            DisplayName = "Labs",
             ShortName = "NeoLabs",
             Levels = new LevelInfo[]
             {
@@ -423,7 +423,229 @@ public class LevelCollection
 
         new LevelCollection()
         {
-            DisplayName = "Legacy Labs",
+            DisplayName = "Grand Prix",
+            ShortName = "Final",
+            Levels = new LevelInfo[]
+            {
+                new LevelInfo()
+                {
+                    DisplayName = "Grand Prix 2026",
+                    Id = "grand-prix-2026",
+                    BuildIndex = 129,
+                    IsRaceable = true,
+                    NumCheckpoints = 4,
+                    MaxCars = 4,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Micro Grand Prix 2026",
+                    Id = "micro-grand-prix-2026",
+                    BuildIndex = 128,
+                    IsRaceable = true,
+                    NumCheckpoints = 0,
+                    MaxCars = 2,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Mini Grand Prix: Fall 2025",
+                    Id = "mini-grand-prix-fall-2025",
+                    BuildIndex = 119,
+                    HasRandomMaps = true,
+                    RandomSceneBuildIndices = new int[] {120, 121, 122, 123, 124, 125},
+                    IsRaceable = true,
+                    NumCheckpoints = 0,
+                    MaxCars = 2,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Grand Prix 2025",
+                    Id = "grand-prix-2025",
+                    BuildIndex = 118,
+                    IsRaceable = true,
+                    NumCheckpoints = 4,
+                    MaxCars = 4,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Mini Grand Prix: Spring 2025",
+                    Id = "mini-grand-prix-spring-2025",
+                    BuildIndex = 116,
+                    IsRaceable = true,
+                    NumCheckpoints = 4,
+                    MaxCars = 2,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Micro Grand Prix 2025",
+                    Id = "micro-grand-prix-2025",
+                    BuildIndex = 115,
+                    IsRaceable = true,
+                    NumCheckpoints = 0,
+                    MaxCars = 2,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Mini Grand Prix: Fall 2024",
+                    Id = "mini-grand-prix-fall-2024",
+                    BuildIndex = 111,
+                    IsRaceable = true,
+                    NumCheckpoints = 1,
+                    MaxCars = 2,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Grand Prix 2024",
+                    Id = "grand-prix-2024",
+                    BuildIndex = 99,
+                    IsRaceable = true,
+                    NumCheckpoints = 5,
+                    MaxCars = 4,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Mini Grand Prix: Spring 2024",
+                    Id = "mini-grand-prix-spring-2024",
+                    BuildIndex = 98,
+                    IsRaceable = true,
+                    NumCheckpoints = 0,
+                    MaxCars = 2,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Mini Grand Prix: Fall 2023",
+                    Id = "mini-grand-prix-fall-2023",
+                    BuildIndex = 91,
+                    IsRaceable = true,
+                    NumCheckpoints = 0,
+                    MaxCars = 4,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Grand Prix 2022",
+                    Id = "grand-prix-2022",
+                    BuildIndex = 90,
+                    IsRaceable = true,
+                    NumCheckpoints = 7,
+                    MaxCars = 4,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Grand Prix 2021",
+                    Id = "grand-prix-2021",
+                    BuildIndex = 89,
+                    IsRaceable = true,
+                    NumCheckpoints = 8,
+                    MaxCars = 4,
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Grand Prix 2020",
+                    Id = "grand-prix-2020",
+                    BuildIndex = 18,
+                    IsRaceable = true,
+                    NumCheckpoints = 5,
+                    MaxCars = 4,
+                    AutograderBuildIndex = 88,
+                    AutograderLevelCode = "gp2020",
+                    AutograderLevels = new AutograderLevelInfo[]
+                    {
+                        new AutograderLevelInfo()
+                        {
+                            Title = "Grand Prix 2020",
+                            Description = "Navigate through the course.",
+                            MaxPoints = 25,
+                            TimeLimit = 360,
+                            TimeBonuses = new Vector2[]{ new Vector2(105, 3), new Vector2(120, 2), new Vector2(150, 1), new Vector2(180, 0), new Vector2(240, -1), new Vector2(300, -3), new Vector2(float.PositiveInfinity, -5) }
+                        }
+                    }
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "Time Trial 2020",
+                    Id = "time-trial-2020",
+                    BuildIndex = 17,
+                    IsRaceable = true,
+                    NumCheckpoints = 3,
+                    AutograderBuildIndex = 87,
+                    AutograderLevelCode = "tt2020",
+                    AutograderLevels = new AutograderLevelInfo[]
+                    {
+                        new AutograderLevelInfo()
+                        {
+                            Title = "Time Trial",
+                            Description = "Navigate through the course.",
+                            MaxPoints = 25,
+                            TimeLimit = 300,
+                            TimeBonuses = new Vector2[]{ new Vector2(75, 3), new Vector2(90, 2), new Vector2(120, 1), new Vector2(150, 0), new Vector2(180, -1), new Vector2(240, -3), new Vector2(float.PositiveInfinity, -5) }
+                        }
+                    }
+                }, 
+            }
+        },
+
+        new LevelCollection()
+        {
+            DisplayName = "Community",
+            ShortName = "PubLev",
+            Levels = new LevelInfo[]
+            {
+                new LevelInfo()
+                {
+                    DisplayName = "[Greece] Time Trial 2026",
+                    Id = "greece-time-trial-2026",
+                    BuildIndex = 126,
+                    IsRaceable = true,
+                    NumCheckpoints = 3,
+                    MaxCars = 1,
+                    AutograderBuildIndex = 127,
+                    AutograderLevelCode = "gtt2026",
+                    AutograderLevels = new AutograderLevelInfo[]
+                    {
+                        new AutograderLevelInfo()
+                        {
+                            Title = "Time Trial 2026",
+                            Description = "Navigate through the course.",
+                            MaxPoints = 25,
+                            TimeLimit = 300,
+                            TimeBonuses = new Vector2[]{ new Vector2(85, 3), new Vector2(100, 2), new Vector2(130, 1), new Vector2(160, 0), new Vector2(190, -1), new Vector2(250, -3), new Vector2(float.PositiveInfinity, -5) }                        }
+                    }
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "[Greece] Time Trial 2025",
+                    Id = "greece-time-trial-2025",
+                    BuildIndex = 112,
+                    IsRaceable = true,
+                    NumCheckpoints = 3,
+                    MaxCars = 1,
+                    AutograderBuildIndex = 113,
+                    AutograderLevelCode = "gtt2025",
+                    AutograderLevels = new AutograderLevelInfo[]
+                    {
+                        new AutograderLevelInfo()
+                        {
+                            Title = "Time Trial 2025",
+                            Description = "Navigate through the course.",
+                            MaxPoints = 25,
+                            TimeLimit = 300,
+                            TimeBonuses = new Vector2[]{ new Vector2(85, 3), new Vector2(100, 2), new Vector2(130, 1), new Vector2(160, 0), new Vector2(190, -1), new Vector2(250, -3), new Vector2(float.PositiveInfinity, -5) }                        }
+                    }
+                },
+                new LevelInfo()
+                {
+                    DisplayName = "[Greece] Grand Prix 2025",
+                    Id = "greece-grand-prix-2025",
+                    BuildIndex = 114,
+                    IsRaceable = true,
+                    NumCheckpoints = 4,
+                    MaxCars = 4,
+                }
+            }
+        },
+
+        new LevelCollection()
+        {
+            DisplayName = "Legacy",
             ShortName = "LegacyLabs",
             Levels = new LevelInfo[]
             {
@@ -1003,228 +1225,6 @@ public class LevelCollection
 
             }
         },
-
-        new LevelCollection()
-        {
-            DisplayName = "Final Challenge",
-            ShortName = "Final",
-            Levels = new LevelInfo[]
-            {
-                new LevelInfo()
-                {
-                    DisplayName = "Grand Prix 2026",
-                    Id = "grand-prix-2026",
-                    BuildIndex = 129,
-                    IsRaceable = true,
-                    NumCheckpoints = 4,
-                    MaxCars = 4,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Micro Grand Prix 2026",
-                    Id = "micro-grand-prix-2026",
-                    BuildIndex = 128,
-                    IsRaceable = true,
-                    NumCheckpoints = 0,
-                    MaxCars = 2,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Mini Grand Prix: Fall 2025",
-                    Id = "mini-grand-prix-fall-2025",
-                    BuildIndex = 119,
-                    HasRandomMaps = true,
-                    RandomSceneBuildIndices = new int[] {120, 121, 122, 123, 124, 125},
-                    IsRaceable = true,
-                    NumCheckpoints = 0,
-                    MaxCars = 2,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Grand Prix 2025",
-                    Id = "grand-prix-2025",
-                    BuildIndex = 118,
-                    IsRaceable = true,
-                    NumCheckpoints = 4,
-                    MaxCars = 4,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Mini Grand Prix: Spring 2025",
-                    Id = "mini-grand-prix-spring-2025",
-                    BuildIndex = 116,
-                    IsRaceable = true,
-                    NumCheckpoints = 4,
-                    MaxCars = 2,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Micro Grand Prix 2025",
-                    Id = "micro-grand-prix-2025",
-                    BuildIndex = 115,
-                    IsRaceable = true,
-                    NumCheckpoints = 0,
-                    MaxCars = 2,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Mini Grand Prix: Fall 2024",
-                    Id = "mini-grand-prix-fall-2024",
-                    BuildIndex = 111,
-                    IsRaceable = true,
-                    NumCheckpoints = 1,
-                    MaxCars = 2,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Grand Prix 2024",
-                    Id = "grand-prix-2024",
-                    BuildIndex = 99,
-                    IsRaceable = true,
-                    NumCheckpoints = 5,
-                    MaxCars = 4,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Mini Grand Prix: Spring 2024",
-                    Id = "mini-grand-prix-spring-2024",
-                    BuildIndex = 98,
-                    IsRaceable = true,
-                    NumCheckpoints = 0,
-                    MaxCars = 2,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Mini Grand Prix: Fall 2023",
-                    Id = "mini-grand-prix-fall-2023",
-                    BuildIndex = 91,
-                    IsRaceable = true,
-                    NumCheckpoints = 0,
-                    MaxCars = 4,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Grand Prix 2022",
-                    Id = "grand-prix-2022",
-                    BuildIndex = 90,
-                    IsRaceable = true,
-                    NumCheckpoints = 7,
-                    MaxCars = 4,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Grand Prix 2021",
-                    Id = "grand-prix-2021",
-                    BuildIndex = 89,
-                    IsRaceable = true,
-                    NumCheckpoints = 8,
-                    MaxCars = 4,
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Grand Prix 2020",
-                    Id = "grand-prix-2020",
-                    BuildIndex = 18,
-                    IsRaceable = true,
-                    NumCheckpoints = 5,
-                    MaxCars = 4,
-                    AutograderBuildIndex = 88,
-                    AutograderLevelCode = "gp2020",
-                    AutograderLevels = new AutograderLevelInfo[]
-                    {
-                        new AutograderLevelInfo()
-                        {
-                            Title = "Grand Prix 2020",
-                            Description = "Navigate through the course.",
-                            MaxPoints = 25,
-                            TimeLimit = 360,
-                            TimeBonuses = new Vector2[]{ new Vector2(105, 3), new Vector2(120, 2), new Vector2(150, 1), new Vector2(180, 0), new Vector2(240, -1), new Vector2(300, -3), new Vector2(float.PositiveInfinity, -5) }
-                        }
-                    }
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "Time Trial 2020",
-                    Id = "time-trial-2020",
-                    BuildIndex = 17,
-                    IsRaceable = true,
-                    NumCheckpoints = 3,
-                    AutograderBuildIndex = 87,
-                    AutograderLevelCode = "tt2020",
-                    AutograderLevels = new AutograderLevelInfo[]
-                    {
-                        new AutograderLevelInfo()
-                        {
-                            Title = "Time Trial",
-                            Description = "Navigate through the course.",
-                            MaxPoints = 25,
-                            TimeLimit = 300,
-                            TimeBonuses = new Vector2[]{ new Vector2(75, 3), new Vector2(90, 2), new Vector2(120, 1), new Vector2(150, 0), new Vector2(180, -1), new Vector2(240, -3), new Vector2(float.PositiveInfinity, -5) }
-                        }
-                    }
-                }, 
-            }
-        },
-
-        new LevelCollection()
-        {
-            DisplayName = "Community Levels",
-            ShortName = "PubLev",
-            Levels = new LevelInfo[]
-            {
-                new LevelInfo()
-                {
-                    DisplayName = "[Greece] Time Trial 2026",
-                    Id = "greece-time-trial-2026",
-                    BuildIndex = 126,
-                    IsRaceable = true,
-                    NumCheckpoints = 3,
-                    MaxCars = 1,
-                    AutograderBuildIndex = 127,
-                    AutograderLevelCode = "gtt2026",
-                    AutograderLevels = new AutograderLevelInfo[]
-                    {
-                        new AutograderLevelInfo()
-                        {
-                            Title = "Time Trial 2026",
-                            Description = "Navigate through the course.",
-                            MaxPoints = 25,
-                            TimeLimit = 300,
-                            TimeBonuses = new Vector2[]{ new Vector2(85, 3), new Vector2(100, 2), new Vector2(130, 1), new Vector2(160, 0), new Vector2(190, -1), new Vector2(250, -3), new Vector2(float.PositiveInfinity, -5) }                        }
-                    }
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "[Greece] Time Trial 2025",
-                    Id = "greece-time-trial-2025",
-                    BuildIndex = 112,
-                    IsRaceable = true,
-                    NumCheckpoints = 3,
-                    MaxCars = 1,
-                    AutograderBuildIndex = 113,
-                    AutograderLevelCode = "gtt2025",
-                    AutograderLevels = new AutograderLevelInfo[]
-                    {
-                        new AutograderLevelInfo()
-                        {
-                            Title = "Time Trial 2025",
-                            Description = "Navigate through the course.",
-                            MaxPoints = 25,
-                            TimeLimit = 300,
-                            TimeBonuses = new Vector2[]{ new Vector2(85, 3), new Vector2(100, 2), new Vector2(130, 1), new Vector2(160, 0), new Vector2(190, -1), new Vector2(250, -3), new Vector2(float.PositiveInfinity, -5) }                        }
-                    }
-                },
-                new LevelInfo()
-                {
-                    DisplayName = "[Greece] Grand Prix 2025",
-                    Id = "greece-grand-prix-2025",
-                    BuildIndex = 114,
-                    IsRaceable = true,
-                    NumCheckpoints = 4,
-                    MaxCars = 4,
-                }
-            }
-        },
     };
     #endregion
 
@@ -1240,6 +1240,7 @@ public class LevelCollection
             foreach (LevelInfo level in collection.Levels)
             {
                 level.CollectionName = collection.ShortName;
+                level.CollectionDisplayName = collection.DisplayName;
                 if (level.IsRaceable)
                 {
                     LevelInfo.WinableLevels.Add(level);

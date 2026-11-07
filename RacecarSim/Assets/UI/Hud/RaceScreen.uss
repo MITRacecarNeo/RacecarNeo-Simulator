@@ -1,0 +1,150 @@
+/* Race screen for 2 to 4 cars: a header with the mode and timer, then one tile per car's view
+   (and the race camera in a free tile), each with the car's badge and speed. */
+
+.race-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--rcn-charcoal);
+}
+
+.race-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 72px;
+    padding: var(--rcn-space-2) var(--rcn-space-8) 0 var(--rcn-space-8);
+}
+
+.race-timer {
+    margin-left: var(--rcn-space-6);
+}
+
+.race-tiles {
+    flex-grow: 1;
+    flex-direction: column;
+    padding: var(--rcn-space-2) var(--rcn-space-4) var(--rcn-space-4) var(--rcn-space-4);
+}
+
+.race-row {
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.race-tile {
+    width: 50%;
+    flex-shrink: 1;
+    padding: var(--rcn-space-2);
+}
+
+.race-view {
+    flex-grow: 1;
+    background-color: var(--rcn-code-bg);
+    border-width: 2px;
+    border-color: var(--rcn-border);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    overflow: hidden;
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.race-tile--selected .race-view {
+    border-width: 4px;
+    border-color: var(--rcn-highlight);
+}
+
+.race-tile--waiting .race-view {
+    -unity-background-image-tint-color: var(--rcn-steel);
+}
+
+.race-badge {
+    position: absolute;
+    left: var(--rcn-space-3);
+    top: var(--rcn-space-3);
+    flex-direction: row;
+    align-items: center;
+    background-color: var(--rcn-overlay);
+    color: var(--rcn-text);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: var(--rcn-space-1) var(--rcn-space-4) var(--rcn-space-1) var(--rcn-space-2);
+}
+
+.race-swatch {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+    border-color: var(--rcn-paper);
+    border-top-left-radius: var(--rcn-radius-pill);
+    border-top-right-radius: var(--rcn-radius-pill);
+    border-bottom-left-radius: var(--rcn-radius-pill);
+    border-bottom-right-radius: var(--rcn-radius-pill);
+}
+
+.race-car-label {
+    padding: 0;
+    margin: 0 var(--rcn-space-3) 0 var(--rcn-space-2);
+}
+
+.race-readouts {
+    position: absolute;
+    right: var(--rcn-space-3);
+    top: var(--rcn-space-3);
+    align-items: center;
+    background-color: var(--rcn-overlay);
+    border-top-left-radius: var(--rcn-radius-md);
+    border-top-right-radius: var(--rcn-radius-md);
+    border-bottom-left-radius: var(--rcn-radius-md);
+    border-bottom-right-radius: var(--rcn-radius-md);
+    padding: var(--rcn-space-2) var(--rcn-space-3);
+}
+
+.race-gauge {
+    width: 112px;
+    height: 112px;
+    align-self: center;
+    margin-bottom: 20px;
+}
+
+/* Digits under the dial: at this size they would cross the ring */
+.race-gauge .hud-gauge-readout {
+    font-size: var(--rcn-text-sm);
+    bottom: -22px;
+}
+
+.race-waiting {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 40%;
+    color: var(--rcn-text);
+    -unity-text-align: middle-center;
+    white-space: normal;
+    display: none;
+}
+
+.race-tile--waiting .race-waiting {
+    display: flex;
+}
+
+/* The race camera tile has no badge or readouts */
+.race-tile--overview .race-badge,
+.race-tile--overview .race-readouts {
+    display: none;
+}
+
+.race-toast-row {
+    position: absolute;
+    left: 25%;
+    right: 25%;
+    top: 80px;
+    align-items: center;
+}

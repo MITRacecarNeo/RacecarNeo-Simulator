@@ -17,6 +17,17 @@ public class RacecarModelImport : AssetPostprocessor
     /// </summary>
     public const string ModelPath = RacecarModelImport.ModelFolder + "RacecarNeoV2.fbx";
 
+    /// <summary>
+    /// Paths of the car models in Settings.CarDetailLevel order: the low-detail model, ModelPath,
+    /// and the menu turntable's model.
+    /// </summary>
+    public static readonly string[] DetailModelPaths =
+    {
+        RacecarModelImport.ModelFolder + "RacecarNeoV2Low.fbx",
+        RacecarModelImport.ModelPath,
+        RacecarModelImport.ModelFolder + "RacecarNeoV2Showcase.fbx",
+    };
+
     private void OnPreprocessModel()
     {
         if (!this.assetPath.StartsWith(RacecarModelImport.ModelFolder))

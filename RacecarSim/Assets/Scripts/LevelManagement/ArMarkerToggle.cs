@@ -129,7 +129,11 @@ public class ArMarkerToggle : MonoBehaviour
             {
                 PlayerCameraViews.ScrollCaptures.Remove(this);
             }
-            this.renderers[(int)Renderers.Padding].material.SetColor("_Color", this.selected ? ArMarkerToggle.selectedColor : Color.white);
+            // Markers built without a padding object (some Mini Grand Prix markers) show no highlight
+            if (this.renderers.Length > (int)Renderers.Padding)
+            {
+                this.renderers[(int)Renderers.Padding].material.SetColor("_Color", this.selected ? ArMarkerToggle.selectedColor : Color.white);
+            }
         }
     }
 

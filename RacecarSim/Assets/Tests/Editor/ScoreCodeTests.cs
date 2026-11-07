@@ -49,11 +49,11 @@ public class ScoreCodeTests
     [Test]
     public void Encrypt_MatchesPythonReferenceVector()
     {
-        Assert.AreEqual(crossLanguageVector, Utilities.Encrypt("gp2026|23.5|25|étudiant", ScoreCodeTests.testKey, ScoreCodeTests.testIv));
+        Assert.AreEqual(crossLanguageVector, Utilities.Encrypt("gp2026|23.5|25|\u00e9tudiant", ScoreCodeTests.testKey, ScoreCodeTests.testIv));
     }
 
     [TestCase("lab1|12.5|25|student")]
-    [TestCase("gp2026|23.5|25|étudiant")]
+    [TestCase("gp2026|23.5|25|\u00e9tudiant")]
     [TestCase("")]
     public void DecryptScoreCode_RoundTrips(string payload)
     {

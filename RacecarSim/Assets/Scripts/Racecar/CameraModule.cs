@@ -316,6 +316,9 @@ public class CameraModule : RacecarModule
         this.colorRequest = new AsyncCaptureRequest(this.colorImageRaw.Length);
         this.depthRequest = new AsyncCaptureRequest(this.depthImageRaw.Length);
 
+        // Arena scenery is for the player's view only; the car's images stay as without it
+        this.colorCamera.cullingMask &= ~Arena.LayerMaskBit;
+        this.depthCamera.cullingMask &= ~Arena.LayerMaskBit;
         if (Settings.HideCarsInColorCamera)
         {
             this.colorCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("Player"));

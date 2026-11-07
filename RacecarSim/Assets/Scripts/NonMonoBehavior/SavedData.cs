@@ -29,9 +29,33 @@ public class SavedData
     public CarCustomization[] CarCustomizations;
 
     /// <summary>
-    /// True if the dialog was shown prompting the user to select a username.
+    /// True once the username reminder was shown. Kept in the saved file; the menu now shows the
+    /// reminder on every Autograder start while the username is the default (LevelLaunch).
     /// </summary>
     public bool WasUsernameDialogShown;
+
+    /// <summary>
+    /// Cars connected to with Connect car, newest first, at most MaxRecentCars.
+    /// </summary>
+    public List<CarLinkTarget> RecentCars = new List<CarLinkTarget>();
+
+    /// <summary>
+    /// The number of recent cars kept.
+    /// </summary>
+    public const int MaxRecentCars = 5;
+
+    /// <summary>
+    /// Moves a car to the front of the recent list, replacing an entry with the same address.
+    /// </summary>
+    public void RememberCar(CarLinkTarget target)
+    {
+        this.RecentCars.RemoveAll(entry => entry == null || entry.SameAddress(target));
+        this.RecentCars.Insert(0, target);
+        if (this.RecentCars.Count > SavedData.MaxRecentCars)
+        {
+            this.RecentCars.RemoveRange(SavedData.MaxRecentCars, this.RecentCars.Count - SavedData.MaxRecentCars);
+        }
+    }
 
     /// <summary>
     /// Returns the default data, which should be used when no saved data can be found.

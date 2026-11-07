@@ -1,90 +1,39 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 /// <summary>
-/// Manages the summary shown after completing the autograder for a lab.
+/// The summary shown after completing the autograder for a lab (UI Toolkit,
+/// AutograderSummary.uxml): lab title, total score and time, a row per trial, the username, and
+/// the score code with a copy button.
 /// </summary>
 public class AutograderSummary : MonoBehaviour
 {
     #region Set in Unity Editor
     /// <summary>
-    /// The UI template which displays the information about a single autograder level.
+    /// The document showing AutograderSummary.uxml.
     /// </summary>
     [SerializeField]
-    private GameObject levelEntry;
-
-    /// <summary>
-    /// The UI object which contains all of the level entries.
-    /// </summary>
-    [SerializeField]
-    private GameObject levelEntryContainer;
-
-    /// <summary>
-    /// The UI object which is displayed when the autograder was cut short.
-    /// </summary>
-    [SerializeField]
-    private GameObject cutShortMessage;
-
-    /// <summary>
-    /// The text inside cutShortMessage.
-    /// </summary>
-    [SerializeField]
-    private Text cutShortText;
-
-    /// <summary>
-    /// The lab title.
-    /// </summary>
-    [SerializeField]
-    private Text titleText;
-
-    /// <summary>
-    /// The total score and time.
-    /// </summary>
-    [SerializeField]
-    private Text totalText;
-
-    /// <summary>
-    /// The note explaining required trials, shown when the lab has one.
-    /// </summary>
-    [SerializeField]
-    private Text requiredTrialText;
-
-    /// <summary>
-    /// The username.
-    /// </summary>
-    [SerializeField]
-    private InputField usernameInput;
-
-    /// <summary>
-    /// The score code.
-    /// </summary>
-    [SerializeField]
-    private InputField scoreCodeInput;
+    private UIDocument document;
     #endregion
 
     #region Constants
     /// <summary>
-    /// The width of a level entry divided by the space between two level entries.
-    /// </summary>
-    private const int entryWidthToBufferRatio = 3;
-
-    /// <summary>
-    /// The fraction of the container that a single level entry should take up.
-    /// </summary>
-    private const float entryHeight = 0.2f;
-
-    /// <summary>
-    /// The fraction of the container that a level entry should leave unoccupied on the left and right.
-    /// </summary>
-    private const float entryXBuffer = 0.02f;
-
-    /// <summary>
     /// Shown in place of a score code when the build has no autograder key.
     /// </summary>
     private const string noKeyMessage = "Score codes unavailable in this build";
+
+    /// <summary>
+    /// The score code shown for the default username, which the online course rejects.
+    /// </summary>
+    private const string nullScoreCode = "0000000000000000";
+
+    /// <summary>
+    /// How long the copy button shows that the code was copied (in seconds).
+    /// </summary>
+    private const float copiedSeconds = 2;
     #endregion
 
     #region Public Interface
@@ -99,130 +48,27 @@ public class AutograderSummary : MonoBehaviour
     public static bool WasError = false;
 
     /// <summary>
+    /// The score code on screen.
+    /// </summary>
+    public string ScoreCode { get; private set; }
+
+    /// <summary>
     /// Return to the main menu.
     /// </summary>
     public void MainMenu()
     {
         AutograderManager.ResetAutograder();
-        SceneManager.LoadScene(LevelCollection.MainMenuBuildIndex, LoadSceneMode.Single);
-    }
-    #endregion
-
-    private void Start()
-    {
-        this.PopulateLevelEntries(LevelManager.LevelInfo.AutograderLevels, AutograderManager.levelScores.ToArray(), out float totalScore, out float totalTime, out bool requiredTrial);
-        this.titleText.text = $"{LevelManager.LevelInfo.FullName} Autograder";
-        this.totalText.text = $"{totalScore:F2}/{LevelManager.LevelInfo.AutograderMaxScore:F2}; {totalTime} seconds";
-        this.requiredTrialText.gameObject.SetActive(requiredTrial);
-
-        this.usernameInput.text = Settings.Username;
-        this.scoreCodeInput.text = this.GenerateScoreCode(LevelManager.LevelInfo, totalScore, Settings.Username);
-        string trials = string.Join("; ", AutograderManager.levelScores.Select((level, i) => $"{i + 1}: {level.Score} pts, {level.Time:F2} s"));
-        Debug.Log($"Autograder summary: {LevelManager.LevelInfo.FullName}, score {totalScore}, error {AutograderSummary.WasError}, trials [{trials}], score code {this.scoreCodeInput.text}");
-
-        if (AutograderSummary.WasError || AutograderSummary.WasRequiredLevelFailed)
-        { 
-            this.cutShortMessage.SetActive(true);
-            Text message = this.cutShortText;
-            if (AutograderSummary.WasError)
-            {
-                message.text = "The autograder was cut short because an error occurred. This may be because your Python program encountered an error.";
-            }
-            else // wasRequiredLevelFailed
-            {
-                int failedLevel = Mathf.Clamp(AutograderManager.levelScores.Count, 1, LevelManager.LevelInfo.AutograderLevels.Length);
-                AutograderLevelInfo lastLevelInfo = LevelManager.LevelInfo.AutograderLevels[failedLevel - 1];
-                message.text = $"The autograder was cut short because you did not pass the required trial <b>{failedLevel}. {lastLevelInfo.Title}</b>. To complete the full autograder for this lab, you must pass that trial with full points.";
-            }
-        }
-        AutograderSummary.WasError = false;
-        AutograderSummary.WasRequiredLevelFailed = false;
-    }
-
-    private void Update()
-    {
-        if (Input.anyKeyDown)
-        {
-            this.cutShortMessage.SetActive(false);
-        }
+        SceneFlow.Load(LevelCollection.MainMenuBuildIndex, SceneTransition.Wipe);
     }
 
     /// <summary>
-    /// Populates the level entry container with information about every level of the autograder.
+    /// Copies the score code to the system clipboard.
     /// </summary>
-    /// <param name="levelInfos">Information about each autograder level.</param>
-    /// <param name="levelScores">Information about the user's performance on each autograder level.</param>
-    /// <param name="totalMaxScore">The sum of the max score of each autograder level.</param>
-    /// <param name="totalScore">The sum of the user's score on each level.</param>
-    /// <param name="totalTime">The sum of the user's time spent on each level.</param>
-    /// <param name="requiredTrial">True if this lab contained one or more required trials.</param>
-    private void PopulateLevelEntries(AutograderLevelInfo[] levelInfos, AutograderLevelScore[] levelScores, out float totalScore, out float totalTime, out bool requiredTrial)
+    public void CopyScoreCode()
     {
-        totalScore = 0;
-        totalTime = 0;
-        requiredTrial = false;
-
-        // Set anchor points of container
-        RectTransform container = (RectTransform)this.levelEntryContainer.transform;
-        container.anchorMax = new Vector2(1, 1);
-        container.anchorMin = new Vector2(0, 1 - AutograderSummary.entryHeight * levelInfos.Length);
-        container.anchoredPosition = new Vector2(0, 0);
-        container.sizeDelta = new Vector2(0, 0);
-
-        float entryYBuffer = 1.0f / (levelInfos.Length * (AutograderSummary.entryWidthToBufferRatio + 1) + 2);
-        float entryHeight = entryYBuffer * AutograderSummary.entryWidthToBufferRatio;
-        float anchorY = 1 - entryYBuffer;
-
-        for (int i = 0; i < levelInfos.Length; i++)
-        {
-            GameObject entry = GameObject.Instantiate(this.levelEntry, Vector3.zero, Quaternion.identity);
-
-            // Set uiEntry's anchor points inside of the container
-            entry.transform.SetParent(this.levelEntryContainer.transform);
-            RectTransform rect = entry.GetComponent<RectTransform>();
-            rect.anchorMax = new Vector2(1 - AutograderSummary.entryXBuffer, anchorY);
-            anchorY -= entryHeight;
-            rect.anchorMin = new Vector2(AutograderSummary.entryXBuffer, anchorY);
-            anchorY -= entryYBuffer;
-
-            // Size exactly to the anchor points
-            rect.anchoredPosition = new Vector2(0, 0);
-            rect.sizeDelta = new Vector2(0, 0);
-
-            // Set entry
-            if (i < levelScores.Length)
-            {
-                totalScore += levelScores[i].Score;
-                totalTime += levelScores[i].Time;
-                entry.GetComponent<AutograderUIEntry>().SetInfo(levelInfos[i], levelScores[i]);
-            }
-            else
-            {
-                entry.GetComponent<AutograderUIEntry>().SetInfo(levelInfos[i], null);
-            }
-
-            requiredTrial |= levelInfos[i].IsRequired;
-        }
-    }
-
-    /// <summary>
-    /// Generates an encrypted score code which encodes the user's score for the level.
-    /// </summary>
-    /// <param name="levelInfo">Information about the lab.</param>
-    /// <param name="score">The user's total score on the lab autograder.</param>
-    /// <param name="username">The user's OpenEdx username.</param>
-    /// <returns>An hex ciphertext which encodes the user's score for the level.</returns>
-    private string GenerateScoreCode(LevelInfo levelInfo, float score, string username)
-    {
-        if (username == "Default"){
-            return "0000000000000000"; // Null code to prevent users from using default username in Edly autograder
-        } else if (!Utilities.HasKey) {
-            return AutograderSummary.noKeyMessage;
-        } else {
-            string scoreCode = AutograderSummary.FormatScorePayload(levelInfo.AutograderLevelCode, score, levelInfo.AutograderMaxScore, username);
-            return Utilities.Encrypt(scoreCode);
-        }
-
+        GUIUtility.systemCopyBuffer = this.ScoreCode;
+        this.copyButton.text = "Copied";
+        this.copiedUntil = Time.unscaledTime + AutograderSummary.copiedSeconds;
     }
 
     /// <summary>
@@ -232,10 +78,164 @@ public class AutograderSummary : MonoBehaviour
     /// <param name="levelCode">The lab's autograder level code.</param>
     /// <param name="score">The user's total score on the lab autograder.</param>
     /// <param name="maxScore">The maximum score for the lab.</param>
-    /// <param name="username">The user's OpenEdx username.</param>
+    /// <param name="username">The course ID from the Edly autograder problem (Settings.Username).</param>
     /// <returns>The payload in the form code|score|max|username.</returns>
     public static string FormatScorePayload(string levelCode, float score, float maxScore, string username)
     {
         return FormattableString.Invariant($"{levelCode}|{score}|{maxScore}|{username}");
+    }
+    #endregion
+
+    private VisualElement root;
+    private Button copyButton;
+    private float copiedUntil = -1;
+
+    private void Start()
+    {
+        this.root = this.document.rootVisualElement;
+        this.copyButton = this.root.Q<Button>("copy");
+        this.copyButton.clicked += this.CopyScoreCode;
+        this.root.Q<Button>("menu").clicked += this.MainMenu;
+
+        LevelInfo lab = LevelManager.LevelInfo;
+        AutograderLevelScore[] scores = AutograderManager.levelScores.ToArray();
+        // Float accumulation in trial order, as before, so the score code payload is unchanged
+        float totalScore = 0;
+        float totalTime = 0;
+        for (int i = 0; i < Mathf.Min(scores.Length, lab.AutograderLevels.Length); i++)
+        {
+            totalScore += scores[i].Score;
+            totalTime += scores[i].Time;
+        }
+
+        this.root.Q<Label>("lab-title").text = lab.DisplayName;
+        this.root.Q<Label>("total-score").text = $"{AutograderSummary.Points(totalScore)} / {AutograderSummary.Points(lab.AutograderMaxScore)}";
+        this.root.Q<Label>("total-time").text = $"{totalTime.ToString("F2", CultureInfo.InvariantCulture)} s";
+        this.root.Q<GradientBar>("total-progress").Fill = lab.AutograderMaxScore > 0 ? Mathf.Clamp01(totalScore / lab.AutograderMaxScore) : 0;
+
+        ScrollView trials = this.root.Q<ScrollView>("trials");
+        for (int i = 0; i < lab.AutograderLevels.Length; i++)
+        {
+            trials.Add(AutograderSummary.TrialRow(i, lab.AutograderLevels[i], i < scores.Length ? scores[i] : null));
+        }
+        this.root.Q("required-note").style.display = lab.AutograderLevels.Any(level => level.IsRequired) ? DisplayStyle.Flex : DisplayStyle.None;
+
+        this.root.Q<Label>("username").text = Settings.Username;
+        this.ScoreCode = AutograderSummary.GenerateScoreCode(lab, totalScore, Settings.Username);
+        this.root.Q<TextField>("score-code").value = this.ScoreCode;
+        this.copyButton.SetEnabled(this.ScoreCode != AutograderSummary.noKeyMessage);
+
+        string trialLog = string.Join("; ", scores.Select((level, i) => $"{i + 1}: {level.Score} pts, {level.Time:F2} s"));
+        Debug.Log($"Autograder summary: {lab.FullName}, score {totalScore}, error {AutograderSummary.WasError}, trials [{trialLog}], score code {this.ScoreCode}");
+
+        if (AutograderSummary.WasError || AutograderSummary.WasRequiredLevelFailed)
+        {
+            this.root.Q("cut-short").style.display = DisplayStyle.Flex;
+            this.root.Q<Label>("cut-short-text").text = AutograderSummary.WasError
+                ? "The autograder was cut short because an error occurred. This may be because your Python program encountered an error."
+                : AutograderSummary.RequiredFailedMessage(lab, scores.Length);
+        }
+        AutograderSummary.WasError = false;
+        AutograderSummary.WasRequiredLevelFailed = false;
+    }
+
+    private void Update()
+    {
+        if (this.copiedUntil > 0 && Time.unscaledTime >= this.copiedUntil)
+        {
+            this.copiedUntil = -1;
+            this.copyButton.text = "Copy";
+        }
+        if (Input.GetKeyDown(Hotkeys.Exit) && !SceneFlow.IsTransitioning)
+        {
+            this.MainMenu();
+        }
+    }
+
+    private static string RequiredFailedMessage(LevelInfo lab, int finishedLevels)
+    {
+        int failedLevel = Mathf.Clamp(finishedLevels, 1, lab.AutograderLevels.Length);
+        AutograderLevelInfo failed = lab.AutograderLevels[failedLevel - 1];
+        return $"The autograder was cut short because you did not pass the required trial <b>{failedLevel}. {failed.Title}</b>. To complete the full autograder for this lab, you must pass that trial with full points.";
+    }
+
+    private static VisualElement TrialRow(int index, AutograderLevelInfo level, AutograderLevelScore score)
+    {
+        VisualElement row = new VisualElement();
+        row.AddToClassList("ags-row");
+        row.Add(AutograderSummary.RowLabel((index + 1).ToString(CultureInfo.InvariantCulture), "rcn-numeric", "rcn-muted", "ags-row-index"));
+        row.Add(AutograderSummary.RowLabel(level.IsRequired ? $"*{level.Title}" : level.Title, "rcn-body", "ags-row-title"));
+
+        GradientBar bar = new GradientBar { Fill = score != null && level.MaxPoints > 0 ? Mathf.Clamp01(score.Score / level.MaxPoints) : 0 };
+        bar.AddToClassList("rcn-progress");
+        bar.AddToClassList("ags-row-bar");
+        row.Add(bar);
+
+        string points = score != null ? AutograderSummary.Points(score.Score) : "--";
+        Label scoreLabel = AutograderSummary.RowLabel($"{points} / {AutograderSummary.Points(level.MaxPoints)}", "rcn-numeric", "ags-row-score");
+        string scoreClass = AutograderSummary.ScoreClass(level.MaxPoints, score?.Score);
+        if (scoreClass != null)
+        {
+            scoreLabel.AddToClassList(scoreClass);
+        }
+        row.Add(scoreLabel);
+
+        string time = score != null ? $"{score.Time.ToString("F2", CultureInfo.InvariantCulture)} s" : "--";
+        row.Add(AutograderSummary.RowLabel(time, "rcn-numeric", "rcn-muted", "ags-row-time"));
+        return row;
+    }
+
+    /// <summary>
+    /// The style class for a trial score: none (no points or not run), partial, extra (over the
+    /// maximum), or null for full credit.
+    /// </summary>
+    public static string ScoreClass(float maxPoints, float? score)
+    {
+        if (score == null || (maxPoints > 0 && score.Value <= 0))
+        {
+            return "ags-row-score--none";
+        }
+        if (score.Value > maxPoints)
+        {
+            return "ags-row-score--extra";
+        }
+        return score.Value < maxPoints ? "ags-row-score--partial" : null;
+    }
+
+    private static Label RowLabel(string text, params string[] classes)
+    {
+        Label label = new Label(text);
+        foreach (string name in classes)
+        {
+            label.AddToClassList(name);
+        }
+        return label;
+    }
+
+    private static string Points(float points)
+    {
+        return points.ToString("F2", CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Generates an encrypted score code which encodes the user's score for the level.
+    /// </summary>
+    /// <param name="levelInfo">Information about the lab.</param>
+    /// <param name="score">The user's total score on the lab autograder.</param>
+    /// <param name="username">The course ID from the Edly autograder problem (Settings.Username).</param>
+    /// <returns>An hex ciphertext which encodes the user's score for the level.</returns>
+    private static string GenerateScoreCode(LevelInfo levelInfo, float score, string username)
+    {
+        if (username == "Default")
+        {
+            // Null code to prevent users from using default username in Edly autograder
+            return AutograderSummary.nullScoreCode;
+        }
+        if (!Utilities.HasKey)
+        {
+            return AutograderSummary.noKeyMessage;
+        }
+        string scoreCode = AutograderSummary.FormatScorePayload(levelInfo.AutograderLevelCode, score, levelInfo.AutograderMaxScore, username);
+        return Utilities.Encrypt(scoreCode);
     }
 }

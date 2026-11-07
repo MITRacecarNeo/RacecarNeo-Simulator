@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="SceneFlow.uss" />
+    <ui:VisualElement name="scene-flow" class="sf-root">
+        <TransitionWipe name="wipe" class="sf-wipe" />
+        <ui:VisualElement name="card" class="sf-card">
+            <ui:VisualElement name="card-thumbnail" class="sf-card-thumbnail" />
+            <ui:Label name="card-collection" class="rcn-eyebrow rcn-muted" />
+            <ui:Label name="card-title" class="rcn-h1 rcn-motion" />
+            <ui:Label name="card-mode" class="rcn-label rcn-muted" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

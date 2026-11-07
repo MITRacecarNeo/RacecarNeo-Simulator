@@ -1,0 +1,69 @@
+/* Scene change overlay: the wipe fills the screen; the loading card sits in the lower-left safe area. */
+
+.sf-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.sf-wipe {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Mode tints: the charcoal cover mixed with the mode's brand color for the whole change. Each mix
+   keeps the card text at 4.5:1 or more (SceneFlowCardRenderTests). */
+.sf--autograder .sf-wipe {
+    --tint: var(--rcn-crimson);
+    --tint-strength: 0.55;
+}
+
+.sf--race .sf-wipe {
+    --tint: var(--rcn-orange);
+    --tint-strength: 0.52;
+}
+
+/* Mist text falls below 4.5:1 on the orange tint; the race card uses paper for every line */
+.sf--race .sf-card Label {
+    color: var(--rcn-paper);
+}
+
+.sf-card {
+    position: absolute;
+    left: var(--rcn-space-16);
+    bottom: var(--rcn-space-16);
+    max-width: 60%;
+    opacity: 0;
+    translate: -48px 0;
+    transition-property: opacity, translate;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out-cubic;
+}
+
+.sf-card-thumbnail {
+    width: 640px;
+    height: 360px;
+    margin-bottom: var(--rcn-space-6);
+    border-top-left-radius: var(--rcn-radius-lg);
+    border-top-right-radius: var(--rcn-radius-lg);
+    border-bottom-left-radius: var(--rcn-radius-lg);
+    border-bottom-right-radius: var(--rcn-radius-lg);
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.sf-card--visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* Optical alignment: the italic title's slant and side bearing start its letters right of the
+   upright lines above and below. The right shift depends on the first letter (about 8 px for W,
+   2 px for L at this size); 5 px keeps both within 3 px of the edge. */
+#card-title {
+    margin-left: -5px;
+}

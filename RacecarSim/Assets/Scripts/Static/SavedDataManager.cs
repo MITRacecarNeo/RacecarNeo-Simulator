@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -23,7 +24,7 @@ public static class SavedDataManager
     /// <summary>
     /// The folder holding saved data: Application.persistentDataPath, or -racecarsim-data-dir.
     /// </summary>
-    private static string DataDirectory
+    public static string DataDirectory
     {
         get
         {
@@ -107,6 +108,11 @@ public static class SavedDataManager
             data.ClearBestTimes();
         }
         data.BestTimes.RemoveAll(entry => entry == null || string.IsNullOrEmpty(entry.LevelId));
+        if (data.RecentCars == null)
+        {
+            data.RecentCars = new List<CarLinkTarget>();
+        }
+        data.RecentCars.RemoveAll(entry => entry == null || !CarLinkTarget.IsValidHost(entry.Host));
 
         // Saves before version 3 hold stripe and logo colors, which do not map onto the shell
         if (data.Version < 3 || data.CarCustomizations == null || data.CarCustomizations.Length < SavedData.Default.CarCustomizations.Length

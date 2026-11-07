@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="screen" class="rcn-screen" style="padding: 48px; flex-direction: row;">
+        <ui:VisualElement name="type" style="width: 55%;">
+            <ui:Label text="FOUNDATION" class="rcn-eyebrow rcn-muted" />
+            <ui:Label name="display" text="RACECAR Neo" class="rcn-display" />
+            <GradientBar name="divider" class="rcn-divider" style="margin: 12px 0 24px 0;" />
+            <ui:Label text="Heading one" class="rcn-h1" />
+            <ui:Label text="Heading two" class="rcn-h2" />
+            <ui:Label text="Heading three" class="rcn-h3" />
+            <ui:Label text="Heading four" class="rcn-h4" />
+            <ui:Label name="body" text="Body text in Barlow at the base size." class="rcn-body" />
+            <ui:Label text="Muted text for secondary details." class="rcn-body rcn-muted" />
+            <ui:Label text="UI label" class="rcn-label" />
+            <ui:Label text="Caption" class="rcn-caption" />
+            <ui:Label text="Grand Prix" class="rcn-h2 rcn-motion" />
+            <ui:Label text="rc.drive.set_speed_angle(1.0, 0.0)" class="rcn-code" style="margin-top: 12px; align-self: flex-start;" />
+            <ui:Label text="0.25 m/s  9.81 m/s^2" class="rcn-numeric" style="margin-top: 12px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="components" style="width: 45%;">
+            <ParallelogramElement name="timer" text="01:23.45" class="rcn-timer-badge" />
+            <ParallelogramElement name="badge" text="BEST" class="rcn-badge" style="margin-top: 24px;" />
+            <ui:VisualElement style="flex-direction: row; margin-top: 24px;">
+                <ui:Button name="primary" text="Start" class="rcn-button" />
+                <ui:Button name="secondary" text="Back" class="rcn-button rcn-button--secondary" style="margin-left: 24px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="card" class="rcn-card" style="margin-top: 24px;">
+                <ui:Label text="Card" class="rcn-h4" />
+                <ui:Label text="Level card surface with a border." class="rcn-body rcn-muted" />
+            </ui:VisualElement>
+            <ui:VisualElement name="surface" class="rcn-surface" style="margin-top: 24px;">
+                <ui:Label text="Raised surface" class="rcn-body" />
+            </ui:VisualElement>
+            <GradientBar name="progress" class="rcn-progress" fill="0.6" style="margin-top: 24px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

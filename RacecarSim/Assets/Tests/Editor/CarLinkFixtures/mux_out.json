@@ -1,0 +1,1 @@
+{"op":"publish","topic":"\/mux_out","msg":{"header":{"stamp":{"sec":1792492836,"nanosec":851549769},"frame_id":"base_link"},"drive":{"steering_angle":0.0,"steering_angle_velocity":0.0,"speed":0.0,"acceleration":0.0,"jerk":0.0}}}

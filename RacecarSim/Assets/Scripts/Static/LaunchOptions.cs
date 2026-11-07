@@ -13,7 +13,8 @@ using System.Linq;
 /// -racecarsim-diagnostics CSV enables SimDiagnostics, with -racecarsim-screenshot-interval
 /// and -racecarsim-restart-interval in seconds. -racecarsim-username sets the username for this
 /// session only (not saved), so an unattended autograder run produces a score code.
-/// -racecarsim-frametime CSV enables FrameTimeLog.
+/// -racecarsim-frametime CSV enables FrameTimeLog. -racecarsim-car host[:bridgePort[:apiPort]]
+/// connects to a physical car from the main menu on start.
 /// </summary>
 public static class LaunchOptions
 {
@@ -33,6 +34,12 @@ public static class LaunchOptions
         public float RestartInterval;
         public string Username;
         public string FrameTimePath;
+        public string Car;
+
+        /// <summary>
+        /// A captured world to open (its name in the library, or its folder).
+        /// </summary>
+        public string World;
     }
 
     /// <summary>
@@ -44,6 +51,12 @@ public static class LaunchOptions
     /// True once the requested level was loaded, so returning to the main menu shows the menu.
     /// </summary>
     private static bool wasLevelRequestTaken;
+
+    /// <summary>
+    /// True once the requested car connection was started.
+    /// </summary>
+    private static bool wasCarRequestTaken;
+    private static bool wasWorldRequestTaken;
 
     /// <summary>
     /// Parses launch options; unknown arguments are ignored.
@@ -94,6 +107,12 @@ public static class LaunchOptions
                 case "-racecarsim-frametime":
                     options.FrameTimePath = next;
                     break;
+                case "-racecarsim-car":
+                    options.Car = next;
+                    break;
+                case "-racecarsim-world":
+                    options.World = next;
+                    break;
                 case "-racecarsim-restart-interval":
                     options.RestartInterval = LaunchOptions.ParsePositive(next, 0);
                     break;
@@ -114,6 +133,41 @@ public static class LaunchOptions
     private static float ParsePositive(string text, float fallback)
     {
         return float.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float value) && value > 0 ? value : fallback;
+    }
+
+    /// <summary>
+    /// Returns the car requested with -racecarsim-car the first time it is called, then false.
+    /// </summary>
+    /// <param name="target">The requested car, if the option parses.</param>
+    public static bool TryTakeCarRequest(out CarLinkTarget target)
+    {
+        target = null;
+        if (LaunchOptions.wasCarRequestTaken || string.IsNullOrEmpty(LaunchOptions.Current.Car))
+        {
+            return false;
+        }
+        LaunchOptions.wasCarRequestTaken = true;
+        if (!CarLinkTarget.TryParse(LaunchOptions.Current.Car, out target))
+        {
+            UnityEngine.Debug.LogError($"Bad car address [{LaunchOptions.Current.Car}] passed to -racecarsim-car.");
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Returns the world requested with -racecarsim-world the first time it is called, then false.
+    /// </summary>
+    /// <param name="world">The world's name or folder, as given.</param>
+    public static bool TryTakeWorldRequest(out string world)
+    {
+        world = LaunchOptions.Current.World;
+        if (LaunchOptions.wasWorldRequestTaken || string.IsNullOrEmpty(world))
+        {
+            return false;
+        }
+        LaunchOptions.wasWorldRequestTaken = true;
+        return true;
     }
 
     /// <summary>

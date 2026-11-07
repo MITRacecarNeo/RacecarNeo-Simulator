@@ -1,0 +1,43 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="AutograderSummary.uss" />
+    <ui:VisualElement name="summary" class="ags-root">
+        <ui:VisualElement class="rcn-card ags-panel">
+            <ui:VisualElement class="ags-header">
+                <ui:VisualElement class="ags-heading">
+                    <ui:Label text="AUTOGRADER" class="rcn-eyebrow rcn-muted" />
+                    <ui:Label name="lab-title" class="rcn-h2 rcn-motion ags-title" />
+                </ui:VisualElement>
+                <ui:VisualElement class="ags-total">
+                    <ui:Label name="total-score" class="rcn-h2 rcn-numeric" />
+                    <ui:Label name="total-time" class="rcn-label rcn-muted ags-total-time" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <GradientBar name="total-progress" class="rcn-progress ags-progress" fill="0" />
+
+            <ui:VisualElement name="cut-short" class="ags-alert">
+                <ui:Label name="cut-short-text" class="rcn-body ags-alert-text" />
+            </ui:VisualElement>
+
+            <ui:ScrollView name="trials" class="ags-trials" />
+            <ui:Label name="required-note" text="* Required trial (must be passed to continue)" class="rcn-caption rcn-muted ags-note" />
+
+            <ui:VisualElement class="ags-footer">
+                <ui:VisualElement class="ags-field ags-field--username">
+                    <ui:Label text="COURSE ID" class="rcn-eyebrow rcn-muted" />
+                    <ui:Label name="username" class="rcn-body ags-username" />
+                </ui:VisualElement>
+                <ui:VisualElement class="ags-field ags-field--code">
+                    <ui:Label text="SCORE CODE" class="rcn-eyebrow rcn-muted" />
+                    <ui:VisualElement class="ags-code-row">
+                        <ui:TextField name="score-code" readonly="true" class="ags-code" />
+                        <ui:Button name="copy" text="Copy" class="rcn-button rcn-button--secondary ags-copy" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="menu" class="rcn-button ags-menu">
+                    <MenuIcon icon="Back" class="ags-icon" />
+                    <ui:Label text="Main menu" class="ags-button-label" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

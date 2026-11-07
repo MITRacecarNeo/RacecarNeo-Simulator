@@ -1,0 +1,113 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="Hud.uss" />
+    <ui:VisualElement name="hud" class="hud-root" picking-mode="Ignore">
+        <ui:VisualElement name="left-column" class="hud-left-column" picking-mode="Ignore">
+            <ui:VisualElement name="map" class="hud-map">
+                <ui:VisualElement name="map-image" class="hud-map-image" />
+                <MiniMapView name="map-overlay" class="hud-map-image" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hud-spacer" picking-mode="Ignore" />
+            <ui:VisualElement name="tray-left" class="hud-tray hud-tray-left" picking-mode="Ignore">
+                <ui:VisualElement class="hud-l-panel hud-l-tall">
+                    <ui:VisualElement class="hud-feed-box">
+                        <ui:VisualElement name="lidar-feed" class="hud-feed" />
+                        <ui:Label text="LIDAR" class="rcn-eyebrow hud-feed-label" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hud-feed-box hud-feed-box--below">
+                        <ui:VisualElement name="color-feed" class="hud-feed" />
+                        <ui:Label text="CAMERA" class="rcn-eyebrow hud-feed-label" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="hud-l-panel hud-l-short">
+                    <ui:VisualElement class="hud-feed-box">
+                        <ui:VisualElement name="depth-feed" class="hud-feed" />
+                        <ui:Label text="DEPTH" class="rcn-eyebrow hud-feed-label" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="top-center" class="hud-top-center" picking-mode="Ignore">
+            <ui:VisualElement name="chip" class="hud-chip">
+                <MenuIcon name="mode-icon" class="hud-chip-icon" />
+                <ui:Label name="mode-label" class="rcn-label hud-chip-label" />
+                <ui:VisualElement name="connection" class="hud-connection" />
+                <ui:Label name="time-scale" class="rcn-label hud-time-scale" />
+            </ui:VisualElement>
+            <ui:VisualElement name="toast" class="hud-toast">
+                <ui:Label name="toast-text" class="rcn-body hud-toast-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="top-right" class="hud-top-right" picking-mode="Ignore">
+            <ParallelogramElement name="timer" text="00:00.00" class="rcn-timer-badge hud-timer" />
+            <ui:VisualElement name="pips" class="hud-pips" />
+            <ui:VisualElement name="autograder" class="rcn-overlay hud-autograder">
+                <ui:Label name="ag-trial" class="rcn-eyebrow rcn-muted" />
+                <ui:Label name="ag-title" class="rcn-h4 hud-ag-title" />
+                <ui:Label name="ag-description" class="rcn-caption rcn-muted hud-ag-text" />
+                <ui:VisualElement class="hud-ag-row">
+                    <ui:VisualElement class="hud-ag-score-box">
+                        <ui:Label name="ag-score" class="rcn-h3 rcn-numeric" />
+                        <ui:Label name="ag-limit" class="rcn-label hud-ag-limit" />
+                    </ui:VisualElement>
+                    <TimeRing name="ag-ring" class="hud-ag-ring">
+                        <ui:Label name="ag-ring-text" class="rcn-numeric hud-ag-ring-text" />
+                    </TimeRing>
+                </ui:VisualElement>
+                <GradientBar name="ag-progress" class="rcn-progress hud-ag-progress" fill="0" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="tray-right" class="hud-tray hud-tray-right" picking-mode="Ignore">
+            <ui:VisualElement name="dot-matrix" class="hud-dot-matrix" />
+            <ui:VisualElement class="hud-tray-row">
+                <ui:VisualElement class="hud-readouts">
+                    <ui:Label text="ACCEL (M/S^2)" class="rcn-eyebrow rcn-muted" />
+                    <ui:Label name="accel" class="rcn-numeric hud-readout" />
+                    <ui:Label text="GYRO (RAD/S)" class="rcn-eyebrow rcn-muted hud-readout-gap" />
+                    <ui:Label name="gyro" class="rcn-numeric hud-readout" />
+                    <ui:VisualElement name="battery" class="hud-battery">
+                        <ui:Label text="BATTERY" class="rcn-eyebrow rcn-muted hud-readout-gap" />
+                        <ui:VisualElement class="hud-meter">
+                            <ui:VisualElement class="hud-meter-track">
+                                <ui:VisualElement name="volts-fill" class="hud-meter-fill hud-meter-fill--volts" />
+                            </ui:VisualElement>
+                            <ui:Label name="volts-text" class="rcn-numeric hud-readout hud-meter-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="hud-meter">
+                            <ui:VisualElement class="hud-meter-track">
+                                <ui:VisualElement name="amps-fill" class="hud-meter-fill hud-meter-fill--amps" />
+                            </ui:VisualElement>
+                            <ui:Label name="amps-text" class="rcn-numeric hud-readout hud-meter-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="pad" class="hud-pad" />
+                </ui:VisualElement>
+                <ui:VisualElement class="hud-side">
+                    <ui:Label text="BODY FRAME" class="rcn-eyebrow rcn-muted" />
+                    <BodyFrameView name="body-frame" class="hud-body-frame" />
+                    <ui:VisualElement name="gauge-box" class="hud-gauge-box" picking-mode="Ignore">
+                        <SpeedGauge name="gauge" class="hud-gauge">
+                            <ui:Label text="TRUE SPEED  M/S" class="rcn-eyebrow rcn-muted hud-gauge-label" />
+                        </SpeedGauge>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="pause" class="hud-pause">
+            <ui:Label text="Paused" class="rcn-h1 rcn-motion" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="result" class="hud-result-backdrop">
+            <ui:VisualElement name="result-card" class="rcn-card hud-result">
+                <MenuIcon name="result-icon" class="hud-result-icon" />
+                <ui:Label name="result-title" class="rcn-h2 rcn-motion hud-result-title" />
+                <ui:Label name="result-detail" class="rcn-body rcn-muted hud-result-detail" />
+                <ParallelogramElement name="result-best" text="NEW BEST" class="rcn-badge hud-result-best" />
+                <ui:VisualElement name="result-hints" class="hud-hints" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

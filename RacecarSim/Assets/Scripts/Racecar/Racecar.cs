@@ -73,6 +73,12 @@ public class Racecar : MonoBehaviour
     public Hud Hud { get; set; }
 
     /// <summary>
+    /// If true, Space, C, and the scroll wheel change this car's camera view and zoom. In a race
+    /// with several cars, RaceScreen gives this to the selected car only.
+    /// </summary>
+    public bool TakesViewInput { get; set; } = true;
+
+    /// <summary>
     /// The center point of the car, inside the payload shell collider (mid-height of the lower
     /// shell). Level objects aim raycasts at it to find the car's surface.
     /// </summary>
@@ -155,6 +161,32 @@ public class Racecar : MonoBehaviour
     public float CameraZoom { get; private set; } = 1;
 
     /// <summary>
+    /// True to keep the camera at the view's offset from the car, smoothing only the offset as
+    /// the car turns. A car posed from outside (the car world) moves evenly while frame times
+    /// vary; trailing it by a frame-time lerp would show that variation as the camera surging.
+    /// </summary>
+    public bool IsCameraOffsetSmoothed
+    {
+        get
+        {
+            return this.isCameraOffsetSmoothed;
+        }
+        set
+        {
+            this.isCameraOffsetSmoothed = value;
+            if (value && this.playerCameras.Length > 0)
+            {
+                this.cameraOffset = this.playerCameras[0].transform.position - this.Center;
+            }
+        }
+    }
+
+    /// <summary>
+    /// The view camera, or null.
+    /// </summary>
+    public Camera ViewCamera { get { return this.playerCameras.Length > 0 ? this.playerCameras[0] : null; } }
+
+    /// <summary>
     /// Switches to a view at its default distance.
     /// </summary>
     /// <param name="cameraIndex">The view index in PlayerCameraViews.</param>
@@ -166,9 +198,17 @@ public class Racecar : MonoBehaviour
         {
             this.playerCameras[0].transform.position = PlayerCameraViews.Position(this.transform, this.Center, this.CameraView, this.CameraZoom);
             this.playerCameras[0].transform.LookAt(this.Center);
+            this.cameraOffset = this.playerCameras[0].transform.position - this.Center;
         }
     }
     #endregion
+
+    /// <summary>
+    /// The camera's smoothed offset from Center (IsCameraOffsetSmoothed).
+    /// </summary>
+    private Vector3 cameraOffset;
+
+    private bool isCameraOffsetSmoothed;
 
     /// <summary>
     /// Per-car copy of the shell material created by SetIndex.
@@ -201,12 +241,17 @@ public class Racecar : MonoBehaviour
 
     private void Update()
     {
+        if (!this.TakesViewInput)
+        {
+            return;
+        }
+
         // Space cycles the views and C returns to the first; each view starts at its default distance
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(Hotkeys.NextView))
         {
             this.SetCamera((this.CameraView + 1) % PlayerCameraViews.Count);
         }
-        else if (Input.GetKeyDown(KeyCode.C))
+        else if (Input.GetKeyDown(Hotkeys.ResetView))
         {
             this.SetCamera(0);
         }
@@ -226,10 +271,16 @@ public class Racecar : MonoBehaviour
         }
 
         Transform cameraTransform = this.playerCameras[0].transform;
-        cameraTransform.position = Vector3.Lerp(
-            cameraTransform.position,
-            PlayerCameraViews.Position(this.transform, this.Center, this.CameraView, this.CameraZoom),
-            Racecar.cameraSpeed * Time.deltaTime);
+        Vector3 target = PlayerCameraViews.Position(this.transform, this.Center, this.CameraView, this.CameraZoom);
+        if (this.IsCameraOffsetSmoothed)
+        {
+            this.cameraOffset = Vector3.Lerp(this.cameraOffset, target - this.Center, 1 - Mathf.Exp(-Racecar.cameraSpeed * Time.deltaTime));
+            cameraTransform.position = this.Center + this.cameraOffset;
+        }
+        else
+        {
+            cameraTransform.position = Vector3.Lerp(cameraTransform.position, target, Racecar.cameraSpeed * Time.deltaTime);
+        }
         cameraTransform.LookAt(this.Center);
     }
 }

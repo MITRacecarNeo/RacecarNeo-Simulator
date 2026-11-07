@@ -1,19 +1,12 @@
+using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
-/// Shows the car's 8x24 dot matrix on the HUD as round red LEDs, when Settings.ShowDotMatrix is on.
+/// Draws the car's 8x24 dot matrix as round red LEDs into a texture (Texture), which the HUD shows
+/// when Settings.ShowDotMatrix is on.
 /// </summary>
-public class DotMatrixPanel : MonoBehaviour
+public class DotMatrixPanel : IDisposable
 {
-    #region Set in Unity Editor
-    /// <summary>
-    /// The image the matrix is drawn into.
-    /// </summary>
-    [SerializeField]
-    private RawImage image;
-    #endregion
-
     #region Constants
     /// <summary>
     /// Texture pixels per LED along each axis.
@@ -76,7 +69,7 @@ public class DotMatrixPanel : MonoBehaviour
                 int x0 = column * DotMatrixPanel.cellSize;
                 for (int y = 0; y < DotMatrixPanel.cellSize; y++)
                 {
-                    System.Array.Copy(cell, y * DotMatrixPanel.cellSize, buffer, (y0 + y) * width + x0, DotMatrixPanel.cellSize);
+                    Array.Copy(cell, y * DotMatrixPanel.cellSize, buffer, (y0 + y) * width + x0, DotMatrixPanel.cellSize);
                 }
             }
         }
@@ -85,47 +78,52 @@ public class DotMatrixPanel : MonoBehaviour
     }
     #endregion
 
-    private DotMatrixDisplay display;
+    private readonly DotMatrixDisplay display;
 
     private DotMatrixDisplay.DriveMode driveMode = DotMatrixDisplay.DriveMode.Manual;
 
-    private Texture2D texture;
-
-    private Color32[] texturePixels;
+    private readonly Color32[] texturePixels;
 
     /// <summary>
     /// The frame currently in the texture, or null before the first draw.
     /// </summary>
     private bool[,] shownFrame;
 
-    private void Awake()
+    /// <summary>
+    /// Creates the panel and its texture.
+    /// </summary>
+    /// <param name="showSplash">True to scroll the welcome message now; false when the run has already shown it.</param>
+    public DotMatrixPanel(bool showSplash)
     {
-        this.display = new DotMatrixDisplay(Time.unscaledTime);
-        this.texture = DotMatrixPanel.CreateTexture();
-        this.texturePixels = new Color32[this.texture.width * this.texture.height];
-        this.image.texture = this.texture;
+        this.display = new DotMatrixDisplay(showSplash ? Time.unscaledTime : float.NegativeInfinity);
+        this.Texture = DotMatrixPanel.CreateTexture();
+        this.texturePixels = new Color32[this.Texture.width * this.Texture.height];
     }
 
-    private void Update()
-    {
-        this.image.enabled = Settings.ShowDotMatrix;
-        Racecar car = LevelManager.GetCar(0);
-        if (!this.image.enabled || car == null)
-        {
-            return;
-        }
+    /// <summary>
+    /// The texture the matrix is drawn into.
+    /// </summary>
+    public Texture2D Texture { get; }
 
+    /// <summary>
+    /// Draws the car's current frame when it changed.
+    /// </summary>
+    public void Refresh(Racecar car)
+    {
         bool[,] frame = this.display.Frame(car.Actuators, this.driveMode, Time.unscaledTime);
         if (!DotMatrixPanel.SameFrame(frame, this.shownFrame))
         {
-            DotMatrixPanel.DrawFrame(this.texture, this.texturePixels, frame);
+            DotMatrixPanel.DrawFrame(this.Texture, this.texturePixels, frame);
             this.shownFrame = frame;
         }
     }
 
-    private void OnDestroy()
+    /// <summary>
+    /// Releases the texture.
+    /// </summary>
+    public void Dispose()
     {
-        Destroy(this.texture);
+        UnityEngine.Object.Destroy(this.Texture);
     }
 
     /// <summary>
